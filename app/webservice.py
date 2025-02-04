@@ -48,13 +48,17 @@ if path.exists(assets_path + "/swagger-ui.css") and path.exists(assets_path + "/
 
     applications.get_swagger_ui_html = swagger_monkey_patch
 
+static_path = os.getcwd() + "/static"
+if path.exists(static_path):
+    app.mount("/", StaticFiles(directory=static_path), name="static")
 
-@app.get("/", response_class=RedirectResponse, include_in_schema=False)
-async def index():
-    return "/docs"
+
+# @app.get("/", response_class=RedirectResponse, include_in_schema=False)
+# async def index():
+#     return "/docs"
 
 
-@app.post("/asr", tags=["Endpoints"])
+@app.post("/was/asr", tags=["Endpoints"])
 async def asr(
         audio_file: UploadFile = File(...),  # noqa: B008
         encode: bool = Query(default=True, description="Encode audio first through ffmpeg"),
@@ -84,7 +88,7 @@ async def asr(
     )
 
 
-@app.post("/detect-language", tags=["Endpoints"])
+@app.post("/was/detect-language", tags=["Endpoints"])
 async def detect_language(
         audio_file: UploadFile = File(...),  # noqa: B008
         encode: bool = Query(default=True, description="Encode audio first through FFmpeg"),
