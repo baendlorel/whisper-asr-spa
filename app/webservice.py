@@ -52,8 +52,6 @@ if path.exists(assets_path + "/swagger-ui.css") and path.exists(assets_path + "/
 html_path = os.getcwd() + "/app/html"
 if path.exists(assets_path):
     app.mount("/", StaticFiles(directory=html_path), name="static")
-    app.mount("/was/js", StaticFiles(directory=html_path + "/js"), name="static")
-    app.mount("/was/css", StaticFiles(directory=html_path + "/css"), name="static")
 
 # 定义路由，返回 index.html
 @app.get("/", response_class=RedirectResponse, include_in_schema=False)
