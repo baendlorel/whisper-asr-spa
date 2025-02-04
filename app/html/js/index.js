@@ -12,13 +12,24 @@ const initI18n = () => {
 };
 
 const initFilePreview = () => {
+  /**
+   * @type {HTMLInputElement}
+   */
   const fileInput = document.getElementById('audio_file');
+
+  /**
+   * @type {HTMLVideoElement}
+   */
   const videoPlayer = document.getElementById('video-player');
+
+  /**
+   * @type {HTMLAudioElement}
+   */
   const audioPlayer = document.getElementById('audio-player');
 
-  fileInput.addEventListener('change', function (event) {
+  fileInput.addEventListener('change', () => {
     // 获取用户选择的文件
-    const file = event.target.files[0];
+    const file = fileInput.files && fileInput.files[0];
 
     if (!file) {
       console.log('未选择文件');
@@ -27,6 +38,9 @@ const initFilePreview = () => {
 
     audioPlayer.style.display = 'none';
     videoPlayer.style.display = 'none';
+
+    audioPlayer.pause();
+    videoPlayer.pause();
 
     if (isAudio(file)) {
       audioPlayer.style.display = '';

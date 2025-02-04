@@ -9,9 +9,19 @@ body {
   text-align: center;
 }
 
+.locale,
 .form-wrapper {
   max-width: 400px;
   margin: auto;
+}
+
+.locale label {
+  margin-top: 10px;
+}
+
+.locale input {
+  margin-top: 5px;
+  padding: 8px;
 }
 
 .form-wrapper label {
@@ -29,6 +39,7 @@ body {
 }
 
 .form-wrapper button {
+  margin-top: 5px;
   background-color: #4caf50;
   color: white;
   border: none;

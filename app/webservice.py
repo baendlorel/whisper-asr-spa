@@ -8,7 +8,7 @@ import click
 import uvicorn
 from fastapi import FastAPI, File, Query, UploadFile, applications
 from fastapi.openapi.docs import get_swagger_ui_html
-from fastapi.responses import RedirectResponse, StreamingResponse 
+from fastapi.responses import RedirectResponse, StreamingResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from whisper import tokenizer
 
@@ -54,9 +54,9 @@ if path.exists(assets_path):
     app.mount("/", StaticFiles(directory=html_path), name="static")
 
 # 定义路由，返回 index.html
-@app.get("/", response_class=RedirectResponse, include_in_schema=False)
-async def read_root():
-    return RedirectResponse("/index.html")
+@app.get("/", response_class=FileResponse, include_in_schema=False)
+async def index():
+    return html_path + "/index.html"
 
 # @app.get("/", response_class=RedirectResponse, include_in_schema=False)
 # async def index():

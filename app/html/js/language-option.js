@@ -103,11 +103,6 @@ const initLanguageOption = () => {
   };
 
   const el = document.getElementById('language');
-  const defaultOption = document.createElement('option');
-  defaultOption.value = '';
-  defaultOption.innerHTML = '默认（自动检测）';
-  defaultOption.setAttribute('selected', 'true');
-  el.appendChild(defaultOption);
 
   for (const key of Object.keys(LANGUAGES)) {
     const node = document.createElement('option');
