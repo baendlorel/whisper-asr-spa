@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio File Processing</title>
+  <link rel="stylesheet" href="/was/css/style.css">
+  <script src="/was/js/index.js"></script>
+</head>
+
+<body>
+  <h2>Whisper ASR</h2>
+  <form id="audio-form">
+    <label for="audio_file">音视频文件</label>
+    <input type="file" id="audio_file" name="audio_file" required>
+
+    <label for="output">输出格式</label>
+    <select id="output" name="output">
+      <option value="text" selected>Text</option>
+      <option value="json">JSON</option>
+      <option value="vtt">VTT</option>
+      <option value="srt">SRT</option>
+      <option value="tsv">TSV</option>
+    </select>
+
+    <label for="task">任务</label>
+    <select id="task" name="task">
+      <option value="transcribe" selected>将语音转录为文本/字幕</option>
+      <option value="translate">翻译（只能自动转译为英文）</option>
+    </select>
+
+    <label for="language">语言选择</label>
+    <input type="text" id="language" name="language" value="">
+
+    <label for="word_timestamps">字词级时间戳</label>
+    <select id="word_timestamps" name="word_timestamps">
+      <option value="false" selected>否</option>
+      <option value="true">是</option>
+    </select>
+
+    <label for="encode">用FFMpeg编码音频</label>
+    <radio value="true" name="encode" checked>是</radio>
+    <radio value="false" name="encode">否</radio>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+  </script>
+</body>
+
+</html>

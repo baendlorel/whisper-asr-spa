@@ -8,7 +8,7 @@ import click
 import uvicorn
 from fastapi import FastAPI, File, Query, UploadFile, applications
 from fastapi.openapi.docs import get_swagger_ui_html
-from fastapi.responses import RedirectResponse, StreamingResponse
+from fastapi.responses import RedirectResponse, StreamingResponse 
 from fastapi.staticfiles import StaticFiles
 from whisper import tokenizer
 
@@ -48,15 +48,21 @@ if path.exists(assets_path + "/swagger-ui.css") and path.exists(assets_path + "/
 
     applications.get_swagger_ui_html = swagger_monkey_patch
 
-static_path = os.getcwd() + "/static"
-if path.exists(static_path):
-    app.mount("/", StaticFiles(directory=static_path), name="static")
 
+html_path = os.getcwd() + "/app/html"
+if path.exists(assets_path):
+    app.mount("/", StaticFiles(directory=html_path), name="static")
+    app.mount("/was/js", StaticFiles(directory=html_path + "/js"), name="static")
+    app.mount("/was/css", StaticFiles(directory=html_path + "/css"), name="static")
+
+# 定义路由，返回 index.html
+@app.get("/", response_class=RedirectResponse, include_in_schema=False)
+async def read_root():
+    return RedirectResponse("/index.html")
 
 # @app.get("/", response_class=RedirectResponse, include_in_schema=False)
 # async def index():
 #     return "/docs"
-
 
 @app.post("/was/asr", tags=["Endpoints"])
 async def asr(
