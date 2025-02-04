@@ -3,31 +3,39 @@ body {
   margin: 20px;
 }
 
-form {
+.title {
+  width: 400px;
+  margin: auto;
+  text-align: center;
+}
+
+.form-wrapper {
   max-width: 400px;
   margin: auto;
 }
 
-label {
+.form-wrapper label {
   display: block;
   margin-top: 10px;
 }
 
-input,
-select,
-button {
+.form-wrapper input,
+.form-wrapper select,
+.form-wrapper button {
   width: 100%;
   padding: 8px;
   margin-top: 5px;
+  border-radius: 5px;
 }
 
-button {
+.form-wrapper button {
   background-color: #4caf50;
   color: white;
   border: none;
+  border-radius: 5px;
   cursor: pointer;
 }
 
-button:hover {
+.form-wrapper button:hover {
   background-color: #45a049;
 }

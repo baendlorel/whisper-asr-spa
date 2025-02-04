@@ -5,46 +5,79 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Audio File Processing</title>
-  <link rel="stylesheet" href="/was/css/style.css">
-  <script src="/was/js/index.js"></script>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/i18n.js"></script>
+  <script src="/js/video-audio-manager.js"></script>
+  <script src="/js/language-option.js"></script>
+  <script src="/js/index.js"></script>
 </head>
 
 <body>
-  <h2>Whisper ASR</h2>
-  <form id="audio-form">
-    <label for="audio_file">音视频文件</label>
-    <input type="file" id="audio_file" name="audio_file" required>
+  <h2 class="title">Whisper ASR</h2>
+  <div>
+    <label en="UI Language" zh="界面语言" i18n></label>
+    <input type="radio" id="ui-en" name="ui-language" value="en">
+    <label for="ui-en">
+      English
+    </label>
+    <input type="radio" id="ui-zh" name="ui-language" value="zh" checked>
+    <label for="ui-zh">
+      中文
+    </label>
+  </div>
+  <div class="form-wrapper">
+    <video id="video-player" controls width="100%" style="display: none;"></video>
+    <audio id="audio-player" controls width="100%" style="display: none;"></audio>
 
-    <label for="output">输出格式</label>
-    <select id="output" name="output">
-      <option value="text" selected>Text</option>
-      <option value="json">JSON</option>
-      <option value="vtt">VTT</option>
-      <option value="srt">SRT</option>
-      <option value="tsv">TSV</option>
-    </select>
+    <form id="audio-form">
+      <label for="audio_file">
+        <span en="Audio/Video File" zh="音视频文件" i18n>
+        </span>
+      </label>
+      <input type="file" id="audio_file" name="audio_file" required>
 
-    <label for="task">任务</label>
-    <select id="task" name="task">
-      <option value="transcribe" selected>将语音转录为文本/字幕</option>
-      <option value="translate">翻译（只能自动转译为英文）</option>
-    </select>
+      <label for="output">
+        <span en="Output" zh="输出格式" i18n>
+        </span>
+      </label>
+      <select id="output" name="output">
+        <option value="text" en="Text" zh="文本" i18n></option>
+        <option value="json" en="JSON" zh="JSON" i18n></option>
+        <option value="vtt" en="VTT" zh="VTT字幕" i18n></option>
+        <option value="srt" en="SRT" zh="SRT字幕" i18n selected></option>
+        <option value="tsv" en="TSV" zh="TSV字幕" i18n></option>
+      </select>
 
-    <label for="language">语言选择</label>
-    <input type="text" id="language" name="language" value="">
+      <h4>以下都推荐默认设置</h4>
 
-    <label for="word_timestamps">字词级时间戳</label>
-    <select id="word_timestamps" name="word_timestamps">
-      <option value="false" selected>否</option>
-      <option value="true">是</option>
-    </select>
+      <label for="task">任务</label>
+      <select id="task" name="task">
+        <option value="transcribe" en="Transcribe" zh="将语音转录为文本/字幕" i18n selected></option>
+        <option value="translate" en="Translate" zh="翻译（只能自动转译为英文）" i18n></option>
+      </select>
 
-    <label for="encode">用FFMpeg编码音频</label>
-    <radio value="true" name="encode" checked>是</radio>
-    <radio value="false" name="encode">否</radio>
+      <label for="language">语言选择</label>
+      <select id="language" name="language">
+      </select>
 
-    <button type="submit">Submit</button>
-  </form>
+      <label for="word_timestamps">字词级时间戳</label>
+      <select id="word_timestamps" name="word_timestamps">
+        <option value="false" en="false" zh="否（默认）" i18n></option>
+        <option value="true" en="true" zh="是" i18n></option>
+      </select>
+
+      <label for="encode">用FFMpeg编码音频</label>
+      <select id="encode" name="encode">
+        <option value="true" en="true" zh="是（默认）" i18n selected></option>
+        <option value="false" en="false" zh="否" i18n></option>
+      </select>
+
+    </form>
+
+    <button id="asr">
+      <span en="Execute" zh="执行" i18n></span>
+    </button>
+  </div>
 
   <script>
   </script>
