@@ -6,6 +6,10 @@ const i18n = (function () {
     render(localStorage.getItem(UI_LANGUAGE));
   };
 
+  const getCurrentUILanguage = () => {
+    return localStorage.getItem(UI_LANGUAGE) || DEFAULT_LANGUAGE;
+  };
+
   const render = (languageAttributeName) => {
     languageAttributeName = languageAttributeName || DEFAULT_LANGUAGE;
 
@@ -29,5 +33,5 @@ const i18n = (function () {
     localStorage.setItem(UI_LANGUAGE, languageAttributeName);
   };
 
-  return { init, render };
+  return { init, render, getCurrentUILanguage };
 })();

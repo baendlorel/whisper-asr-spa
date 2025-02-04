@@ -2,11 +2,21 @@ const initI18n = () => {
   // 初始化语言
   i18n.init();
 
+  const currentLanguage = i18n.getCurrentUILanguage();
   const radios = document.querySelectorAll('input[name=ui-language]');
 
   for (let i = 0; i < radios.length; i++) {
-    radios[i].addEventListener('click', () => {
-      i18n.render(radios[i].value);
+    // 设置选中
+    if (r.value === currentLanguage) {
+      r.setAttribute('checked', '');
+    } else {
+      r.removeAttribute('checked');
+    }
+
+    // 监听
+    const r = radios[i];
+    r.addEventListener('click', () => {
+      i18n.render(r.value);
     });
   }
 };
