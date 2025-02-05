@@ -1,7 +1,18 @@
+import { RichElement } from '../types';
 import { h } from '../modules/common';
+import { isAudio, isVideo, play } from '../modules/video-audio-manager';
+import { audioPlayer, videoPlayer } from './players';
+import languageOptions from './language-options';
 
-export default h('div', { class: 'form-wrapper' }).appendChild(
-  h('form', { id: 'audio-form' }).appendChild(
+let fileSelector: RichElement<HTMLButtonElement>;
+let fileInput: RichElement<HTMLInputElement>;
+let fileLabel: RichElement<HTMLLabelElement>;
+
+let audioForm: RichElement<HTMLFormElement>;
+let asr: RichElement<HTMLButtonElement>;
+
+const comp = h('div', { class: 'form-wrapper' }).appendChild(
+  (audioForm = h('form', { id: 'audio-form' }).appendChild(
     h('div', { class: 'basic-options-wrapper' }).appendChild(
       h(
         'label',
@@ -12,21 +23,21 @@ export default h('div', { class: 'form-wrapper' }).appendChild(
         }
       ),
       h('div').appendChild(
-        h(
+        (fileSelector = h(
           'button',
           { id: 'file-selector', type: 'button' },
           {
             zh: '选择文件',
             en: 'Choose File',
           }
-        ),
-        h('label', { id: 'file-label' }),
-        h('input', {
+        )),
+        (fileLabel = h('label', { id: 'file-label' })),
+        (fileInput = h('input', {
           id: 'audio_file',
           type: 'file',
           name: 'audio_file',
           style: 'visibility: hidden;width:0px;height:0px;',
-        })
+        }))
       ),
       h(
         'label',
@@ -67,7 +78,8 @@ export default h('div', { class: 'form-wrapper' }).appendChild(
       h('div', { class: 'col-half' }).appendChild(
         h('label', { for: 'language' }, { zh: '语言选择', en: 'Language' }),
         h('select', { id: 'language', name: 'language' }).appendChild(
-          h('option', { value: 'transcribe', selected: '' }, { zh: '自动检测', en: 'auto detect' })
+          h('option', { value: '', selected: '' }, { zh: '自动检测', en: 'auto detect' }),
+          ...languageOptions
         )
       ),
       h('div', { class: 'col-half' }).appendChild(
@@ -85,6 +97,73 @@ export default h('div', { class: 'form-wrapper' }).appendChild(
         )
       )
     )
-  ),
-  h('button', { id: 'asr', class: 'execute' }, { zh: '执行', en: 'Execute' })
+  )),
+  (asr = h('button', { id: 'asr', class: 'execute' }, { zh: '执行', en: 'Execute' }))
 );
+
+fileSelector.on('click', () => {
+  fileInput.el.click();
+});
+
+fileInput.on('change', () => {
+  const file = fileInput.files && fileInput.files[0];
+
+  if (!file) {
+    console.log('未选择文件');
+    return;
+  }
+
+  // 设置label里的文件名
+  fileLabel.el.textContent = file.name;
+
+  // 预览
+  audioPlayer.el.style.display = 'none';
+  videoPlayer.el.style.display = 'none';
+  audioPlayer.el.pause();
+  videoPlayer.el.pause();
+
+  if (isAudio(file)) {
+    audioPlayer.el.style.display = '';
+    play(file, audioPlayer.el);
+  }
+
+  if (isVideo(file)) {
+    videoPlayer.el.style.display = '';
+    play(file, videoPlayer.el);
+    // getAudioStream(videoPlayer.el);
+  }
+});
+
+asr.on('click', () => {
+  const formData = new FormData(audioForm.el);
+
+  if (formData.get('language') === '') {
+    formData.delete('language');
+  }
+
+  const file = formData.get('audio_file');
+  if (!isAudio(file) && !isVideo(file)) {
+    alert('不是音视频文件');
+    return;
+  }
+
+  formData.forEach((value, key) => {
+    console.log(key, value);
+  });
+
+  fetch('/was/asr', {
+    method: 'POST',
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+      alert('Request sent successfully!');
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+      alert('Error sending request.');
+    });
+});
+
+export default comp;
