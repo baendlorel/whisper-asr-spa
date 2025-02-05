@@ -6,6 +6,8 @@ const initI18n = () => {
   const radios = document.querySelectorAll('input[name=ui-language]');
 
   for (let i = 0; i < radios.length; i++) {
+    const r = radios[i];
+
     // 设置选中
     if (r.value === currentLanguage) {
       r.setAttribute('checked', '');
@@ -14,11 +16,42 @@ const initI18n = () => {
     }
 
     // 监听
-    const r = radios[i];
     r.addEventListener('click', () => {
       i18n.render(r.value);
     });
   }
+};
+
+const initFileSelector = () => {
+  /**
+   * @type {HTMLButtonElement}
+   */
+  const fileSelector = document.getElementById('file-selector');
+
+  /**
+   * @type {HTMLLabelElement}
+   */
+  const fileLabel = document.getElementById('file-label');
+
+  /**
+   * @type {HTMLInputElement}
+   */
+  const fileInput = document.getElementById('audio_file');
+
+  fileSelector.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files && fileInput.files[0];
+
+    if (!file) {
+      console.log('未选择文件');
+      return;
+    }
+
+    fileLabel.textContent = file.name;
+  });
 };
 
 const initFilePreview = () => {
@@ -38,7 +71,6 @@ const initFilePreview = () => {
   const audioPlayer = document.getElementById('audio-player');
 
   fileInput.addEventListener('change', () => {
-    // 获取用户选择的文件
     const file = fileInput.files && fileInput.files[0];
 
     if (!file) {
@@ -101,15 +133,13 @@ const initAsrPoster = () => {
 };
 
 window.onload = () => {
-  // 初始化语言
   initI18n();
 
-  // 挂载超长的语言选择
   initLanguageOption();
 
-  // 监听音视频文件的选择
+  initFileSelector();
+
   initFilePreview();
 
-  // 监听表单
   initAsrPoster();
 };

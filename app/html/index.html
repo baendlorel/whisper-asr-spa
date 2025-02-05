@@ -16,7 +16,7 @@
   <h2 class="title">Whisper ASR</h2>
 
   <div class="locale">
-    <label en="UI Language" zh="界面语言" i18n></label>
+    <!-- <label en="UI Language" zh="界面语言" i18n></label> -->
     <input type="radio" id="ui-en" name="ui-language" value="en">
     <label for="ui-en" class="ui-language">
       English
@@ -34,23 +34,33 @@
 
   <div class="form-wrapper">
     <form id="audio-form">
-      <label for="audio_file">
-        <span en="Audio/Video File" zh="音视频文件" i18n>
-        </span>
-      </label>
-      <input type="file" id="audio_file" name="audio_file" required>
+      <div class="basic-options-wrapper">
+        <label for="audio_file">
+          <span en="Audio/Video" zh="音视频" i18n>
+          </span>
+        </label>
+        <div>
+          <button id="file-selector" type="button">
+            <span en="Choose File" zh="选择文件" i18n></span>
+          </button>
+          <label id="file-label">
 
-      <label for="output">
-        <span en="Output" zh="输出格式" i18n>
-        </span>
-      </label>
-      <select id="output" name="output">
-        <option value="text" en="Text" zh="文本" i18n></option>
-        <option value="json" en="JSON" zh="JSON" i18n></option>
-        <option value="vtt" en="VTT" zh="VTT字幕" i18n></option>
-        <option value="srt" en="SRT" zh="SRT字幕" i18n selected></option>
-        <option value="tsv" en="TSV" zh="TSV字幕" i18n></option>
-      </select>
+          </label>
+          <input type="file" id="audio_file" name="audio_file" style="visibility: hidden;width:0px;height:0px;">
+        </div>
+
+        <label for="output">
+          <span en="Output" zh="输出格式" i18n>
+          </span>
+        </label>
+        <select id="output" name="output">
+          <option value="text" en="Text" zh="文本" i18n></option>
+          <option value="json" en="JSON" zh="JSON" i18n></option>
+          <option value="vtt" en="VTT" zh="VTT字幕" i18n></option>
+          <option value="srt" en="SRT" zh="SRT字幕" i18n selected></option>
+          <option value="tsv" en="TSV" zh="TSV字幕" i18n></option>
+        </select>
+      </div>
 
       <h4>
         <span en="We suggest not to change options below" zh="以下都推荐默认设置" i18n>
@@ -64,8 +74,8 @@
             </span>
           </label>
           <select id="task" name="task">
-            <option value="transcribe" en="Transcribe" zh="将语音转录为文本/字幕" i18n selected></option>
-            <option value="translate" en="Translate" zh="翻译（只能自动转译为英文）" i18n></option>
+            <option value="transcribe" en="transcribe" zh="转录为文本/字幕" i18n selected></option>
+            <option value="translate" en="translate" zh="翻译（仅能译为英文）" i18n></option>
           </select>
         </div>
 
@@ -75,7 +85,19 @@
             </span>
           </label>
           <select id="language" name="language">
-            <option value="" en="Default(auto detect)" zh="默认（自动检测）" i18n selected></option>
+            <option value="" en="auto detect" zh="自动检测" i18n selected></option>
+          </select>
+        </div>
+
+
+        <div class="col-half">
+          <label for="encode">
+            <span en="Encode" zh="编码音频" i18n>
+            </span>
+          </label>
+          <select id="encode" name="encode">
+            <option value="true" en="true" zh="是（默认）" i18n selected></option>
+            <option value="false" en="false" zh="否" i18n></option>
           </select>
         </div>
 
@@ -89,21 +111,10 @@
             <option value="true" en="true" zh="是" i18n></option>
           </select>
         </div>
-
-        <div class="col-half">
-          <label for="encode">
-            <span en="Encode" zh="编码音频" i18n>
-            </span>
-          </label>
-          <select id="encode" name="encode">
-            <option value="true" en="true" zh="是（默认）" i18n selected></option>
-            <option value="false" en="false" zh="否" i18n></option>
-          </select>
-        </div>
       </div>
     </form>
 
-    <button id="asr">
+    <button id="asr" class="execute">
       <span en="Execute" zh="执行" i18n></span>
     </button>
   </div>
