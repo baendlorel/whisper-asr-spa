@@ -20,6 +20,10 @@ button:hover {
   background-color: #45a049;
 }
 
+.logo {
+  margin: 0px 10px;
+}
+
 .title {
   width: 600px;
   margin: auto;

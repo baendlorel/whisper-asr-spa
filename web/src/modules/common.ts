@@ -1,4 +1,5 @@
 import { HTMLElementType, I18NConfig, RichElement, RichElementAttribute, TQuery } from '../types';
+import { i18n } from './i18n';
 
 /**
  * 反向映射
@@ -8,9 +9,14 @@ export const reverseMap = new Map<HTMLElementType, RichElement<HTMLElementType>>
 export const h = <TN extends keyof HTMLElementTagNameMap>(
   tagName: TN,
   attributes?: RichElementAttribute,
-  i18n?: I18NConfig
+  i18nOrTextContent?: I18NConfig | string
 ): RichElement<HTMLElementTagNameMap[TN]> => {
   const element: HTMLElementTagNameMap[TN] = document.createElement<typeof tagName>(tagName);
+
+  if (typeof i18nOrTextContent === 'string') {
+    element.textContent = i18nOrTextContent;
+    i18nOrTextContent = undefined;
+  }
 
   // 注册CSS类
   if (attributes) {
@@ -40,34 +46,9 @@ export const h = <TN extends keyof HTMLElementTagNameMap>(
     }
   }
 
-  const richElement: RichElement<HTMLElementTagNameMap[TN]> = {
-    el: element,
-    i18n,
-    on: element.addEventListener,
-    appendChild: (...richEls: RichElement<HTMLElementType>[]) => {
-      for (const r of richEls) {
-        richElement.el.appendChild(r.el);
-      }
-      return richElement;
-    },
-    set value(v: string) {
-      (element as any).value = v;
-    },
-    get value() {
-      return (element as any).value;
-    },
-    get files() {
-      if (!(element instanceof HTMLInputElement)) {
-        return null;
-      }
+  const richElement = new RichElement<HTMLElementTagNameMap[TN]>(element, i18nOrTextContent);
 
-      if (element.files === null || element.files.length === 0) {
-        return null;
-      }
-
-      return element.files;
-    },
-  };
+  i18n.render(richElement);
 
   reverseMap.set(element, richElement);
 
@@ -75,5 +56,7 @@ export const h = <TN extends keyof HTMLElementTagNameMap>(
 };
 
 export const $: TQuery = Object.assign((selectors: keyof HTMLElementTagNameMap) => {
-  return document.querySelectorAll(selectors);
+  return [...document.querySelectorAll(selectors)].map(
+    (e) => reverseMap.get(e) || new RichElement(e)
+  );
 });

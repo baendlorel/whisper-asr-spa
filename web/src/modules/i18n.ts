@@ -1,51 +1,72 @@
-import { HTMLElementType, LanguageType, LanguageTypes } from '../types';
-import { reverseMap } from './common';
+import { HTMLElementType, LanguageType, LanguageTypes, RichElement } from '../types';
 
-const UI_LANGUAGE = 'UI_LANGUAGE';
-const DEFAULT_LANGUAGE: LanguageType = 'zh';
+// const rerender = (node: ChildNode | HTMLElementType, newText: string) => {
+//   for (const localeText of Object.keys(i18n)) {
+//     if (node.textContent === localeText) {
+//       node.textContent = newText;
+//       return;
+//     }
+//   }
+// };
 
-const init = () => {
-  const lang = getCurrentUILanguage();
-  render(lang);
-};
+// const render = (lang: LanguageType = DEFAULT_LANGUAGE) => {
+//   reverseMap.forEach(({ i18n }, element) => {
+//     if (i18n === undefined) {
+//       return;
+//     }
+//     const childs = element.childNodes;
+//     if (childs.length === 0) {
+//       rerender(element, i18n[lang]);
+//     } else {
+//       for (let j = 0; j < childs.length; j++) {
+//         rerender(childs[j], i18n[lang]);
+//       }
+//     }
+//   });
+// };
 
-const getCurrentUILanguage = (): LanguageType => {
-  let lang = localStorage.getItem(UI_LANGUAGE) as LanguageType;
-  if (!LanguageTypes.includes(lang)) {
-    lang = DEFAULT_LANGUAGE;
+class I18N {
+  static readonly UI_LANGUAGE = 'UI_LANGUAGE';
+  static readonly DEFAULT_LANGUAGE: LanguageType = 'zh';
+
+  private reverseMap: Map<HTMLElementType, RichElement<HTMLElementType>>;
+
+  constructor() {
+    this.reverseMap = new Map();
   }
-  return lang;
-};
 
-const setCurrentUILanguage = (lang: LanguageType) => {
-  localStorage.setItem(UI_LANGUAGE, lang);
-  render(lang);
-};
+  get locale() {
+    let lang = localStorage.getItem(I18N.UI_LANGUAGE) as LanguageType;
+    if (!LanguageTypes.includes(lang)) {
+      lang = I18N.DEFAULT_LANGUAGE;
+    }
+    return lang;
+  }
 
-const rerender = (node: ChildNode | HTMLElementType, newText: string) => {
-  for (const localeText of Object.keys(i18n)) {
-    if (node.textContent === localeText) {
-      node.textContent = newText;
+  set locale(lang: LanguageType) {
+    localStorage.setItem(I18N.UI_LANGUAGE, lang);
+    this.renderAll();
+  }
+
+  public setReverseMap(r: Map<HTMLElementType, RichElement<HTMLElementType>>) {
+    this.reverseMap = r;
+  }
+
+  public init() {
+    this.renderAll();
+  }
+
+  public render(r: RichElement<HTMLElementType>, locale?: LanguageType) {
+    if (r.i18n === undefined) {
       return;
     }
+    r.el.textContent = r.i18n[locale || this.locale];
   }
-};
 
-const render = (lang: LanguageType = DEFAULT_LANGUAGE) => {
-  reverseMap.forEach(({ i18n }, element) => {
-    if (i18n === undefined) {
-      return;
-    }
+  public renderAll() {
+    const lang = this.locale;
+    this.reverseMap.forEach((r) => this.render(r, lang));
+  }
+}
 
-    const childs = element.childNodes;
-    if (childs.length === 0) {
-      rerender(element, i18n[lang]);
-    } else {
-      for (let j = 0; j < childs.length; j++) {
-        rerender(childs[j], i18n[lang]);
-      }
-    }
-  });
-};
-
-export const i18n = { init, setCurrentUILanguage };
+export const i18n = new I18N();

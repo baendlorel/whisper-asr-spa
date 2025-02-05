@@ -6,18 +6,51 @@ export type I18NConfig = { [key in LanguageType]: string };
 
 export type HTMLElementType = HTMLElementTagNameMap[keyof HTMLElementTagNameMap];
 
-export type RichElement<T extends HTMLElementType> = {
-  readonly files: FileList | null;
+export class RichElement<T extends HTMLElementType> {
   el: T;
   i18n?: I18NConfig;
-  value: string;
-  appendChild: (...richEls: RichElement<HTMLElementType>[]) => RichElement<T>;
-  on: <K extends keyof HTMLElementEventMap>(
+
+  constructor(el: T, i18n?: I18NConfig) {
+    this.el = el;
+    this.i18n = i18n;
+  }
+
+  set value(v: string) {
+    (this.el as HTMLInputElement).value = v;
+  }
+
+  get value() {
+    return (this.el as HTMLInputElement).value;
+  }
+
+  get files(): FileList | null {
+    if (!(this.el instanceof HTMLInputElement)) {
+      return null;
+    }
+
+    if (this.el.files === null || this.el.files.length === 0) {
+      return null;
+    }
+
+    return this.el.files;
+  }
+
+  public appendChild(...richEls: RichElement<HTMLElementType>[]): RichElement<T> {
+    for (const r of richEls) {
+      this.el.appendChild(r.el);
+    }
+    return this;
+  }
+
+  public on<K extends keyof HTMLElementEventMap>(
     type: K,
     listener: EventListenerOrEventListenerObject,
     options?: boolean | AddEventListenerOptions
-  ) => void;
-};
+  ) {
+    this.el.addEventListener(type, listener, options);
+    return this;
+  }
+}
 
 export type RichElementAttribute = {
   [k: string]: any;
@@ -25,12 +58,18 @@ export type RichElementAttribute = {
   style?: string | { [k: string]: string };
 };
 
-export type CreateElementFunction = <T extends keyof HTMLElementTagNameMap>(
-  tagName: T,
-  attributes?: RichElementAttribute,
-  i18n?: I18NConfig
-) => RichElement<HTMLElementTagNameMap[T]>;
+export class TQueryResult extends Array {
+  private on<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions
+  ) {
+    this.forEach((richEl) => {
+      richEl.on(type, listener, options);
+    });
+  }
+}
 
 export type TQuery = {
-  (selectors: keyof HTMLElementTagNameMap): NodeListOf<HTMLElementType>;
+  (selectors: keyof HTMLElementTagNameMap | string): RichElement<HTMLElementType>[];
 };
