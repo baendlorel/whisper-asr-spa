@@ -1,41 +1,79 @@
-import { HTMLElementType, I18nElement } from '../types';
+import { HTMLElementType, I18NConfig, RichElement, RichElementAttribute, TQuery } from '../types';
 
 /**
  * 反向映射
  */
-const reverseMap = new Map<HTMLElementType, I18nElement<HTMLElementType>>();
+export const reverseMap = new Map<HTMLElementType, RichElement<HTMLElementType>>();
 
-const h = function <T extends keyof HTMLElementTagNameMap>(
-  tagName: T,
-  attributes: { [key: string]: string } | null | undefined,
-  i18n: {
-    en: '';
-    zh: '';
-  }
-) {
-  const element: HTMLElementTagNameMap[T] = document.createElement<typeof tagName>(tagName);
+export const h = <TN extends keyof HTMLElementTagNameMap>(
+  tagName: TN,
+  attributes?: RichElementAttribute,
+  i18n?: I18NConfig
+): RichElement<HTMLElementTagNameMap[TN]> => {
+  const element: HTMLElementTagNameMap[TN] = document.createElement<typeof tagName>(tagName);
 
+  // 注册CSS类
   if (attributes) {
+    if (attributes.class) {
+      if (Array.isArray(attributes.class)) {
+        element.classList.add(...attributes.class);
+      } else {
+        element.className = attributes.class;
+      }
+      delete attributes.class;
+    }
+
+    // 注册样式
+    if (attributes.style) {
+      if (typeof attributes.style === 'string') {
+        element.setAttribute('style', attributes.style);
+      } else {
+        for (const prop of Object.keys(attributes.style)) {
+          (element.style as any)[prop] = attributes.style[prop];
+        }
+      }
+      delete attributes.style;
+    }
+
     for (const key of Object.keys(attributes)) {
       element.setAttribute(key, attributes[key]);
     }
   }
 
-  const i18nElement: I18nElement<HTMLElementTagNameMap[T]> = {
-    element,
+  const richElement: RichElement<HTMLElementTagNameMap[TN]> = {
+    el: element,
     i18n,
-    render: () => {},
+    on: element.addEventListener,
+    appendChild: (...richEls: RichElement<HTMLElementType>[]) => {
+      for (const r of richEls) {
+        richElement.el.appendChild(r.el);
+      }
+      return richElement;
+    },
+    set value(v: string) {
+      (element as any).value = v;
+    },
+    get value() {
+      return (element as any).value;
+    },
+    get files() {
+      if (!(element instanceof HTMLInputElement)) {
+        return null;
+      }
+
+      if (element.files === null || element.files.length === 0) {
+        return null;
+      }
+
+      return element.files;
+    },
   };
 
-  reverseMap.set(element, i18nElement);
+  reverseMap.set(element, richElement);
 
-  return i18nElement;
+  return richElement;
 };
 
-const $ = (selectors: keyof HTMLElementTagNameMap) => {
+export const $: TQuery = Object.assign((selectors: keyof HTMLElementTagNameMap) => {
   return document.querySelectorAll(selectors);
-};
-
-Object.defineProperty($, 'h', { value: h });
-
-export { $ };
+});
