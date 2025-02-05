@@ -52,18 +52,14 @@ class I18N {
     this.reverseMap = r;
   }
 
-  public init() {
-    this.renderAll();
-  }
-
-  public render(r: RichElement<HTMLElementType>, locale?: LanguageType) {
+  private render(r: RichElement<HTMLElementType>, locale?: LanguageType) {
     if (r.i18n === undefined) {
       return;
     }
     r.el.textContent = r.i18n[locale || this.locale];
   }
 
-  public renderAll() {
+  private renderAll() {
     const lang = this.locale;
     this.reverseMap.forEach((r) => this.render(r, lang));
   }

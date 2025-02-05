@@ -19,7 +19,7 @@ const comp = h('div', { class: 'form-wrapper' }).appendChild(
         { for: 'audio_file' },
         {
           zh: '音视频',
-          en: 'Audio/Video',
+          en: 'Media',
         }
       ),
       h('div').appendChild(
@@ -31,12 +31,12 @@ const comp = h('div', { class: 'form-wrapper' }).appendChild(
             en: 'Choose File',
           }
         )),
-        (fileLabel = h('label', { id: 'file-label' })),
+        (fileLabel = h('label', { id: 'file-label', style: 'margin-left: 5px' })),
         (fileInput = h('input', {
           id: 'audio_file',
           type: 'file',
           name: 'audio_file',
-          style: 'visibility: hidden;width:0px;height:0px;',
+          style: 'display: none; width:0px; height:0px;',
         }))
       ),
       h(

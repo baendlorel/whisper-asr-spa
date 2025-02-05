@@ -8,8 +8,9 @@ label {
 }
 
 button {
-  padding: 12px 20px;
-  background-color: #4caf50;
+  padding: 8px 20px;
+  /* background-color: #4caf50; */
+  background-color: #3876c6;
   color: white;
   border: none;
   border-radius: 5px;
@@ -17,7 +18,8 @@ button {
 }
 
 button:hover {
-  background-color: #45a049;
+  /* background-color: #45a049; */
+  background-color: #1a5db5;
 }
 
 .logo {
@@ -50,13 +52,14 @@ button:hover {
 
 .form-wrapper button.execute {
   margin-top: 15px;
+  padding: 15px 20px;
   width: 100%;
 }
 
 .basic-options-wrapper {
   display: grid;
   grid-template-columns: 100px 1fr;
-  grid-column-gap: 20px;
+  grid-column-gap: 5px;
   grid-row-gap: 10px;
 }
 

@@ -1,10 +1,14 @@
 import { i18n } from './modules/i18n';
-import { reverseMap } from './modules/common';
+import { h, reverseMap } from './modules/common';
 import './css/style.css';
 import typescriptLogo from './assets/typescript.svg';
 import app from './app';
 
 i18n.setReverseMap(reverseMap);
+
+document.head.appendChild(
+  h('link', { rel: 'icon', type: 'image/svg+xml', href: typescriptLogo }).el
+);
 
 document.body.appendChild(app.el);
 
