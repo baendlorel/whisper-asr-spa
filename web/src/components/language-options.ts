@@ -1,5 +1,5 @@
 import { h } from '../modules/common';
-import { RichElement } from '../types';
+import { YukaElement } from '../types';
 
 const LANGUAGES = {
   en: 'english',
@@ -104,7 +104,7 @@ const LANGUAGES = {
   yue: 'cantonese',
 };
 
-const options: RichElement<HTMLOptionElement>[] = [];
+const options: YukaElement<HTMLOptionElement>[] = [];
 for (const key of Object.keys(LANGUAGES)) {
   options.push(h('option', { value: key }, (LANGUAGES as any)[key]));
 }

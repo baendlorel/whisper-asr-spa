@@ -1,8 +1,8 @@
 import { h } from '../modules/common';
-import { RichElement } from '../types';
+import { YukaElement } from '../types';
 
-let videoPlayer: RichElement<HTMLVideoElement>;
-let audioPlayer: RichElement<HTMLAudioElement>;
+let videoPlayer: YukaElement<HTMLVideoElement>;
+let audioPlayer: YukaElement<HTMLAudioElement>;
 
 export default h('div', { class: 'player-wrapper' }).appendChild(
   (videoPlayer = h('video', {

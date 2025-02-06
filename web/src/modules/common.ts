@@ -1,16 +1,22 @@
-import { HTMLElementType, I18NConfig, RichElement, RichElementAttribute, TQuery } from '../types';
+import { HTMLElementType, I18NConfig, YukaElement, YukaElementAttribute, TQuery } from '../types';
 import { i18n } from './i18n';
+
+export const $: TQuery = Object.assign((selectors: keyof HTMLElementTagNameMap) => {
+  return [...document.querySelectorAll(selectors)].map(
+    (e) => reverseMap.get(e) || new YukaElement(e)
+  );
+});
 
 /**
  * 反向映射
  */
-export const reverseMap = new Map<HTMLElementType, RichElement<HTMLElementType>>();
+export const reverseMap = new Map<HTMLElementType, YukaElement<HTMLElementType>>();
 
 export const h = <TN extends keyof HTMLElementTagNameMap>(
   tagName: TN,
-  attributes?: RichElementAttribute,
+  attributes?: YukaElementAttribute | string | string[],
   i18nOrTextContent?: I18NConfig | string
-): RichElement<HTMLElementTagNameMap[TN]> => {
+): YukaElement<HTMLElementTagNameMap[TN]> => {
   const element: HTMLElementTagNameMap[TN] = document.createElement<typeof tagName>(tagName);
 
   if (typeof i18nOrTextContent === 'string') {
@@ -20,6 +26,10 @@ export const h = <TN extends keyof HTMLElementTagNameMap>(
 
   // 注册CSS类
   if (attributes) {
+    if (typeof attributes === 'string' || Array.isArray(attributes)) {
+      attributes = { class: attributes };
+    }
+
     if (attributes.class) {
       if (Array.isArray(attributes.class)) {
         element.classList.add(...attributes.class);
@@ -35,7 +45,7 @@ export const h = <TN extends keyof HTMLElementTagNameMap>(
         element.setAttribute('style', attributes.style);
       } else {
         for (const prop of Object.keys(attributes.style)) {
-          (element.style as any)[prop] = attributes.style[prop];
+          (element.style as any)[prop] = attributes.style[prop as any];
         }
       }
       delete attributes.style;
@@ -46,17 +56,25 @@ export const h = <TN extends keyof HTMLElementTagNameMap>(
     }
   }
 
-  const richElement = new RichElement<HTMLElementTagNameMap[TN]>(element, i18nOrTextContent);
+  const yukaElement = new YukaElement<HTMLElementTagNameMap[TN]>(element, i18nOrTextContent);
 
-  i18n.render(richElement);
+  i18n.render(yukaElement);
 
-  reverseMap.set(element, richElement);
+  reverseMap.set(element, yukaElement);
 
-  return richElement;
+  return yukaElement;
 };
 
-export const $: TQuery = Object.assign((selectors: keyof HTMLElementTagNameMap) => {
-  return [...document.querySelectorAll(selectors)].map(
-    (e) => reverseMap.get(e) || new RichElement(e)
+export const css = (selector: keyof HTMLElementTagNameMap | string, style: CSSStyleDeclaration) => {
+  const c = new Proxy(
+    {},
+    {
+      get(target, p) {},
+      apply() {},
+    }
   );
-});
+
+  return css;
+};
+
+document.createElement('div').style;

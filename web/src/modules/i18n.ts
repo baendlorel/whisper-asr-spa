@@ -1,4 +1,4 @@
-import { HTMLElementType, LanguageType, LanguageTypes, RichElement } from '../types';
+import { HTMLElementType, LanguageType, LanguageTypes, YukaElement } from '../types';
 
 // const rerender = (node: ChildNode | HTMLElementType, newText: string) => {
 //   for (const localeText of Object.keys(i18n)) {
@@ -29,7 +29,7 @@ class I18N {
   static readonly UI_LANGUAGE = 'UI_LANGUAGE';
   static readonly DEFAULT_LANGUAGE: LanguageType = 'zh';
 
-  private reverseMap: Map<HTMLElementType, RichElement<HTMLElementType>>;
+  private reverseMap: Map<HTMLElementType, YukaElement<HTMLElementType>>;
 
   constructor() {
     this.reverseMap = new Map();
@@ -48,11 +48,11 @@ class I18N {
     this.renderAll();
   }
 
-  public setReverseMap(r: Map<HTMLElementType, RichElement<HTMLElementType>>) {
+  public setReverseMap(r: Map<HTMLElementType, YukaElement<HTMLElementType>>) {
     this.reverseMap = r;
   }
 
-  private render(r: RichElement<HTMLElementType>, locale?: LanguageType) {
+  public render(r: YukaElement<HTMLElementType>, locale?: LanguageType) {
     if (r.i18n === undefined) {
       return;
     }

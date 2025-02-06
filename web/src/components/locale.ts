@@ -1,9 +1,9 @@
-import { RichElement } from '../types';
+import { YukaElement } from '../types';
 import { h } from '../modules/common';
 import { i18n } from '../modules/i18n';
 
-let radioZh: RichElement<HTMLInputElement>;
-let radioEn: RichElement<HTMLInputElement>;
+let radioZh: YukaElement<HTMLInputElement>;
+let radioEn: YukaElement<HTMLInputElement>;
 
 const comp = h('div', { class: 'locale' }).appendChild(
   (radioZh = h('input', {

@@ -1,19 +1,24 @@
-import { RichElement } from '../types';
+import { YukaElement } from '../types';
 import { h } from '../modules/common';
-import { isAudio, isVideo, play } from '../modules/video-audio-manager';
+import { isAudio, isVideo, loadAudioBuffer, play } from '../modules/video-audio-manager';
 import { audioPlayer, videoPlayer } from './players';
 import languageOptions from './language-options';
+import { audioBufferToWav } from '../modules/audio-buffer-to-wav';
+import progressBar from './progress-bar';
 
-let fileSelector: RichElement<HTMLButtonElement>;
-let fileInput: RichElement<HTMLInputElement>;
-let fileLabel: RichElement<HTMLLabelElement>;
+const { component: progressBarComponent, setProgress } = progressBar();
 
-let audioForm: RichElement<HTMLFormElement>;
-let asr: RichElement<HTMLButtonElement>;
+let fileSelector: YukaElement<HTMLButtonElement>;
+let fileInput: YukaElement<HTMLInputElement>;
+let fileLabel: YukaElement<HTMLLabelElement>;
 
-const comp = h('div', { class: 'form-wrapper' }).appendChild(
+let audioForm: YukaElement<HTMLFormElement>;
+let asr: YukaElement<HTMLButtonElement>;
+
+const comp = h('div', 'form-wrapper').appendChild(
+  progressBarComponent,
   (audioForm = h('form', { id: 'audio-form' }).appendChild(
-    h('div', { class: 'basic-options-wrapper' }).appendChild(
+    h('div', 'basic-options-wrapper').appendChild(
       h(
         'label',
         { for: 'audio_file' },
@@ -56,8 +61,8 @@ const comp = h('div', { class: 'form-wrapper' }).appendChild(
       )
     ),
     h('h4', undefined, { zh: '以下都推荐默认设置', en: 'We suggest not to change options below' }),
-    h('div', { class: 'advanced-options-wrapper' }).appendChild(
-      h('div', { class: 'col-half' }).appendChild(
+    h('div', 'advanced-options-wrapper').appendChild(
+      h('div', 'col-half').appendChild(
         h(
           'label',
           { for: 'task' },
@@ -75,21 +80,21 @@ const comp = h('div', { class: 'form-wrapper' }).appendChild(
           h('option', { value: 'translate' }, { zh: '翻译（仅能译为英文）', en: 'translate' })
         )
       ),
-      h('div', { class: 'col-half' }).appendChild(
+      h('div', 'col-half').appendChild(
         h('label', { for: 'language' }, { zh: '语言选择', en: 'Language' }),
         h('select', { id: 'language', name: 'language' }).appendChild(
           h('option', { value: '', selected: '' }, { zh: '自动检测', en: 'auto detect' }),
           ...languageOptions
         )
       ),
-      h('div', { class: 'col-half' }).appendChild(
+      h('div', 'col-half').appendChild(
         h('label', { for: 'encode' }, { zh: '编码音频', en: 'Encode' }),
         h('select', { id: 'encode', name: 'encode' }).appendChild(
           h('option', { value: 'true', selected: '' }, { zh: '是（默认）', en: 'true' }),
           h('option', { value: 'false' }, { zh: '否', en: 'false' })
         )
       ),
-      h('div', { class: 'col-half' }).appendChild(
+      h('div', 'col-half').appendChild(
         h('label', { for: 'word_timestamps' }, { zh: '字词级时间戳', en: 'Word Timestamps' }),
         h('select', { id: 'word_timestamps', name: 'word_timestamps' }).appendChild(
           h('option', { value: 'true' }, { zh: '是', en: 'true' }),
@@ -130,7 +135,14 @@ fileInput.on('change', () => {
   if (isVideo(file)) {
     videoPlayer.el.style.display = '';
     play(file, videoPlayer.el);
-    // getAudioStream(videoPlayer.el);
+    loadAudioBuffer(file).then((ab) => {
+      const wav = audioBufferToWav(ab, setProgress);
+      console.log(wav);
+
+      //  (percent) => {
+      //    requestAnimationFrame(() => setProgress(percent));
+      //  };
+    });
   }
 });
 
@@ -165,5 +177,7 @@ asr.on('click', () => {
       alert('Error sending request.');
     });
 });
+
+console.log(comp);
 
 export default comp;

@@ -1,4 +1,5 @@
 export const isVideo = (file: any) => file instanceof File && file.type.includes('video');
+
 export const isAudio = (file: any) => file instanceof File && file.type.includes('audio');
 
 export const play = (file: File, player: HTMLMediaElement) => {
@@ -13,10 +14,6 @@ export const play = (file: File, player: HTMLMediaElement) => {
   player.play();
 };
 
-/**
- *
- * @param {HTMLVideoElement} videoPlayer
- */
 const getAudioStream = (videoPlayer) => {
   const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -44,3 +41,29 @@ const getAudioStream = (videoPlayer) => {
 
   console.log({ buffer, blob, file });
 };
+
+export const loadAudioBuffer = async (file: File): Promise<AudioBuffer> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const arrayBuffer = event.target && event.target.result;
+      if (arrayBuffer === null) {
+        console.log(event);
+        reject('LoadFile arrayBuffer is empty');
+        return;
+      }
+      if (typeof arrayBuffer === 'string') {
+        console.log(event);
+        reject('LoadFile arrayBuffer is string');
+        return;
+      }
+
+      const audioCtx = new AudioContext();
+      audioCtx.decodeAudioData(arrayBuffer, (audioBuffer) => {
+        console.log('audioBuffer', audioBuffer);
+        resolve(audioBuffer);
+      });
+    };
+    reader.readAsArrayBuffer(file);
+  });

@@ -5,20 +5,20 @@ body {
 
 label {
   padding-top: 5px;
+  font-size: 15px;
 }
 
 button {
   padding: 8px 20px;
-  /* background-color: #4caf50; */
   background-color: var(--primary);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: var(--border-radius);
   cursor: pointer;
+  font-size: 15px;
 }
 
 button:hover {
-  /* background-color: #45a049; */
   background-color: var(--primary-hover);
 }
 
@@ -47,13 +47,34 @@ button:hover {
 .form-wrapper select {
   width: 100%;
   padding: 8px;
-  border-radius: 5px;
+  border-radius: var(--border-radius);
 }
 
 .form-wrapper button.execute {
   margin-top: 15px;
   padding: 15px 20px;
   width: 100%;
+}
+
+.progress-wrapper {
+  margin: 10px 0px;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.progress-bar {
+  --progress-height: 30px;
+  width: 100px;
+  height: 30px;
+  text-align: right;
+  border-radius: var(--border-radius);
+  background-color: var(--primary);
+  color: white;
+  overflow: hidden;
+}
+
+.progress-label {
+  line-height: var(--progress-height);
 }
 
 .basic-options-wrapper {

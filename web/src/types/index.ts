@@ -6,11 +6,15 @@ export type I18NConfig = { [key in LanguageType]: string };
 
 export type HTMLElementType = HTMLElementTagNameMap[keyof HTMLElementTagNameMap];
 
-export class RichElement<T extends HTMLElementType> {
+const uidSymbol = Symbol('uid');
+export class YukaElement<T extends HTMLElementType> {
+  static [uidSymbol]: number = 0;
+  uid: number;
   el: T;
   i18n?: I18NConfig;
 
   constructor(el: T, i18n?: I18NConfig) {
+    this.uid = ++YukaElement[uidSymbol];
     this.el = el;
     this.i18n = i18n;
   }
@@ -35,14 +39,14 @@ export class RichElement<T extends HTMLElementType> {
     return this.el.files;
   }
 
-  public appendChild(...richEls: RichElement<HTMLElementType>[]): RichElement<T> {
-    for (const r of richEls) {
+  appendChild(...yukaEls: YukaElement<HTMLElementType>[]): YukaElement<T> {
+    for (const r of yukaEls) {
       this.el.appendChild(r.el);
     }
     return this;
   }
 
-  public on<K extends keyof HTMLElementEventMap>(
+  on<K extends keyof HTMLElementEventMap>(
     type: K,
     listener: EventListenerOrEventListenerObject,
     options?: boolean | AddEventListenerOptions
@@ -52,24 +56,14 @@ export class RichElement<T extends HTMLElementType> {
   }
 }
 
-export type RichElementAttribute = {
+export type YukaElementAttribute = {
   [k: string]: any;
   class?: string | string[];
-  style?: string | { [k: string]: string };
+  style?: string | CSSStyleDeclaration;
+  scopedCss?: { [k: string]: string };
 };
 
-export class TQueryResult extends Array {
-  private on<K extends keyof HTMLElementEventMap>(
-    type: K,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
-  ) {
-    this.forEach((richEl) => {
-      richEl.on(type, listener, options);
-    });
-  }
-}
-
-export type TQuery = {
-  (selectors: keyof HTMLElementTagNameMap | string): RichElement<HTMLElementType>[];
-};
+export type YukaCssCreator = (
+  selector: keyof HTMLElementTagNameMap | string,
+  style: CSSStyleDeclaration
+) => YukaCssCreator;
