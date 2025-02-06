@@ -2,10 +2,10 @@ import { YukaElement } from '../types';
 import { css, h } from '../modules/common';
 import { i18n } from '../modules/i18n';
 
-css('.locale ', {
-  marginTop: '10px',
-  textAlign: 'center',
-});
+css(`.locale{
+  margin: 15px 0px;
+  text-align: center;
+}`);
 
 let radioZh: YukaElement<HTMLInputElement>;
 let radioEn: YukaElement<HTMLInputElement>;

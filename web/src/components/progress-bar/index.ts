@@ -1,13 +1,15 @@
 import { YukaElement } from '../../types';
-import { css, h } from '../../modules/common';
+import { css, genScopeName, h } from '../../modules/common';
 import style from './style.css?raw';
 
-css(style);
+const sn = genScopeName();
+
+css(style, sn);
 
 export default () => {
   let progressBar: YukaElement<HTMLDivElement>;
 
-  const component = h('div', 'progress-wrapper').appendChild(
+  const component = h('div', 'progress-wrapper', undefined, sn).appendChild(
     (progressBar = h('div', 'progress-bar'))
   );
 

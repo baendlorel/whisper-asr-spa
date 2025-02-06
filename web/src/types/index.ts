@@ -11,12 +11,14 @@ export class YukaElement<T extends HTMLElementType> {
   static [uidSymbol]: number = 0;
   uid: number;
   el: T;
+  scopeName?: string;
   i18n?: I18NConfig;
 
-  constructor(el: T, i18n?: I18NConfig) {
+  constructor(el: T, i18n?: I18NConfig, scopeName?: string) {
     this.uid = ++YukaElement[uidSymbol];
     this.el = el;
     this.i18n = i18n;
+    this.scopeName = scopeName;
   }
 
   get isYuka() {
@@ -57,9 +59,19 @@ export class YukaElement<T extends HTMLElementType> {
     return this.el.style;
   }
 
+  scopeSpread(scopeName?: string) {
+    // 已有scope就不用改了
+    if (this.scopeName || scopeName === undefined) {
+      return;
+    }
+    this.scopeName = scopeName;
+    this.el.setAttribute(scopeName, '');
+  }
+
   appendChild(...yukaEls: YukaElement<HTMLElementType>[]): YukaElement<T> {
     for (const r of yukaEls) {
       this.el.appendChild(r.el);
+      r.scopeSpread(this.scopeName);
     }
     return this;
   }

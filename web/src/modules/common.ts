@@ -16,7 +16,7 @@ export const h = <TN extends keyof HTMLElementTagNameMap>(
   tagName: TN,
   attributes?: YukaElementAttribute | string | string[],
   i18nOrTextContent?: I18NConfig | string,
-  scopeSymbol?: string
+  scopeName?: string
 ): YukaElement<HTMLElementTagNameMap[TN]> => {
   const element: HTMLElementTagNameMap[TN] = document.createElement<typeof tagName>(tagName);
 
@@ -57,7 +57,15 @@ export const h = <TN extends keyof HTMLElementTagNameMap>(
     }
   }
 
-  const yukaElement = new YukaElement<HTMLElementTagNameMap[TN]>(element, i18nOrTextContent);
+  if (scopeName !== undefined) {
+    element.setAttribute(scopeName, '');
+  }
+
+  const yukaElement = new YukaElement<HTMLElementTagNameMap[TN]>(
+    element,
+    i18nOrTextContent,
+    scopeName
+  );
 
   i18n.render(yukaElement);
 
@@ -82,9 +90,22 @@ let cssString: string[] = [];
 //   return css;
 // };
 
-export const css = (cssText: string, scopeSymbol?: string) => {
-  cssString.push(cssText);
+export const css = (cssText: string, scopeName?: string) => {
+  const c =
+    scopeName === undefined
+      ? cssText
+      : cssText
+          .replace(/[\s]+\,/g, ',')
+          .replace(/[\s]+\{/g, '{')
+          .replace(/\,/g, `[${scopeName}],`)
+          .replace(/\{/g, `[${scopeName}]{`);
+  cssString.push(c);
   return css;
+};
+
+const DIC = 'abcdefhijkmnprstwxyz';
+export const genScopeName = () => {
+  return 'yuka-bbbbbbb'.replace(/bbbbbbb/g, () => DIC[Math.floor(Math.random() * DIC.length)]);
 };
 
 export const applyCss = () => {
