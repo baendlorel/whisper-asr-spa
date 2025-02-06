@@ -10,7 +10,7 @@ label {
 button {
   padding: 8px 20px;
   /* background-color: #4caf50; */
-  background-color: #3876c6;
+  background-color: var(--primary);
   color: white;
   border: none;
   border-radius: 5px;
@@ -19,7 +19,7 @@ button {
 
 button:hover {
   /* background-color: #45a049; */
-  background-color: #1a5db5;
+  background-color: var(--primary-hover);
 }
 
 .logo {
