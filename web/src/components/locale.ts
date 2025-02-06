@@ -1,11 +1,16 @@
 import { YukaElement } from '../types';
-import { h } from '../modules/common';
+import { css, h } from '../modules/common';
 import { i18n } from '../modules/i18n';
+
+css('.locale ', {
+  marginTop: '10px',
+  textAlign: 'center',
+});
 
 let radioZh: YukaElement<HTMLInputElement>;
 let radioEn: YukaElement<HTMLInputElement>;
 
-const comp = h('div', { class: 'locale' }).appendChild(
+const comp = h('div', 'locale').appendChild(
   (radioZh = h('input', {
     type: 'radio',
     id: 'ui-zh',

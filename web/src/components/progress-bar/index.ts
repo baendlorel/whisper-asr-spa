@@ -1,14 +1,14 @@
-import { YukaElement } from '../types';
-import { h } from '../modules/common';
+import { YukaElement } from '../../types';
+import { css, h } from '../../modules/common';
+import style from './style.css?raw';
+
+css(style);
 
 export default () => {
   let progressBar: YukaElement<HTMLDivElement>;
-  let progressLabel: YukaElement<HTMLLabelElement>;
 
   const component = h('div', 'progress-wrapper').appendChild(
-    (progressBar = h('div', 'progress-bar')).appendChild(
-      (progressLabel = h('label', { class: 'progress-label' }, '0%'))
-    )
+    (progressBar = h('div', 'progress-bar'))
   );
 
   /**
@@ -17,8 +17,7 @@ export default () => {
    */
   const setProgress = (percent: number) => {
     const p = (percent * 100).toFixed(2) + '%';
-    progressBar.el.style.width = p;
-    progressLabel.el.textContent = p;
+    progressBar.style.width = p;
   };
 
   return {

@@ -6,14 +6,14 @@ import './css/ds-select.css';
 
 // 引入模块
 import { i18n } from './modules/i18n';
-import { h, reverseMap } from './modules/common';
+import { applyCss, h, reverseMap } from './modules/common';
 import typescriptLogo from './assets/typescript.svg';
 import app from './app';
 
 i18n.setReverseMap(reverseMap);
 
-document.head.appendChild(
-  h('link', { rel: 'icon', type: 'image/svg+xml', href: typescriptLogo }).el
-);
+h('link', { rel: 'icon', type: 'image/svg+xml', href: typescriptLogo }).mount(document.head);
 
-document.body.appendChild(app.el);
+app.mount(document.body);
+
+applyCss();

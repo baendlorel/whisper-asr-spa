@@ -1,11 +1,11 @@
-import { HTMLElementType, I18NConfig, YukaElement, YukaElementAttribute, TQuery } from '../types';
+import { HTMLElementType, I18NConfig, YukaElement, YukaElementAttribute } from '../types';
 import { i18n } from './i18n';
 
-export const $: TQuery = Object.assign((selectors: keyof HTMLElementTagNameMap) => {
-  return [...document.querySelectorAll(selectors)].map(
-    (e) => reverseMap.get(e) || new YukaElement(e)
-  );
-});
+// export const $: TQuery = Object.assign((selectors: keyof HTMLElementTagNameMap) => {
+//   return [...document.querySelectorAll(selectors)].map(
+//     (e) => reverseMap.get(e) || new YukaElement(e)
+//   );
+// });
 
 /**
  * 反向映射
@@ -15,7 +15,8 @@ export const reverseMap = new Map<HTMLElementType, YukaElement<HTMLElementType>>
 export const h = <TN extends keyof HTMLElementTagNameMap>(
   tagName: TN,
   attributes?: YukaElementAttribute | string | string[],
-  i18nOrTextContent?: I18NConfig | string
+  i18nOrTextContent?: I18NConfig | string,
+  scopeSymbol?: string
 ): YukaElement<HTMLElementTagNameMap[TN]> => {
   const element: HTMLElementTagNameMap[TN] = document.createElement<typeof tagName>(tagName);
 
@@ -44,8 +45,8 @@ export const h = <TN extends keyof HTMLElementTagNameMap>(
       if (typeof attributes.style === 'string') {
         element.setAttribute('style', attributes.style);
       } else {
-        for (const prop of Object.keys(attributes.style)) {
-          (element.style as any)[prop] = attributes.style[prop as any];
+        for (const [prop, style] of Object.entries(attributes.style)) {
+          (element.style as any)[prop] = style;
         }
       }
       delete attributes.style;
@@ -65,16 +66,29 @@ export const h = <TN extends keyof HTMLElementTagNameMap>(
   return yukaElement;
 };
 
-export const css = (selector: keyof HTMLElementTagNameMap | string, style: CSSStyleDeclaration) => {
-  const c = new Proxy(
-    {},
-    {
-      get(target, p) {},
-      apply() {},
-    }
-  );
+let cssString: string[] = [];
 
+// export const css: YukaCssCreator = (
+//   selector: keyof HTMLElementTagNameMap | string,
+//   style: Partial<CSSStyleDeclaration>
+// ) => {
+//   let str = '';
+
+//   for (const [prop, s] of Object.entries(style)) {
+//     str += `${prop.replace(/[A-Z]/g, (a) => '-' + a.toLowerCase())}:${s};`;
+//   }
+
+//   cssString.push(`${selector}{${str}}`);
+//   return css;
+// };
+
+export const css = (cssText: string, scopeSymbol?: string) => {
+  cssString.push(cssText);
   return css;
+};
+
+export const applyCss = () => {
+  document.body.append(h('style', { yuka: 'saikou' }, cssString.join(' ')).el);
 };
 
 document.createElement('div').style;

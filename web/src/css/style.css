@@ -32,66 +32,7 @@ button:hover {
   text-align: center;
 }
 
-.locale,
-.form-wrapper,
-.player-wrapper {
+.container {
   max-width: 600px;
-  margin: 10px auto;
-}
-
-.locale {
-  text-align: center;
-}
-
-.form-wrapper input,
-.form-wrapper select {
-  width: 100%;
-  padding: 8px;
-  border-radius: var(--border-radius);
-}
-
-.form-wrapper button.execute {
-  margin-top: 15px;
-  padding: 15px 20px;
-  width: 100%;
-}
-
-.progress-wrapper {
-  margin: 10px 0px;
-  display: grid;
-  grid-template-columns: 1fr;
-}
-
-.progress-bar {
-  --progress-height: 30px;
-  width: 100px;
-  height: 30px;
-  text-align: right;
-  border-radius: var(--border-radius);
-  background-color: var(--primary);
-  color: white;
-  overflow: hidden;
-}
-
-.progress-label {
-  line-height: var(--progress-height);
-}
-
-.basic-options-wrapper {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-  grid-column-gap: 5px;
-  grid-row-gap: 10px;
-}
-
-.advanced-options-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-column-gap: 20px;
-  grid-row-gap: 10px;
-}
-.advanced-options-wrapper .col-half {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-  grid-column-gap: 5px;
+  margin: 0px auto;
 }

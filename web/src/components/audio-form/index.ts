@@ -1,10 +1,34 @@
-import { YukaElement } from '../types';
-import { h } from '../modules/common';
-import { isAudio, isVideo, loadAudioBuffer, play } from '../modules/video-audio-manager';
-import { audioPlayer, videoPlayer } from './players';
-import languageOptions from './language-options';
-import { audioBufferToWav } from '../modules/audio-buffer-to-wav';
-import progressBar from './progress-bar';
+import { YukaElement } from '../../types';
+import { css, h } from '../../modules/common';
+import { isAudio, isVideo, loadAudioBuffer, play } from '../../modules/video-audio-manager';
+import { audioPlayer, videoPlayer } from '../players';
+import languageOptions from '../language-options';
+import { audioBufferToWav } from '../../modules/audio-buffer-to-wav';
+import progressBar from '../progress-bar';
+
+css('.form-wrapper input,.form-wrapper select', {
+  width: '100%',
+  padding: '8px',
+  borderRadius: 'var(--border-radius)',
+})('.form-wrapper button.execute', {
+  marginTop: '15px',
+  padding: '15px 20px',
+  width: '100%',
+})('.basic-options-wrapper', {
+  display: 'grid',
+  gridTemplateColumns: '100px 1fr',
+  columnGap: '5px',
+  rowGap: '10px',
+})('.advanced-options-wrapper', {
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  columnGap: '10px',
+  rowGap: '10px',
+})('.advanced-options-wrapper .col-half', {
+  display: 'grid',
+  gridTemplateColumns: '100px 1fr',
+  columnGap: '5px',
+});
 
 const { component: progressBarComponent, setProgress } = progressBar();
 
