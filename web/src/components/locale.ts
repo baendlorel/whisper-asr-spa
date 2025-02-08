@@ -1,6 +1,6 @@
-import { YukaElement } from '../types';
-import { css, h } from '../modules/common';
-import { i18n } from '../modules/i18n';
+import { YukaElement } from '../yuka/types';
+import { css, h } from '../yuka';
+import { i18n } from '../yuka/i18n';
 
 css(`.locale{
   margin: 15px 0px;

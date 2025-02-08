@@ -1,5 +1,5 @@
-import { YukaElement } from '../../types';
-import { css, h } from '../../modules/common';
+import { YukaElement } from '../../yuka/types';
+import { css, h } from '../../yuka';
 import { isAudio, isVideo, loadAudioBuffer, play } from '../../modules/video-audio-manager';
 import { audioPlayer, videoPlayer } from '../players';
 import languageOptions from '../language-options';

@@ -1,5 +1,5 @@
-import { h } from '../modules/common';
-import { YukaElement } from '../types';
+import { h } from '../yuka';
+import { YukaElement } from '../yuka/types';
 
 const LANGUAGES = {
   en: 'english',

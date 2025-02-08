@@ -1,12 +1,7 @@
-export const LanguageTypes = ['zh', 'en'] as const;
-
-export type LanguageType = (typeof LanguageTypes)[number];
-
-export type I18NConfig = { [key in LanguageType]: string };
-
-export type HTMLElementType = HTMLElementTagNameMap[keyof HTMLElementTagNameMap];
+import { HTMLElementType, I18NConfig } from './types';
 
 const uidSymbol = Symbol('uid');
+
 export class YukaElement<T extends HTMLElementType> {
   static [uidSymbol]: number = 0;
   uid: number;
@@ -87,6 +82,10 @@ export class YukaElement<T extends HTMLElementType> {
     return this;
   }
 
+  mount(element: YukaElement<HTMLElementType>): void;
+
+  mount(element: HTMLElement): void;
+
   mount(element: YukaElement<HTMLElementType> | HTMLElement) {
     if (element instanceof YukaElement) {
       element.appendChild(this);
@@ -100,10 +99,4 @@ export type YukaElementAttribute = {
   [k: string]: any;
   class?: string | string[];
   style?: string | Partial<CSSStyleDeclaration>;
-  scopedCss?: { [k: string]: string };
 };
-
-export type YukaCssCreator = (
-  selector: keyof HTMLElementTagNameMap | string,
-  style: Partial<CSSStyleDeclaration> | { [key: string]: string }
-) => YukaCssCreator;

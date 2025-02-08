@@ -1,5 +1,5 @@
-import { YukaElement } from '../../types';
-import { css, genScopeName, h } from '../../modules/common';
+import { YukaElement } from '../../yuka/types';
+import { css, genScopeName, h } from '../../yuka';
 import style from './style.css?raw';
 
 const sn = genScopeName();

@@ -1,4 +1,4 @@
-import { h } from './modules/common';
+import { h } from './yuka';
 import locale from './components/locale';
 import players from './components/players';
 import audioForm from './components/audio-form';

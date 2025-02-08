@@ -1,4 +1,5 @@
-import { HTMLElementType, LanguageType, LanguageTypes, YukaElement } from '../types';
+import { HTMLElementType, LanguageType, LanguageTypes } from './types';
+import { YukaElement } from './yuka-element.class';
 
 // const rerender = (node: ChildNode | HTMLElementType, newText: string) => {
 //   for (const localeText of Object.keys(i18n)) {
