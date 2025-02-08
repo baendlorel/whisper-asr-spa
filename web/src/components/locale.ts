@@ -1,14 +1,13 @@
-import { YukaElement } from '../yuka/types';
-import { css, h } from '../yuka';
-import { i18n } from '../yuka/i18n';
+import { h, css, Yuka } from '@/yuka';
+import { i18n } from '@/yuka/i18n';
 
 css(`.locale{
   margin: 15px 0px;
   text-align: center;
 }`);
 
-let radioZh: YukaElement<HTMLInputElement>;
-let radioEn: YukaElement<HTMLInputElement>;
+let radioZh: Yuka<HTMLInputElement>;
+let radioEn: Yuka<HTMLInputElement>;
 
 const comp = h('div', 'locale').appendChild(
   (radioZh = h('input', {

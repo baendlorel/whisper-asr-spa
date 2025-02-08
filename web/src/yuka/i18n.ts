@@ -1,5 +1,5 @@
 import { HTMLElementType, LanguageType, LanguageTypes } from './types';
-import { YukaElement } from './yuka-element.class';
+import { Yuka } from './yuka.class';
 
 // const rerender = (node: ChildNode | HTMLElementType, newText: string) => {
 //   for (const localeText of Object.keys(i18n)) {
@@ -26,44 +26,37 @@ import { YukaElement } from './yuka-element.class';
 //   });
 // };
 
-class I18N {
-  static readonly UI_LANGUAGE = 'UI_LANGUAGE';
-  static readonly DEFAULT_LANGUAGE: LanguageType = 'zh';
+export const i18n = {
+  get UI_LANGUAGE() {
+    return 'UI_LANGUAGE';
+  },
 
-  private reverseMap: Map<HTMLElementType, YukaElement<HTMLElementType>>;
-
-  constructor() {
-    this.reverseMap = new Map();
-  }
+  get DEFAULT_LANGUAGE() {
+    return 'zh' as LanguageType;
+  },
 
   get locale() {
-    let lang = localStorage.getItem(I18N.UI_LANGUAGE) as LanguageType;
+    let lang = localStorage.getItem(i18n.UI_LANGUAGE) as LanguageType;
     if (!LanguageTypes.includes(lang)) {
-      lang = I18N.DEFAULT_LANGUAGE;
+      lang = i18n.DEFAULT_LANGUAGE;
     }
     return lang;
-  }
+  },
 
   set locale(lang: LanguageType) {
-    localStorage.setItem(I18N.UI_LANGUAGE, lang);
-    this.renderAll();
-  }
+    localStorage.setItem(i18n.UI_LANGUAGE, lang);
+    i18n.renderAll();
+  },
 
-  public setReverseMap(r: Map<HTMLElementType, YukaElement<HTMLElementType>>) {
-    this.reverseMap = r;
-  }
-
-  public render(r: YukaElement<HTMLElementType>, locale?: LanguageType) {
+  render(r: Yuka<HTMLElementType>, locale?: LanguageType) {
     if (r.i18n === undefined) {
       return;
     }
     r.el.textContent = r.i18n[locale || this.locale];
-  }
+  },
 
-  private renderAll() {
-    const lang = this.locale;
-    this.reverseMap.forEach((r) => this.render(r, lang));
-  }
-}
-
-export const i18n = new I18N();
+  renderAll() {
+    const lang = i18n.locale;
+    Yuka.reverseMap.forEach((r) => i18n.render(r, lang));
+  },
+};

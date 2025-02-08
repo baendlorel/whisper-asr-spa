@@ -1,8 +1,7 @@
-import { h } from '../yuka';
-import { YukaElement } from '../yuka/types';
+import { h, Yuka } from '@/yuka';
 
-let videoPlayer: YukaElement<HTMLVideoElement>;
-let audioPlayer: YukaElement<HTMLAudioElement>;
+let videoPlayer: Yuka<HTMLVideoElement>;
+let audioPlayer: Yuka<HTMLAudioElement>;
 
 export default h('div', { class: 'player-wrapper' }).appendChild(
   (videoPlayer = h('video', {

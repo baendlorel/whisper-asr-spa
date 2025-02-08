@@ -1,19 +1,21 @@
 import { HTMLElementType, I18NConfig } from './types';
 
 const uidSymbol = Symbol('uid');
-
-export class YukaElement<T extends HTMLElementType> {
+export class Yuka<T extends HTMLElementType> {
+  static readonly reverseMap: Map<HTMLElementType, Yuka<HTMLElementType>> = new Map();
   static [uidSymbol]: number = 0;
+
   uid: number;
   el: T;
   scopeName?: string;
   i18n?: I18NConfig;
 
   constructor(el: T, i18n?: I18NConfig, scopeName?: string) {
-    this.uid = ++YukaElement[uidSymbol];
+    this.uid = ++Yuka[uidSymbol];
     this.el = el;
     this.i18n = i18n;
     this.scopeName = scopeName;
+    Yuka.reverseMap.set(this.el, this);
   }
 
   get isYuka() {
@@ -54,19 +56,19 @@ export class YukaElement<T extends HTMLElementType> {
     return this.el.style;
   }
 
-  scopeSpread(scopeName?: string) {
-    // 已有scope就不用改了
-    if (this.scopeName || scopeName === undefined) {
-      return;
-    }
-    this.scopeName = scopeName;
-    this.el.setAttribute(scopeName, '');
-  }
+  // scopeSpread(scopeName?: string) {
+  //   // 已有scope就不用改了
+  //   if (this.scopeName || scopeName === undefined) {
+  //     return;
+  //   }
+  //   this.scopeName = scopeName;
+  //   this.el.setAttribute(scopeName, '');
+  // }
 
-  appendChild(...yukaEls: YukaElement<HTMLElementType>[]): YukaElement<T> {
+  appendChild(...yukaEls: Yuka<HTMLElementType>[]): Yuka<T> {
     for (const r of yukaEls) {
       this.el.appendChild(r.el);
-      r.scopeSpread(this.scopeName);
+      // r.scopeSpread(this.scopeName);
     }
     return this;
   }
@@ -82,12 +84,12 @@ export class YukaElement<T extends HTMLElementType> {
     return this;
   }
 
-  mount(element: YukaElement<HTMLElementType>): void;
+  mount(element: Yuka<HTMLElementType>): void;
 
-  mount(element: HTMLElement): void;
+  mount(yukaElement: HTMLElement): void;
 
-  mount(element: YukaElement<HTMLElementType> | HTMLElement) {
-    if (element instanceof YukaElement) {
+  mount(element: Yuka<HTMLElementType> | HTMLElement) {
+    if (element instanceof Yuka) {
       element.appendChild(this);
     } else {
       element.appendChild(this.el);
@@ -95,8 +97,16 @@ export class YukaElement<T extends HTMLElementType> {
   }
 }
 
-export type YukaElementAttribute = {
+export type YukaAttribute = {
   [k: string]: any;
+  id?: string;
+  for?: string;
+  name?: string;
+  value?: string;
+  min?: string;
+  max?: string;
+  selected?: string;
+  checked?: string;
   class?: string | string[];
   style?: string | Partial<CSSStyleDeclaration>;
 };

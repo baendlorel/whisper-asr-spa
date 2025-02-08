@@ -1,22 +1,21 @@
-import { YukaElement } from '../../yuka/types';
-import { css, h } from '../../yuka';
-import { isAudio, isVideo, loadAudioBuffer, play } from '../../modules/video-audio-manager';
+import { css, h, Yuka } from '@/yuka';
+import { isAudio, isVideo, loadAudioBuffer, play } from '@/modules/video-audio-manager';
+import { audioBufferToWav } from '@/modules/audio-buffer-to-wav';
 import { audioPlayer, videoPlayer } from '../players';
-import languageOptions from '../language-options';
-import { audioBufferToWav } from '../../modules/audio-buffer-to-wav';
 import progressBar from '../progress-bar';
+import languageSelector from '../language-selector';
 import style from './style.css?raw';
 
 css(style);
 
 const { component: progressBarComponent, setProgress } = progressBar();
 
-let fileSelector: YukaElement<HTMLButtonElement>;
-let fileInput: YukaElement<HTMLInputElement>;
-let fileLabel: YukaElement<HTMLLabelElement>;
+let fileSelector: Yuka<HTMLButtonElement>;
+let fileInput: Yuka<HTMLInputElement>;
+let fileLabel: Yuka<HTMLLabelElement>;
 
-let audioForm: YukaElement<HTMLFormElement>;
-let asr: YukaElement<HTMLButtonElement>;
+let audioForm: Yuka<HTMLFormElement>;
+let asr: Yuka<HTMLButtonElement>;
 
 const comp = h('div', 'form-wrapper').appendChild(
   progressBarComponent,
@@ -85,10 +84,7 @@ const comp = h('div', 'form-wrapper').appendChild(
       ),
       h('div', 'col-half').appendChild(
         h('label', { for: 'language' }, { zh: '语言选择', en: 'Language' }),
-        h('select', { id: 'language', name: 'language' }).appendChild(
-          h('option', { value: '', selected: '' }, { zh: '自动检测', en: 'auto detect' }),
-          ...languageOptions
-        )
+        languageSelector
       ),
       h('div', 'col-half').appendChild(
         h('label', { for: 'encode' }, { zh: '编码音频', en: 'Encode' }),
