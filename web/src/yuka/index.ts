@@ -19,7 +19,7 @@ function css(cssText: string) {
  * @param i18n 国际化的元素内容
  */
 
-export function h<TN extends keyof HTMLElementTagNameMap>(
+function h<TN extends keyof HTMLElementTagNameMap>(
   tagName: TN,
   attributes?: YukaAttribute,
   i18n?: I18NConfig
@@ -31,7 +31,7 @@ export function h<TN extends keyof HTMLElementTagNameMap>(
  * @param attributes 元素属性值
  * @param textContent 元素文本内容
  */
-export function h<TN extends keyof HTMLElementTagNameMap>(
+function h<TN extends keyof HTMLElementTagNameMap>(
   tagName: TN,
   attributes?: YukaAttribute,
   textContent?: string
@@ -43,7 +43,7 @@ export function h<TN extends keyof HTMLElementTagNameMap>(
  * @param classes 元素的类名或类名列表
  * @param i18n 国际化的元素内容
  */
-export function h<TN extends keyof HTMLElementTagNameMap>(
+function h<TN extends keyof HTMLElementTagNameMap>(
   tagName: TN,
   classes?: string[] | string,
   i18n?: I18NConfig
@@ -55,13 +55,13 @@ export function h<TN extends keyof HTMLElementTagNameMap>(
  * @param classes 元素的类名或类名列表
  * @param textContent 元素文本内容
  */
-export function h<TN extends keyof HTMLElementTagNameMap>(
+function h<TN extends keyof HTMLElementTagNameMap>(
   tagName: TN,
   classes?: string[] | string,
   textContent?: string
 ): Yuka<HTMLElementTagNameMap[TN]>;
 
-export function h<TN extends keyof HTMLElementTagNameMap>(
+function h<TN extends keyof HTMLElementTagNameMap>(
   tagName: TN,
   attributes?: YukaAttribute | string,
   content?: I18NConfig | string
@@ -69,18 +69,33 @@ export function h<TN extends keyof HTMLElementTagNameMap>(
   return _h(tagName, attributes, content);
 }
 
-const useScope = () => {
-  const scopeName = 'yuka-bbbbbbb'.replace(/b/g, () =>
-    String.fromCharCode(97 + Math.floor(Math.random() * 26))
-  );
-
-  return {
-    css: (cssText: string) => _css(cssText, scopeName),
-    h: (a, b, c) => _h(a, b, c, scopeName),
-  } as {
-    css: typeof css;
-    h: typeof h;
-  };
+type YukaCreator = {
+  css: typeof css;
+  h: typeof h;
 };
 
-export { css, applyCss, useScope, Yuka };
+const yc: YukaCreator = {
+  css: (cssText: string) => _css(cssText),
+  h: (a, b, c) => _h(a, b, c),
+};
+
+/**
+ * 使用h和css函数
+ * @param scoped 默认为true
+ * @returns
+ */
+function useYuka(scoped: boolean = true) {
+  if (scoped) {
+    const scopeName = 'yuka-bbbbbbb'.replace(/b/g, () =>
+      String.fromCharCode(97 + Math.floor(Math.random() * 26))
+    );
+    return {
+      css: (cssText: string) => _css(cssText, scopeName),
+      h: (a, b, c) => _h(a, b, c, scopeName),
+    } as YukaCreator;
+  } else {
+    return yc;
+  }
+}
+
+export { applyCss, useYuka, Yuka };

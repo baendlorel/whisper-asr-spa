@@ -1,10 +1,12 @@
-import { css, h, Yuka } from '@/yuka';
+import { useYuka, Yuka } from '@/yuka';
 import { isAudio, isVideo, loadAudioBuffer, play } from '@/modules/video-audio-manager';
 import { audioBufferToWav } from '@/modules/audio-buffer-to-wav';
 import { audioPlayer, videoPlayer } from '../players';
 import progressBar from '../progress-bar';
 import languageSelector from '../language-selector';
 import style from './style.css?raw';
+
+const { css, h } = useYuka();
 
 css(style);
 

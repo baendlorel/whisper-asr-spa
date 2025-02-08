@@ -1,20 +1,38 @@
-import { HTMLElementType, I18NConfig } from './types';
+import { HTMLElementType, I18NConfig, LanguageType } from './types';
 
 const uidSymbol = Symbol('uid');
 export class Yuka<T extends HTMLElementType> {
   static readonly reverseMap: Map<HTMLElementType, Yuka<HTMLElementType>> = new Map();
   static [uidSymbol]: number = 0;
 
-  uid: number;
-  el: T;
-  scopeName?: string;
-  i18n?: I18NConfig;
+  readonly uid: number;
+  readonly el: T;
+  readonly i18n?: I18NConfig;
 
-  constructor(el: T, i18n?: I18NConfig, scopeName?: string) {
+  constructor(el: T, i18n?: I18NConfig) {
     this.uid = ++Yuka[uidSymbol];
     this.el = el;
-    this.i18n = i18n;
-    this.scopeName = scopeName;
+
+    if (i18n) {
+      this.i18n = {} as I18NConfig;
+      for (const [key, value] of Object.entries(i18n)) {
+        const s = Symbol(key);
+        Object.defineProperty(this.i18n, s, { value });
+        Object.defineProperty(this.i18n, key, {
+          get() {
+            return (this.i18n as any)[s];
+          },
+          set(newValue) {
+            (this.i18n as any)[s] = newValue;
+          },
+        });
+      }
+      // this.i18n = {}
+    } else {
+      this.i18n = undefined;
+    }
+
+    console.log('i18n', this.i18n);
     Yuka.reverseMap.set(this.el, this);
   }
 
@@ -56,19 +74,9 @@ export class Yuka<T extends HTMLElementType> {
     return this.el.style;
   }
 
-  // scopeSpread(scopeName?: string) {
-  //   // 已有scope就不用改了
-  //   if (this.scopeName || scopeName === undefined) {
-  //     return;
-  //   }
-  //   this.scopeName = scopeName;
-  //   this.el.setAttribute(scopeName, '');
-  // }
-
   appendChild(...yukaEls: Yuka<HTMLElementType>[]): Yuka<T> {
     for (const r of yukaEls) {
       this.el.appendChild(r.el);
-      // r.scopeSpread(this.scopeName);
     }
     return this;
   }
@@ -85,9 +93,7 @@ export class Yuka<T extends HTMLElementType> {
   }
 
   mount(element: Yuka<HTMLElementType>): void;
-
   mount(yukaElement: HTMLElement): void;
-
   mount(element: Yuka<HTMLElementType> | HTMLElement) {
     if (element instanceof Yuka) {
       element.appendChild(this);

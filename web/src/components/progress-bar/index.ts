@@ -1,8 +1,8 @@
 import { Yuka } from '@/yuka';
-import { useScope } from '@/yuka';
+import { useYuka } from '@/yuka';
 import style from './style.css?raw';
 
-const { h, css } = useScope();
+const { h, css } = useYuka();
 
 css(style);
 

@@ -51,7 +51,7 @@ export function _h<TN extends keyof HTMLElementTagNameMap>(
     element.setAttribute(scopeName, '');
   }
 
-  const yukaElement = new Yuka<HTMLElementTagNameMap[TN]>(element, content, scopeName);
+  const yukaElement = new Yuka<HTMLElementTagNameMap[TN]>(element, content);
 
   i18n.render(yukaElement);
 
