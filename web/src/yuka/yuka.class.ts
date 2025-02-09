@@ -110,6 +110,11 @@ export class Yuka<T extends HTMLElementType> {
     return this;
   }
 
+  remove() {
+    // 此处的remove已经重写过了，会递归调用并删除reverseMap里的内容
+    this.el.remove();
+  }
+
   //#endregion
 
   on<K extends keyof HTMLElementEventMap>(
