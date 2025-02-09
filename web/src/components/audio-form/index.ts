@@ -1,16 +1,16 @@
 import { useYuka, Yuka } from '@/yuka';
-import { isAudio, isVideo, loadAudioBuffer, play } from '@/modules/video-audio-manager';
-import { audioBufferToWav } from '@/modules/audio-buffer-to-wav';
+import { isAudio, isVideo, loadAudioBuffer, play } from '@/media-handler/video-audio-manager';
+import { audioBufferToWav } from '@/media-handler/audio-buffer-to-wav';
 import { audioPlayer, videoPlayer } from '../players';
 import progressBar from '../progress-bar';
-import languageSelector from '../language-selector';
+import { languageOptions } from './language-options';
 import style from './style.css?raw';
 
 const { css, h } = useYuka();
 
 css(style);
 
-const { component: progressBarComponent, setProgress } = progressBar();
+const { component: progressBarComponent, setProgress, setLabel } = progressBar();
 
 let fileSelector: Yuka<HTMLButtonElement>;
 let fileInput: Yuka<HTMLInputElement>;
@@ -86,7 +86,10 @@ const comp = h('div', 'form-wrapper').appendChild(
       ),
       h('div', 'col-half').appendChild(
         h('label', { for: 'language' }, { zh: '语言选择', en: 'Language' }),
-        languageSelector
+        h('select', { id: 'language', name: 'language' }).appendChild(
+          h('option', { value: '', selected: '' }, { zh: '自动检测', en: 'auto detect' }),
+          ...languageOptions.map((o) => h('option', { value: o.value }, o.label))
+        )
       ),
       h('div', 'col-half').appendChild(
         h('label', { for: 'encode' }, { zh: '编码音频', en: 'Encode' }),
@@ -107,9 +110,14 @@ const comp = h('div', 'form-wrapper').appendChild(
   (asr = h('button', { id: 'asr', class: 'execute' }, { zh: '执行', en: 'Execute' }))
 );
 
+setLabel({ zh: '正在提取音频', en: 'Extracting Audio' });
+
 fileSelector.on('click', () => {
   fileInput.el.click();
 });
+
+let isConvertingToAudioFile = false;
+let audioFile: File | null = null;
 
 fileInput.on('change', () => {
   const file = fileInput.files && fileInput.files[0];
@@ -130,32 +138,38 @@ fileInput.on('change', () => {
 
   if (isAudio(file)) {
     audioPlayer.el.style.display = '';
+    audioFile = file;
     play(file, audioPlayer.el);
   }
 
   if (isVideo(file)) {
     videoPlayer.el.style.display = '';
     play(file, videoPlayer.el);
-    loadAudioBuffer(file).then((ab) => {
-      const wav = audioBufferToWav(ab, setProgress);
-      console.log(wav);
-
-      //  (percent) => {
-      //    requestAnimationFrame(() => setProgress(percent));
-      //  };
-    });
+    isConvertingToAudioFile = true;
+    setProgress(0.001);
+    loadAudioBuffer(file)
+      .then((ab) => audioBufferToWav(ab, setProgress))
+      .then((file) => {
+        audioFile = file;
+        isConvertingToAudioFile = false;
+      });
   }
 });
 
 asr.on('click', () => {
+  if (isConvertingToAudioFile) {
+    alert('Still converting! Please try again later.');
+    return;
+  }
+
   const formData = new FormData(audioForm.el);
 
   if (formData.get('language') === '') {
     formData.delete('language');
   }
 
-  const file = formData.get('audio_file');
-  if (!isAudio(file) && !isVideo(file)) {
+  formData.set('audio_file', audioFile as Blob);
+  if (!isAudio(audioFile)) {
     alert('不是音视频文件');
     return;
   }
@@ -179,6 +193,7 @@ asr.on('click', () => {
     });
 });
 
-console.log(comp);
+console.log('audioform comp', comp);
+console.log('asr', asr);
 
 export default comp;

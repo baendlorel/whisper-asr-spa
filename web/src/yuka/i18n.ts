@@ -1,4 +1,4 @@
-import { LanguageType, LanguageTypes } from './types';
+import { I18NConfig, LanguageType, LanguageTypes } from './types';
 
 // const rerender = (node: ChildNode | HTMLElementType, newText: string) => {
 //   for (const localeText of Object.keys(i18n)) {
@@ -43,5 +43,17 @@ export const i18n = {
 
   set locale(lang: LanguageType) {
     localStorage.setItem(i18n.UI_LANGUAGE, lang);
+  },
+
+  isValidConfig(i18nConfig: I18NConfig) {
+    if (i18nConfig === null || typeof i18nConfig !== 'object') {
+      return false;
+    }
+    for (const key of LanguageTypes) {
+      if (typeof i18nConfig[key] !== 'string') {
+        return false;
+      }
+    }
+    return true;
   },
 };

@@ -8,6 +8,14 @@ export default defineConfig({
       include: [
         /\.[tj]sx?$/, // .ts, .tsx, .js, .jsx
       ],
+      imports: [
+        {
+          './src/yuka': [
+            ['Yuka', 'Yuka'],
+            ['useYuka', 'useYuka'],
+          ],
+        },
+      ],
     }),
   ],
   resolve: {

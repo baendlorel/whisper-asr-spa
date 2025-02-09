@@ -1,7 +1,9 @@
 import { i18n } from './i18n';
-import { HTMLElementType, I18NConfig } from './types';
+import { HTMLElementType, I18NConfig, LanguageTypes } from './types';
 
 const uidSymbol = Symbol('uid');
+const i18nSymbol = Symbol('i18n');
+
 export class Yuka<T extends HTMLElementType> {
   static readonly reverseMap: Map<HTMLElementType, Yuka<HTMLElementType>> = new Map();
   static [uidSymbol]: number = 0;
@@ -12,34 +14,24 @@ export class Yuka<T extends HTMLElementType> {
 
   readonly uid: number;
   readonly el: T;
-  readonly i18n?: I18NConfig;
+  [i18nSymbol]?: I18NConfig;
 
-  constructor(el: T, i18n?: I18NConfig) {
+  constructor(el: T, i18nConfig?: I18NConfig) {
+    if (el instanceof HTMLElement === false) {
+      throw new Error('[Yuka:Yuka.constructor] el is not an HTMLElement');
+    }
+    if (i18nConfig !== undefined && !i18n.isValidConfig(i18nConfig)) {
+      throw new Error('[Yuka:Yuka.constructor] i18nConfig not valid');
+    }
+
     this.uid = ++Yuka[uidSymbol];
     this.el = el;
 
-    if (i18n) {
-      // 必须先这样，不能直接this.i18n={}否则会undefined
-      const i18nConfig = {} as I18NConfig;
-      // 直接使用会有this指向错误
-      const thisArg = this;
-
-      for (const [key, value] of Object.entries(i18n)) {
-        const s = Symbol(key);
-        Object.defineProperty(i18nConfig, s, { value, writable: true });
-        Object.defineProperty(i18nConfig, key, {
-          get() {
-            return Reflect.get(i18nConfig, s);
-          },
-          set(newValue) {
-            Reflect.set(i18nConfig, s, newValue);
-            thisArg.applyLocale();
-          },
-        });
-      }
-      this.i18n = i18nConfig;
+    if (i18nConfig) {
+      this[i18nSymbol] = i18nConfig;
+      this.applyLocale();
     } else {
-      this.i18n = undefined;
+      this[i18nSymbol] = undefined;
     }
 
     this.applyLocale();
@@ -48,6 +40,35 @@ export class Yuka<T extends HTMLElementType> {
 
   get isYuka() {
     return true;
+  }
+
+  set i18n(i18nConfig: I18NConfig) {
+    if (!i18nConfig) {
+    }
+    this[i18nSymbol] = i18nConfig;
+    this.applyLocale();
+  }
+
+  get i18n(): I18NConfig | undefined {
+    if (this[i18nSymbol] === undefined) {
+      return undefined;
+    }
+
+    const i18nConfig = {} as I18NConfig;
+    const thisArg = this;
+
+    for (const key of LanguageTypes) {
+      Object.defineProperty(i18nConfig, key, {
+        get() {
+          return this[i18nSymbol][key];
+        },
+        set(newValue) {
+          Reflect.set(i18nConfig, key, newValue);
+          thisArg.applyLocale();
+        },
+      });
+    }
+    return i18nConfig;
   }
 
   //#region 模拟HTML元素的函数和变量
@@ -113,10 +134,10 @@ export class Yuka<T extends HTMLElementType> {
   }
 
   applyLocale() {
-    if (!this.i18n) {
+    if (!this[i18nSymbol]) {
       return;
     }
-    this.textContent = this.i18n[i18n.locale];
+    this.textContent = this[i18nSymbol][i18n.locale];
   }
 }
 

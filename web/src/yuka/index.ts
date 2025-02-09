@@ -3,6 +3,8 @@ import { Yuka, YukaAttribute } from './yuka.class';
 import { _h } from './h';
 import { _css, applyCss } from './css';
 
+export * from './types';
+
 /**
  * 将css样式应用到页面中
  * @param cssText css文本

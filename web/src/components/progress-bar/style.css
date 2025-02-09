@@ -1,7 +1,8 @@
 .progress-bar {
   --progress-height: 30px;
   width: 100px;
-  height: 30px;
+  height: var(--progress-height);
+  line-height: var(--progress-height);
   text-align: right;
   border-radius: var(--border-radius);
   background-color: var(--primary);
@@ -9,8 +10,14 @@
   overflow: hidden;
 }
 
+.progress-bar span {
+  padding: 0px 10px;
+}
+
 .progress-wrapper {
-  margin: '10px 0px';
-  display: 'grid';
-  grid-template-columns: '1fr';
+  margin: 5px 0px;
+  display: grid;
+  grid-template-columns: 1fr;
+  border-radius: var(--border-radius);
+  background-color: #fdfdfd;
 }

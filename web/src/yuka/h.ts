@@ -3,10 +3,23 @@ import { Yuka, YukaAttribute } from './yuka.class';
 
 export function _h<TN extends keyof HTMLElementTagNameMap>(
   tagName: TN,
-  attributes?: YukaAttribute | string,
+  attr?: YukaAttribute | string,
   content?: I18NConfig | string,
   scopeName?: string
 ): Yuka<HTMLElementTagNameMap[TN]> {
+  if (typeof tagName !== 'string') {
+    throw new Error('[Yuka:h] tagName must be a string');
+  }
+  if (attr !== undefined && typeof attr !== 'string' && typeof attr !== 'object') {
+    throw new Error('[Yuka:h] attributes must be a string or attribute object');
+  }
+  if (content !== undefined && typeof content !== 'string' && typeof content !== 'object') {
+    throw new Error('[Yuka:h] content must be a string or I18NConfig object');
+  }
+  if (scopeName !== undefined && typeof scopeName !== 'string') {
+    throw new Error('[Yuka:h] content must be a string or I18NConfig object');
+  }
+
   const element: HTMLElementTagNameMap[TN] = document.createElement<typeof tagName>(tagName);
 
   if (typeof content === 'string') {
@@ -15,34 +28,34 @@ export function _h<TN extends keyof HTMLElementTagNameMap>(
   }
 
   // 注册CSS类
-  if (attributes) {
-    if (typeof attributes === 'string' || Array.isArray(attributes)) {
-      attributes = { class: attributes };
+  if (attr) {
+    if (typeof attr === 'string' || Array.isArray(attr)) {
+      attr = { class: attr };
     }
 
-    if (attributes.class) {
-      if (Array.isArray(attributes.class)) {
-        element.classList.add(...attributes.class);
+    if (attr.class) {
+      if (Array.isArray(attr.class)) {
+        element.classList.add(...attr.class);
       } else {
-        element.className = attributes.class;
+        element.className = attr.class;
       }
-      delete attributes.class;
+      delete attr.class;
     }
 
     // 注册样式
-    if (attributes.style) {
-      if (typeof attributes.style === 'string') {
-        element.setAttribute('style', attributes.style);
+    if (attr.style) {
+      if (typeof attr.style === 'string') {
+        element.setAttribute('style', attr.style);
       } else {
-        for (const [prop, style] of Object.entries(attributes.style)) {
+        for (const [prop, style] of Object.entries(attr.style)) {
           (element.style as any)[prop] = style;
         }
       }
-      delete attributes.style;
+      delete attr.style;
     }
 
-    for (const key of Object.keys(attributes)) {
-      element.setAttribute(key, attributes[key]);
+    for (const key of Object.keys(attr)) {
+      element.setAttribute(key, attr[key]);
     }
   }
 
@@ -50,7 +63,6 @@ export function _h<TN extends keyof HTMLElementTagNameMap>(
     element.setAttribute(scopeName, '');
   }
 
-  const yukaElement = new Yuka<HTMLElementTagNameMap[TN]>(element, content);
-
-  return yukaElement;
+  // 准备dom元素完成，剩下的处理在Yuka中完成，包括i18n的应用
+  return new Yuka<HTMLElementTagNameMap[TN]>(element, content);
 }

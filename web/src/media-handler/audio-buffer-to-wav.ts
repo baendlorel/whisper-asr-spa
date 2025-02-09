@@ -1,9 +1,39 @@
 const HEADER_LENGTH = 44;
 const MAX_AMPLITUDE = 0x7fff;
+const RUNNER_CAPACITY = 250000;
 
-export const audioBufferToWav = (
+function* runner(
+  buffers: Float32Array<ArrayBufferLike>[],
+  bufferLength: number,
+  nChannels: 1 | 2,
+  int16: Int16Array<ArrayBuffer>
+) {
+  const total = bufferLength * nChannels;
+  console.log({ total, bufferLength, nChannels });
+  let capacityCount = 0;
+  let finishedCount = 0;
+  for (let i = 0, index = HEADER_LENGTH / 2; i < bufferLength; i++) {
+    for (let channel = 0; channel < nChannels; channel++) {
+      capacityCount++;
+      finishedCount++;
+      if (capacityCount++ >= RUNNER_CAPACITY) {
+        capacityCount = 0;
+        yield finishedCount / total;
+      }
+      let sample = buffers[channel][i];
+
+      // clamp and convert to 16bit number
+      sample = Math.min(1, Math.max(-1, sample));
+      sample = Math.round(sample * MAX_AMPLITUDE);
+
+      int16[index++] = sample;
+    }
+  }
+}
+
+export const audioBufferToWav = async (
   audioBuffer: AudioBuffer,
-  onProgress?: (percent: number) => void
+  onProgress: (percent: number) => void = () => void 0
 ) => {
   const nChannels = audioBuffer.numberOfChannels;
 
@@ -101,29 +131,26 @@ export const audioBufferToWav = (
     buffers.push(audioBuffer.getChannelData(channel));
   }
 
-  const total = bufferLength * nChannels;
-  console.log({ total, bufferLength, nChannels });
-  const onePercent = Math.floor(total / 100);
-  let dealCount = 0;
-  for (let i = 0, index = HEADER_LENGTH / 2; i < bufferLength; i++) {
-    for (let channel = 0; channel < nChannels; channel++) {
-      let sample = buffers[channel][i];
+  const job = runner(buffers, bufferLength, nChannels, int16);
+  await new Promise((resolve) => {
+    const run = () => {
+      requestAnimationFrame(() => {
+        const result = job.next();
+        if (result.done) {
+          onProgress(1);
+          resolve(true);
+        } else {
+          onProgress(result.value);
+          run();
+        }
+      });
+    };
+    run();
+  });
 
-      // clamp and convert to 16bit number
-      sample = Math.min(1, Math.max(-1, sample));
-      sample = Math.round(sample * MAX_AMPLITUDE);
+  const fileName = 'audio_bbbbbbbbb.wav'.replace(/b/g, () =>
+    String.fromCharCode(97 + Math.floor(Math.random() * 26))
+  );
 
-      int16[index++] = sample;
-
-      // const now = Math.floor((i * bufferLength + channel) / total);
-      // if (now - dealCount > 1) {
-      //   dealCount = now;
-      //   onProgress && onProgress(dealCount / 100);
-      // }
-    }
-  }
-
-  const blob = new Blob([uint8], { type: 'audio/x-wav' });
-
-  return blob;
+  return new File([uint8], fileName, { type: 'audio/x-wav' });
 };
