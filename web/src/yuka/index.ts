@@ -2,6 +2,7 @@ import { I18NConfig } from './types';
 import { Yuka, YukaAttribute } from './yuka.class';
 import { _h } from './h';
 import { _css, applyCss } from './css';
+import './init';
 
 export * from './types';
 

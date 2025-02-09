@@ -26,13 +26,7 @@ export class Yuka<T extends HTMLElementType> {
 
     this.uid = ++Yuka[uidSymbol];
     this.el = el;
-
-    if (i18nConfig) {
-      this[i18nSymbol] = i18nConfig;
-      this.applyLocale();
-    } else {
-      this[i18nSymbol] = undefined;
-    }
+    this[i18nSymbol] = i18nConfig;
 
     this.applyLocale();
     Yuka.reverseMap.set(this.el, this);
@@ -43,7 +37,8 @@ export class Yuka<T extends HTMLElementType> {
   }
 
   set i18n(i18nConfig: I18NConfig) {
-    if (!i18nConfig) {
+    if (!i18n.isValidConfig(i18nConfig)) {
+      throw new Error('[Yuka:Yuka.i18n] The given i18nConfig is not a valid config object.');
     }
     this[i18nSymbol] = i18nConfig;
     this.applyLocale();
@@ -56,14 +51,17 @@ export class Yuka<T extends HTMLElementType> {
 
     const i18nConfig = {} as I18NConfig;
     const thisArg = this;
-
+    const currentI18NConfig = this[i18nSymbol];
     for (const key of LanguageTypes) {
       Object.defineProperty(i18nConfig, key, {
         get() {
-          return this[i18nSymbol][key];
+          return currentI18NConfig[key];
         },
         set(newValue) {
-          Reflect.set(i18nConfig, key, newValue);
+          if (typeof newValue !== 'string') {
+            throw new Error('[Yuka:Yuka.i18n] The given i18nConfig is not a valid config object.');
+          }
+          Reflect.set(currentI18NConfig, key, newValue);
           thisArg.applyLocale();
         },
       });

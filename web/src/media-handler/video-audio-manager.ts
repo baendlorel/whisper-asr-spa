@@ -32,9 +32,7 @@ export const loadAudioBuffer = async (file: File): Promise<AudioBuffer> =>
       }
 
       const audioCtx = new AudioContext();
-      audioCtx.decodeAudioData(arrayBuffer, (audioBuffer) => {
-        resolve(audioBuffer);
-      });
+      audioCtx.decodeAudioData(arrayBuffer, (audioBuffer) => resolve(audioBuffer));
     };
     reader.readAsArrayBuffer(file);
   });

@@ -12,19 +12,6 @@ export const _css = (cssText: string, scopeName?: string) => {
     return;
   }
 
-  // const c = cssText
-  //   .replace(/[\s]+\,/g, ',')
-  //   .replace(/[\s]+\{/g, '{')
-  //   .replace(/\,/g, `[${scopeName}],`)
-  //   .replace(/\{/g, `[${scopeName}]{`);
-
-  // 事实证明简单的正则无法处理，需要
-  // `.sdf   ,  adf::sdf  { content:"'{}.df{'", content:'"}'"' }.sdf   { content:"'{'", content:'"}'"' }
-  // `.replace(/(}[^\{\'\"}]+\{)|(^[^\{\'\"}]+\{)/g, (t) => {
-  //   console.log(t)
-  //   return t
-  // });
-
   // 下面开始解析css文本并加入scope
   // 解析的前提是css文本是语法正确的，此处只能假设是正确的
   const canonicalIndexes: number[] = [];
@@ -55,14 +42,16 @@ export const _css = (cssText: string, scopeName?: string) => {
         }
         break;
     }
+
     // 再看是否在单双引号中
     if (isSingleQuotation || isDoubleQuotation) {
       continue;
     }
+
     // 如果碰到疑似标志着选择器的字符，则往回回溯到第一个不是空白字符的字符
     if (c === '{' || c === ',') {
       for (let j = i; j >= 0; j--) {
-        if (cssText[j].match(/[\w\]\.\#]/)) {
+        if (cssText[j].match(/[\w\]\.\#\)]/)) {
           canonicalIndexes.push(j + 1);
           break;
         }
@@ -72,12 +61,15 @@ export const _css = (cssText: string, scopeName?: string) => {
 
   // 收集到了所有需要添加scope的位置，开始处理
   let scopedCss = '';
-  for (let i = 0; i < cssText.length; i++) {
-    if (canonicalIndexes.includes(i)) {
-      scopedCss += scopeName;
-    }
-    scopedCss += cssText[i];
+  let last = 0;
+  scopeName = `[${scopeName}]`;
+  for (let i = 0; i < canonicalIndexes.length; i++) {
+    const idx = canonicalIndexes[i];
+    scopedCss += cssText.slice(last, idx);
+    scopedCss += scopeName;
+    last = idx;
   }
+  scopedCss += cssText.slice(last);
 
   cssString.push(scopedCss);
 };
