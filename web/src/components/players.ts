@@ -1,4 +1,6 @@
-import { h, Yuka } from '@/yuka';
+import { useYuka, Yuka } from '@/yuka';
+
+const { h } = useYuka();
 
 let videoPlayer: Yuka<HTMLVideoElement>;
 let audioPlayer: Yuka<HTMLAudioElement>;

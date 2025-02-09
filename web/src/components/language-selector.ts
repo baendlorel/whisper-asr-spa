@@ -1,4 +1,7 @@
-import { h, Yuka } from '@/yuka';
+import { useYuka, Yuka } from '@/yuka';
+
+const { h } = useYuka(false);
+
 const raw = [
   'en',
   'english',

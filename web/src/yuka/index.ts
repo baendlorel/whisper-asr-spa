@@ -98,4 +98,8 @@ function useYuka(scoped: boolean = true) {
   }
 }
 
+export const setIcon = (href: string) => {
+  _h('link', { rel: 'icon', type: 'image/svg+xml', href }).mount(document.head);
+};
+
 export { applyCss, useYuka, Yuka };

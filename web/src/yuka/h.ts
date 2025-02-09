@@ -1,4 +1,3 @@
-import { i18n } from './i18n';
 import { I18NConfig } from './types';
 import { Yuka, YukaAttribute } from './yuka.class';
 
@@ -52,8 +51,6 @@ export function _h<TN extends keyof HTMLElementTagNameMap>(
   }
 
   const yukaElement = new Yuka<HTMLElementTagNameMap[TN]>(element, content);
-
-  i18n.render(yukaElement);
 
   return yukaElement;
 }

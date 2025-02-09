@@ -5,12 +5,11 @@ import './css/radio.css';
 import './css/ds-select.css';
 
 // 引入模块
-import { applyCss, h } from './yuka';
+import { applyCss, setIcon } from './yuka';
 import typescriptLogo from './assets/typescript.svg';
 import app from './app';
 
-h('link', { rel: 'icon', type: 'image/svg+xml', href: typescriptLogo }).mount(document.head);
+setIcon(typescriptLogo);
+applyCss();
 
 app.mount(document.body);
-
-applyCss();

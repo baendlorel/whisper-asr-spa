@@ -1,5 +1,4 @@
-import { HTMLElementType, LanguageType, LanguageTypes } from './types';
-import { Yuka } from './yuka.class';
+import { LanguageType, LanguageTypes } from './types';
 
 // const rerender = (node: ChildNode | HTMLElementType, newText: string) => {
 //   for (const localeText of Object.keys(i18n)) {
@@ -25,7 +24,6 @@ import { Yuka } from './yuka.class';
 //     }
 //   });
 // };
-
 export const i18n = {
   get UI_LANGUAGE() {
     return 'UI_LANGUAGE';
@@ -45,18 +43,5 @@ export const i18n = {
 
   set locale(lang: LanguageType) {
     localStorage.setItem(i18n.UI_LANGUAGE, lang);
-    i18n.renderAll();
-  },
-
-  render(r: Yuka<HTMLElementType>, locale?: LanguageType) {
-    if (r.i18n === undefined) {
-      return;
-    }
-    r.el.textContent = r.i18n[locale || this.locale];
-  },
-
-  renderAll() {
-    const lang = i18n.locale;
-    Yuka.reverseMap.forEach((r) => i18n.render(r, lang));
   },
 };

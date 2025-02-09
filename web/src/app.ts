@@ -1,8 +1,10 @@
-import { h } from './yuka';
+import { useYuka } from './yuka';
 import locale from './components/locale';
 import players from './components/players';
 import audioForm from './components/audio-form';
 import typescriptLogo from './assets/typescript.svg';
+
+const { h } = useYuka();
 
 export default h('div', { class: 'container' }).appendChild(
   h('h2', { class: 'title' }).appendChild(

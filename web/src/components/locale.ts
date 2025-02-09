@@ -1,5 +1,7 @@
-import { h, css, Yuka } from '@/yuka';
+import { useYuka, Yuka } from '@/yuka';
 import { i18n } from '@/yuka/i18n';
+
+const { h, css } = useYuka();
 
 css(`.locale{
   margin: 15px 0px;
@@ -34,10 +36,12 @@ switch (i18n.locale) {
 
 radioZh.on('change', () => {
   i18n.locale = 'zh';
+  Yuka.refreshAllLocale();
 });
 
 radioEn.on('change', () => {
   i18n.locale = 'en';
+  Yuka.refreshAllLocale();
 });
 
 export default comp;
