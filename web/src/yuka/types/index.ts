@@ -7,3 +7,26 @@ export type I18NConfig = { [key in LanguageType]: string };
 // export type I18NResponsive = { [key in LanguageType]: string };
 
 export type HTMLElementType = HTMLElementTagNameMap[keyof HTMLElementTagNameMap];
+
+export type HTMLInputElementType =
+  | 'button'
+  | 'checkbox'
+  | 'color'
+  | 'date'
+  | 'email'
+  | 'file'
+  | 'hidden'
+  | 'image'
+  | 'month'
+  | 'number'
+  | 'password'
+  | 'radio'
+  | 'range'
+  | 'reset'
+  | 'search'
+  | 'submit'
+  | 'tel'
+  | 'text'
+  | 'time'
+  | 'url'
+  | 'week';

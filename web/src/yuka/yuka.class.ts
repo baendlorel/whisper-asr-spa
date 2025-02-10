@@ -171,10 +171,12 @@ export type YukaAttribute = {
   for?: string;
   name?: string;
   value?: string;
+  label?: string;
+  disabled?: string;
   min?: string;
   max?: string;
-  selected?: string;
-  checked?: string;
+  selected?: boolean;
+  checked?: boolean;
   class?: string | string[];
   style?: string | Partial<CSSStyleDeclaration>;
 
