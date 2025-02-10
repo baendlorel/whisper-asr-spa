@@ -1,29 +1,6 @@
+import { yukaEvent } from './event-bus';
 import { I18NConfig, LanguageType, LanguageTypes } from './types';
 
-// const rerender = (node: ChildNode | HTMLElementType, newText: string) => {
-//   for (const localeText of Object.keys(i18n)) {
-//     if (node.textContent === localeText) {
-//       node.textContent = newText;
-//       return;
-//     }
-//   }
-// };
-
-// const render = (lang: LanguageType = DEFAULT_LANGUAGE) => {
-//   reverseMap.forEach(({ i18n }, element) => {
-//     if (i18n === undefined) {
-//       return;
-//     }
-//     const childs = element.childNodes;
-//     if (childs.length === 0) {
-//       rerender(element, i18n[lang]);
-//     } else {
-//       for (let j = 0; j < childs.length; j++) {
-//         rerender(childs[j], i18n[lang]);
-//       }
-//     }
-//   });
-// };
 export const i18n = {
   get UI_LANGUAGE() {
     return 'UI_LANGUAGE';
@@ -42,18 +19,34 @@ export const i18n = {
   },
 
   set locale(lang: LanguageType) {
+    if (typeof lang !== 'string') {
+      throw new Error('[Yuka:i18n.set locale] lang must be a string');
+    }
+
+    if (!LanguageTypes.includes(lang)) {
+      console.warn(
+        `[Yuka:i18n.set locale] lang '${lang}' is not in [${LanguageTypes.join()}], use default '${
+          i18n.DEFAULT_LANGUAGE
+        } instead.'`
+      );
+      lang = i18n.DEFAULT_LANGUAGE;
+    }
+
     localStorage.setItem(i18n.UI_LANGUAGE, lang);
+    yukaEvent.emitI18NUpdated();
   },
 
   isValidConfig(i18nConfig: I18NConfig) {
     if (i18nConfig === null || typeof i18nConfig !== 'object') {
       return false;
     }
+
     for (const key of LanguageTypes) {
       if (typeof i18nConfig[key] !== 'string') {
         return false;
       }
     }
+
     return true;
   },
 };

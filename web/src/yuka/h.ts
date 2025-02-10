@@ -22,8 +22,12 @@ export function _h<TN extends keyof HTMLElementTagNameMap>(
 
   const element: HTMLElementTagNameMap[TN] = document.createElement<typeof tagName>(tagName);
 
+  const textNode: Node = document.createTextNode('');
+
+  element.appendChild(textNode);
+
   if (typeof content === 'string') {
-    element.textContent = content;
+    textNode.textContent = content;
     content = undefined;
   }
 
@@ -55,7 +59,14 @@ export function _h<TN extends keyof HTMLElementTagNameMap>(
     }
 
     for (const key of Object.keys(attr)) {
-      element.setAttribute(key, attr[key]);
+      const o = attr[key];
+      // 如果属性是on开头，就说明要注册事件
+      if (key.match(/^on/g) && typeof o === 'function') {
+        element.addEventListener(key.replace(/^on/g, ''), o);
+      } else {
+        // 其余情况都当作一半的属性设置
+        element.setAttribute(key, o);
+      }
     }
   }
 
@@ -64,5 +75,5 @@ export function _h<TN extends keyof HTMLElementTagNameMap>(
   }
 
   // 准备dom元素完成，剩下的处理在Yuka中完成，包括i18n的应用
-  return new Yuka<HTMLElementTagNameMap[TN]>(element, content);
+  return new Yuka<HTMLElementTagNameMap[TN]>(element, textNode, content);
 }

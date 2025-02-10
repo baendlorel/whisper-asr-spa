@@ -36,12 +36,10 @@ switch (i18n.locale) {
 
 radioZh.on('change', () => {
   i18n.locale = 'zh';
-  Yuka.refreshAllLocale();
 });
 
 radioEn.on('change', () => {
   i18n.locale = 'en';
-  Yuka.refreshAllLocale();
 });
 
 export default comp;

@@ -25,7 +25,7 @@ export default () => {
     component.style.display = 'grid';
     const p = (percent * 100).toFixed(2) + '%';
     progressBar.style.width = p;
-    spanPercent.textContent = p;
+    spanPercent.text = p;
   };
 
   const setLabel = (i18n: I18NConfig) => {

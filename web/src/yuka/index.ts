@@ -1,10 +1,10 @@
+import './init';
+
 import { I18NConfig } from './types';
 import { Yuka, YukaAttribute } from './yuka.class';
 import { _h } from './h';
 import { _css, applyCss } from './css';
-import './init';
-
-export * from './types';
+import { eventBus } from './event-bus';
 
 /**
  * 将css样式应用到页面中
@@ -75,11 +75,13 @@ function h<TN extends keyof HTMLElementTagNameMap>(
 type YukaCreator = {
   css: typeof css;
   h: typeof h;
+  eventBus: typeof eventBus;
 };
 
 const yc: YukaCreator = {
   css: (cssText: string) => _css(cssText),
   h: (a, b, c) => _h(a, b, c),
+  eventBus,
 };
 
 /**
@@ -95,14 +97,17 @@ function useYuka(scoped: boolean = true) {
     return {
       css: (cssText: string) => _css(cssText, scopeName),
       h: (a, b, c) => _h(a, b, c, scopeName),
+      eventBus,
     } as YukaCreator;
   } else {
     return yc;
   }
 }
 
-export const setIcon = (href: string) => {
+const setIcon = (href: string) => {
   _h('link', { rel: 'icon', type: 'image/svg+xml', href }).mount(document.head);
 };
 
-export { applyCss, useYuka, Yuka };
+export * from './types';
+
+export { applyCss, useYuka, setIcon, Yuka };
