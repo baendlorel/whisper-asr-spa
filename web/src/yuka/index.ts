@@ -48,7 +48,7 @@ function h<TN extends keyof HTMLElementTagNameMap>(
  */
 function h<TN extends keyof HTMLElementTagNameMap>(
   tagName: TN,
-  classes?: string[] | string,
+  classes?: string,
   i18n?: I18NConfig
 ): Yuka<HTMLElementTagNameMap[TN]>;
 
@@ -60,10 +60,11 @@ function h<TN extends keyof HTMLElementTagNameMap>(
  */
 function h<TN extends keyof HTMLElementTagNameMap>(
   tagName: TN,
-  classes?: string[] | string,
+  classes?: string,
   textContent?: string
 ): Yuka<HTMLElementTagNameMap[TN]>;
 
+// * 实现h
 function h<TN extends keyof HTMLElementTagNameMap>(
   tagName: TN,
   attributes?: YukaAttribute | string,

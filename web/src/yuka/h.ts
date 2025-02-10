@@ -64,8 +64,10 @@ export function _h<TN extends keyof HTMLElementTagNameMap>(
       if (key.match(/^on/g) && typeof o === 'function') {
         element.addEventListener(key.replace(/^on/g, ''), o);
       } else {
-        // 其余情况都当作一半的属性设置
-        element.setAttribute(key, o);
+        // 其余情况都当作一半的属性设置，如果属性是undefined则不设置
+        if (o !== undefined) {
+          element.setAttribute(key, o);
+        }
       }
     }
   }

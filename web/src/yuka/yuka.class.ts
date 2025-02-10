@@ -164,7 +164,10 @@ export class Yuka<T extends HTMLElementType> {
 }
 
 export type YukaAttribute = {
+  [k: string]: any;
+
   id?: string;
+  type?: string;
   for?: string;
   name?: string;
   value?: string;
@@ -174,9 +177,7 @@ export type YukaAttribute = {
   checked?: string;
   class?: string | string[];
   style?: string | Partial<CSSStyleDeclaration>;
-} & {
-  [k in string]: any;
-} & {
+
   onabort?: (event: UIEvent) => void;
   onanimationcancel?: (event: AnimationEvent) => void;
   onanimationend?: (event: AnimationEvent) => void;
@@ -272,4 +273,3 @@ export type YukaAttribute = {
   onwaiting?: (event: Event) => void;
   onwheel?: (event: WheelEvent) => void;
 };
-document.body.onclick;

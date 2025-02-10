@@ -8,38 +8,29 @@ css(`.locale{
   text-align: center;
 }`);
 
-let radioZh: Yuka<HTMLInputElement>;
-let radioEn: Yuka<HTMLInputElement>;
-
 const comp = h('div', 'locale').appendChild(
-  (radioZh = h('input', {
+  h('input', {
     type: 'radio',
     id: 'ui-zh',
     name: 'ui-language',
     value: 'zh',
-  })),
+    checked: i18n.locale === 'zh',
+    onchange: (event: Event) => {
+      i18n.locale = 'zh';
+    },
+  }),
   h('label', { for: 'ui-zh', class: 'ui-language' }, '中文'),
-  (radioEn = h('input', { type: 'radio', id: 'ui-en', name: 'ui-language', value: 'en' })),
+  h('input', {
+    type: 'radio',
+    id: 'ui-en',
+    name: 'ui-language',
+    value: 'en',
+    checked: i18n.locale === 'en',
+    onchange: (event: Event) => {
+      i18n.locale = 'en';
+    },
+  }),
   h('label', { for: 'ui-en', class: 'ui-language' }, 'English')
 );
-
-switch (i18n.locale) {
-  case 'zh':
-    radioZh.el.checked = true;
-    break;
-  case 'en':
-    radioEn.el.checked = true;
-    break;
-  default:
-    throw new Error('locale设置radio失败');
-}
-
-radioZh.on('change', () => {
-  i18n.locale = 'zh';
-});
-
-radioEn.on('change', () => {
-  i18n.locale = 'en';
-});
 
 export default comp;
