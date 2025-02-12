@@ -19,7 +19,7 @@ export default defineConfig({
     }),
   ],
   build: {
-    outDir: './html',
+    outDir: '../app/html',
   },
   resolve: {
     alias: {

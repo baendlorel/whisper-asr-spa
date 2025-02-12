@@ -21,7 +21,6 @@
     "noUncheckedSideEffectImports": true,
 
     "baseUrl": ".",
-    "outDir": "./html",
     "paths": {
       "@/*": ["./src/*"]
     }
