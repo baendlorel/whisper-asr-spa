@@ -18,6 +18,9 @@ export default defineConfig({
       ],
     }),
   ],
+  build: {
+    outDir: './html',
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

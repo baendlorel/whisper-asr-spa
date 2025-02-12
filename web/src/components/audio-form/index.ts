@@ -5,7 +5,7 @@ import progressBar from '../progress-bar';
 import { languageOptions } from './language-options';
 import style from './style.css?raw';
 
-const { css, h } = useYuka();
+const { css, h, eventBus } = useYuka();
 
 css(style);
 
@@ -178,7 +178,7 @@ asr.on('click', () => {
   })
     .then((response) => response.json())
     .then((data) => {
-      console.log('Success:', data);
+      eventBus.emit('display-result', data);
       alert('Request sent successfully!');
     })
     .catch((error) => {

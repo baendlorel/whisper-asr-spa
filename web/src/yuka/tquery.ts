@@ -1,7 +1,8 @@
-import { HTMLElementType, YukaElement } from '.';
+import { HTMLElementType } from './types';
+import { Yuka } from '.';
 
 export class TQueryResult extends Array {
-  private on<K extends keyof HTMLElementEventMap>(
+  on<K extends keyof HTMLElementEventMap>(
     type: K,
     listener: EventListenerOrEventListenerObject,
     options?: boolean | AddEventListenerOptions
@@ -13,5 +14,5 @@ export class TQueryResult extends Array {
 }
 
 export type TQuery = {
-  (selectors: keyof HTMLElementTagNameMap | string): YukaElement<HTMLElementType>[];
+  (selectors: keyof HTMLElementTagNameMap | string): Yuka<HTMLElementType>[];
 };

@@ -1,15 +1,14 @@
 const HEADER_LENGTH = 44;
 const MAX_AMPLITUDE = 0x7fff;
-const RUNNER_CAPACITY = 250000;
+const RUNNER_CAPACITY = 240000;
 
 function* runner(
-  buffers: Float32Array<ArrayBufferLike>[],
+  buffers: Float32Array[],
   bufferLength: number,
   nChannels: 1 | 2,
-  int16: Int16Array<ArrayBuffer>
+  int16: Int16Array
 ) {
   const total = bufferLength * nChannels;
-  console.log({ total, bufferLength, nChannels });
   let capacityCount = 0;
   let finishedCount = 0;
   for (let i = 0, index = HEADER_LENGTH / 2; i < bufferLength; i++) {
