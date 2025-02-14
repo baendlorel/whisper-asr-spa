@@ -36,7 +36,7 @@ export const i18n = {
     yukaEvent.emitI18NUpdated();
   },
 
-  isValidConfig(i18nConfig: I18NConfig) {
+  isValidConfig(i18nConfig: any) {
     if (i18nConfig === null || typeof i18nConfig !== 'object') {
       return false;
     }

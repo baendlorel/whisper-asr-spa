@@ -1,4 +1,4 @@
-import { useYuka, Yuka } from '@/yuka';
+import { dialog, useYuka, Yuka } from '@/yuka';
 import { isAudio, isVideo, loadAudioBuffer, play, audioBufferToWav } from '@/media-handler';
 import { audioPlayer, videoPlayer } from '../players';
 import progressBar from '../progress-bar';
@@ -224,8 +224,9 @@ asr.on('click', () => {
       return response.json();
     })
     .then((data) => {
-      console.log('%c/was/asr Request sent successfully!', 'color: #43bb88;');
+      // console.log('%c/was/asr Request sent successfully!', 'color:rgb(6, 175, 105);');
       console.log('data', data);
+      dialog.alert(`/was/asr Request sent successfully!`);
     })
     .catch((error) => {
       console.info('Error sending request.');

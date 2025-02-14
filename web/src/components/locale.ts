@@ -1,5 +1,4 @@
-import { useYuka } from '@/yuka';
-import { i18n } from '@/yuka/i18n';
+import { useYuka, i18n } from '@/yuka';
 
 const { h, css } = useYuka();
 

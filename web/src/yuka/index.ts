@@ -110,5 +110,7 @@ const setIcon = (href: string) => {
 };
 
 export * from './types';
+export * from './dialog';
+export * from './i18n';
 
 export { applyCss, useYuka, setIcon, Yuka };
