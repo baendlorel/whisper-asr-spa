@@ -4,6 +4,7 @@ import { audioPlayer, videoPlayer } from '../players';
 import progressBar from '../progress-bar';
 import { languageOptions } from './language-options';
 import style from './style.css?raw';
+import wasService from '@/services/was.service';
 
 const { css, h, eventBus } = useYuka();
 
@@ -11,6 +12,7 @@ css(style);
 
 const { component: progressBarComponent, setProgress, setLabel } = progressBar();
 
+let download: Yuka<HTMLButtonElement>;
 let fileInput: Yuka<HTMLInputElement>;
 let fileLabel: Yuka<HTMLLabelElement>;
 
@@ -18,7 +20,10 @@ let audioForm: Yuka<HTMLFormElement>;
 let asr: Yuka<HTMLButtonElement>;
 
 const comp = h('div', 'form-wrapper').appendChild(
-  progressBarComponent,
+  h('div', 'bar').appendChild(
+    progressBarComponent,
+    (download = h('button', { disabled: 'true' }, { zh: '下载音频', en: 'Download' }))
+  ),
   (audioForm = h('form', { id: 'audio-form' }).appendChild(
     h('div', 'basic-options-wrapper').appendChild(
       h(
@@ -113,6 +118,24 @@ setLabel({ zh: '正在提取音频', en: 'Extracting Audio' });
 let isConvertingToAudioFile = false;
 let audioFile: File | null = null;
 
+download.on('click', () => {
+  console.log('audioFile', audioFile);
+  if (audioFile === null) {
+    console.log('还没有音频文件');
+    return;
+  }
+
+  const url: any = URL.createObjectURL(audioFile);
+  const link = document.createElement('a');
+  link.style.display = 'none';
+  link.href = url;
+  link.setAttribute('download', audioFile.name);
+  document.body.appendChild(link);
+  link.click();
+  URL.revokeObjectURL(url.href);
+  document.body.removeChild(link);
+});
+
 fileInput.on('change', () => {
   const file = fileInput.files && fileInput.files[0];
 
@@ -140,10 +163,12 @@ fileInput.on('change', () => {
     videoPlayer.el.style.display = '';
     play(file, videoPlayer.el);
     isConvertingToAudioFile = true;
+    download.disabled = true;
     setProgress(0.001);
     loadAudioBuffer(file)
       .then((ab) => audioBufferToWav(ab, setProgress))
       .then((file) => {
+        download.disabled = false;
         audioFile = file;
         isConvertingToAudioFile = false;
       });
@@ -168,25 +193,43 @@ asr.on('click', () => {
     return;
   }
 
+  const args: any = {};
+
   formData.forEach((value, key) => {
-    console.log(key, value);
+    args[key] = value;
   });
+
+  console.log('args', args);
+
+  // wasService
+  //   .asrForm(formData)
+  //   .then((data) => {
+  //     console.log(data);
+  //     eventBus.emit('display-result', data);
+  //   })
+  //   .catch((e) => {
+  //     console.log({ args });
+  //     console.log(e);
+  //   });
 
   fetch('/was/asr', {
     method: 'POST',
-    body: formData,
+    body: args,
     headers: {
       'Content-Type': 'multipart/form-data',
     },
   })
-    .then((response) => response.json())
+    .then((response) => {
+      console.log('resp', response);
+      return response.json();
+    })
     .then((data) => {
-      eventBus.emit('display-result', data);
-      alert('Request sent successfully!');
+      console.log('%c/was/asr Request sent successfully!', 'color: #43bb88;');
+      console.log('data', data);
     })
     .catch((error) => {
-      console.error('Error:', error);
-      alert('Error sending request.');
+      console.info('Error sending request.');
+      console.error('9000/was/asr Error:', error);
     });
 });
 

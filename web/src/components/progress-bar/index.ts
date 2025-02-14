@@ -10,7 +10,7 @@ export default () => {
   let spanLabel: Yuka<HTMLSpanElement>;
   let spanPercent: Yuka<HTMLSpanElement>;
 
-  const component = h('div', { class: 'progress-wrapper', style: { display: 'none' } }).appendChild(
+  const component = h('div', { class: 'progress-wrapper' }).appendChild(
     (progressBar = h('div', 'progress-bar')).appendChild(
       (spanLabel = h('span', { style: { paddingRight: '5px' } })),
       (spanPercent = h('span'))
@@ -22,7 +22,6 @@ export default () => {
    * @param percent 0~1之间的小数
    */
   const setProgress = (percent: number) => {
-    component.style.display = 'grid';
     const p = (percent * 100).toFixed(2) + '%';
     progressBar.style.width = p;
     spanPercent.text = p;

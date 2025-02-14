@@ -29,9 +29,22 @@ export default defineConfig({
         changeOrigin: true,
         ws: false,
         secure: false,
+        proxyTimeout: 60000, // 60秒超时
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            console.log('代理请求:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req, res) => {
+            proxyRes.headers['Access-Control-Allow-Origin'] = '*';
+            console.log('代理响应:', proxyRes.statusCode);
+            console.log('代理响应statusMessage:', proxyRes.statusMessage);
+          });
+          proxy.on('error', (err, req, res) => {
+            console.error('代理错误:', err);
+            console.error('代理错误res:', res.statusCode, res.statusMessage);
+          });
+        },
       },
-      port: '5173', // 端口号
-      open: 'true', // 是否自动打开浏览器
     },
   },
   resolve: {

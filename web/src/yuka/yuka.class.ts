@@ -118,6 +118,14 @@ export class Yuka<T extends HTMLElementType> {
     this[textNodeSymbol].textContent = text;
   }
 
+  set disabled(d: boolean) {
+    (this.el as HTMLInputElement).disabled = d;
+  }
+
+  get disabled() {
+    return (this.el as HTMLInputElement).disabled;
+  }
+
   get style() {
     return this.el.style;
   }
