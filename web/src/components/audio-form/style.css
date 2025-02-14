@@ -1,11 +1,4 @@
-.form-wrapper input,
-.form-wrapper select {
-  width: 100%;
-  padding: 8px;
-  border-radius: var(--border-radius);
-}
-
-.form-wrapper button.execute {
+.form-wrapper .execute {
   margin-top: 15px;
   padding: 15px 20px;
   width: 100%;
