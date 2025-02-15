@@ -5,9 +5,10 @@ import { Yuka } from '../yuka.class';
 export type DialogOption = {
   title?: string | I18NConfig | HTMLElement | Yuka<HTMLElementType>;
   body?: string | I18NConfig | HTMLElement | Yuka<HTMLElementType>;
-  footer?: HTMLElement | Yuka<HTMLElementType>;
   variant?: 'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
   width?: string;
+  yesText?: string | I18NConfig;
+  noText?: string | I18NConfig;
   onYes?: () => void;
   onNo?: () => void;
   onOpen?: () => void;
@@ -21,14 +22,15 @@ const isDialogSupported = (() => {
   return typeof dialog.showModal === 'function';
 })();
 
-const DEFAULT_YES_I18N: I18NConfig = {
-  zh: '确定',
-  en: 'Yes',
-};
-
-const DEFAULT_NO_I18N: I18NConfig = {
-  zh: '取消',
-  en: 'No',
+const DEFAULT_FOOTER_BUTTON_I18N = {
+  yes: {
+    zh: '确定',
+    en: 'Yes',
+  },
+  no: {
+    zh: '取消',
+    en: 'No',
+  },
 };
 
 const DIALOG_CONFIRM_ATTR = 'yk-confirm';
@@ -57,22 +59,27 @@ const normalize = (arg1: string | I18NConfig | DialogOption, options?: DialogOpt
   return options as DialogOptionExt;
 };
 
-const createYesButton = (onclick?: (event: Event) => void) => {
+const createFooterButton = (options: DialogOptionExt, type: 'yes' | 'no') => {
   const b = document.createElement('button');
-  b.textContent = DEFAULT_YES_I18N[i18n.locale];
+  const i18nKey = type === 'yes' ? 'yesText' : 'noText';
+  const content = options[i18nKey] as I18NConfig;
 
-  if (typeof onclick === 'function') {
-    b.addEventListener('click', onclick);
+  // 填充按钮文字
+  if (typeof content === 'string') {
+    b.textContent = content;
+  } else if (i18n.isValidConfig(content)) {
+    b.textContent = content[i18n.locale];
+  } else {
+    b.textContent = DEFAULT_FOOTER_BUTTON_I18N[type][i18n.locale];
   }
-  return b;
-};
 
-const createNoButton = (onclick?: (event: Event) => void) => {
-  const b = createYesButton(onclick);
-  b.textContent = DEFAULT_NO_I18N[i18n.locale];
-  b.style.backgroundColor = '#F8F9FA';
-  b.style.color = 'black';
-  b.style.marginRight = '8px';
+  // 设置样式
+  if (type === 'no') {
+    b.style.backgroundColor = '#F8F9FA';
+    b.style.color = 'black';
+    b.style.marginRight = '8px';
+  }
+
   return b;
 };
 
@@ -161,76 +168,75 @@ const applyBody = (dialog: HTMLDialogElement, body: HTMLElement, options: Dialog
  * @returns
  */
 const applyFooter = (dialog: HTMLDialogElement, footer: HTMLElement, options: DialogOptionExt) => {
-  if (options.footer === undefined) {
-    // 创建yes按钮的事件并绑定
-    const createHandler =
-      (handler: ((event: Event) => void) | undefined, confirmResult: boolean) => (e: Event) => {
-        if (typeof handler !== 'function') {
-          dialog.setAttribute(DIALOG_CONFIRM_ATTR, confirmResult.toString());
-          closeDialog(dialog);
-          return;
-        }
-        const returnValue = handler(e) as Promise<any> | any;
-        if (returnValue instanceof Promise) {
-          returnValue.then((result) => {
-            if (result !== false) {
-              dialog.setAttribute(DIALOG_CONFIRM_ATTR, confirmResult.toString());
-              closeDialog(dialog);
-            }
-          });
-          return;
-        } else if (returnValue !== false) {
-          dialog.setAttribute(DIALOG_CONFIRM_ATTR, confirmResult.toString());
-          closeDialog(dialog);
-          return;
-        }
-      };
+  // 创建yes按钮的事件并绑定
+  const createHandler =
+    (handler: ((event: Event) => void) | undefined, type: 'yes' | 'no') => (e: Event) => {
+      if (typeof handler !== 'function') {
+        dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
+        closeDialog(dialog);
+        return;
+      }
+      const returnValue = handler(e) as Promise<any> | any;
+      if (returnValue instanceof Promise) {
+        returnValue.then((result) => {
+          if (result !== false) {
+            dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
+            closeDialog(dialog);
+          }
+        });
+        return;
+      } else if (returnValue !== false) {
+        dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
+        closeDialog(dialog);
+        return;
+      }
+    };
 
-    const onYes = createHandler(options.onYes, true);
-    const yes = createYesButton(onYes);
-    const onNo = createHandler(options.onNo, false);
-    const no = createNoButton(onNo);
+  const yes = createFooterButton(options, 'yes');
+  const no = createFooterButton(options, 'no');
+  yes.addEventListener('click', createHandler(options.onYes, 'yes'));
+  no.addEventListener('click', createHandler(options.onNo, 'no'));
 
-    if (options.type === 'alert') {
-      footer.appendChild(yes);
-    }
-
-    if (options.type === 'confirm') {
-      footer.appendChild(no);
-      footer.appendChild(yes);
-    }
-
-    return { footer, yes, no };
+  if (options.type === 'alert') {
+    footer.appendChild(yes);
   }
 
-  const hasNoButton = (el: HTMLElement) => {
-    const buttons = el.querySelectorAll('button,input[type=button]');
-    return buttons.length === 0;
-  };
-
-  if (options.footer instanceof HTMLElement) {
-    if (hasNoButton(options.footer)) {
-      console.warn(
-        "[Yuka:dialog applyFooter] options.footer doesn't have any button, there might be no way to close the dialog"
-      );
-    }
-    footer.append(options.footer);
-    footer.remove();
-    return { footer: options.footer };
+  if (options.type === 'confirm') {
+    footer.appendChild(no);
+    footer.appendChild(yes);
   }
 
-  if (options.footer instanceof Yuka) {
-    if (hasNoButton(options.footer.el)) {
-      console.warn(
-        "[Yuka:dialog applyFooter] options.footer doesn't have any button, there might be no way to close the dialog"
-      );
-    }
-    footer.append(options.footer.el);
-    footer.remove();
-    return { footer: options.footer.el };
-  }
+  return { footer, yes, no };
 
-  throw new Error("[Yuka:dialog applyFooter] options.footer's type is invalid");
+  // * 不再允许使用options.footer
+  // const hasNoButton = (el: HTMLElement) => {
+  //   const buttons = el.querySelectorAll('button,input[type=button]');
+  //   return buttons.length === 0;
+  // };
+
+  // if (options.footer instanceof HTMLElement) {
+  //   if (hasNoButton(options.footer)) {
+  //     console.warn(
+  //       "[Yuka:dialog applyFooter] options.footer doesn't have any button, there might be no way to close the dialog"
+  //     );
+  //   }
+  //   footer.append(options.footer);
+  //   footer.remove();
+  //   return { footer: options.footer };
+  // }
+
+  // if (options.footer instanceof Yuka) {
+  //   if (hasNoButton(options.footer.el)) {
+  //     console.warn(
+  //       "[Yuka:dialog applyFooter] options.footer doesn't have any button, there might be no way to close the dialog"
+  //     );
+  //   }
+  //   footer.append(options.footer.el);
+  //   footer.remove();
+  //   return { footer: options.footer.el };
+  // }
+
+  // throw new Error("[Yuka:dialog applyFooter] options.footer's type is invalid");
 };
 
 const createDialog = (options: DialogOptionExt) => {
@@ -300,7 +306,7 @@ async function confirm(arg1: string | I18NConfig | DialogOption, options?: Dialo
   return new Promise((resolve) => {
     dialog.addEventListener('close', () => {
       const confirmResult = dialog.getAttribute(DIALOG_CONFIRM_ATTR);
-      resolve(confirmResult === 'true');
+      resolve(confirmResult === 'yes');
     });
   });
 }
