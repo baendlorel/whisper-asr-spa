@@ -1,0 +1,25 @@
+@use 'theme'
+
+select
+  color: #1f1f1f
+  width: 100%
+  padding: 8px
+  border-radius: #{theme.$border-radius}
+  border: #{theme.$input-border}
+  background-color: #{theme.$input-bg-color}
+  outline: none
+  cursor: pointer
+  appearance: none
+  -webkit-appearance: none
+  -moz-appearance: none
+  background-image: url('data:image/svg+xmlutf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23333"><path d="M7 10l5 5 5-5z"/></svg>')
+  background-repeat: no-repeat
+  background-position: right 10px center
+  background-size: 12px
+
+  :hover
+    border-color: #{theme.$primary-hover}
+
+  :focus
+    border-color: #{theme.$primary}
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5)

@@ -188,6 +188,11 @@ function alert(message: string, options?: DialogOption): void;
 function alert(i18nConfig: I18NConfig, options?: DialogOption): void;
 function alert(options: DialogOption): void;
 function alert(arg1: string | I18NConfig | DialogOption, options?: DialogOption): void {
+  if (isDialogSupported === false) {
+    alert(arg1.toString());
+    return;
+  }
+
   // 只用message的
   if (typeof arg1 === 'string') {
     options = Object.assign(options || {}, { body: arg1 });
