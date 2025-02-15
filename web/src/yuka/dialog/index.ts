@@ -29,10 +29,6 @@ const DEFAULT_NO_I18N: I18NConfig = {
 
 const createYesButton = (onclick?: (event: Event) => void) => {
   const b = document.createElement('button');
-  b.style.padding = '8px 16px';
-  b.style.border = '1px solid #ccc';
-  b.style.borderRadius = '5px';
-  b.style.backgroundColor = '#f8f9fa';
   b.textContent = { zh: '确定', en: 'Yes' }[i18n.locale];
 
   if (typeof onclick === 'function') {
@@ -112,8 +108,13 @@ const applyBody = (dialog: HTMLDialogElement, body: HTMLDivElement, options?: Di
 const applyFooter = (dialog: HTMLDialogElement, footer: HTMLDivElement, options?: DialogOption) => {
   if (options === undefined || options.footer === undefined) {
     const onYes = () => {
-      dialog.close();
-      dialog.remove();
+      dialog.classList.remove('show');
+      dialog.addEventListener('transitionend', (e: TransitionEvent) => {
+        if (dialog.isSameNode(e.target as Node) && e.propertyName === 'opacity') {
+          dialog.close();
+          dialog.remove();
+        }
+      });
     };
     const yes = createYesButton(options?.onYes || onYes);
     footer.appendChild(yes);
@@ -162,9 +163,6 @@ const createDialog = (options?: DialogOption) => {
   body.setAttribute('yk-role', 'body');
   footer.setAttribute('yk-role', 'footer');
 
-  // dialog本体样式
-  dialog.style.opacity = '0';
-
   dialog.appendChild(title);
   dialog.appendChild(body);
   dialog.appendChild(footer);
@@ -176,9 +174,10 @@ const createDialog = (options?: DialogOption) => {
   document.body.appendChild(dialog);
 
   dialog.showModal();
+  dialog.classList.add('hide');
 
   requestAnimationFrame(() => {
-    dialog.style.opacity = '1';
+    dialog.classList.add('show');
   });
 
   return { dialog, title, body, footer };
