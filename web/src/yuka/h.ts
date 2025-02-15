@@ -84,6 +84,17 @@ export function _h<TN extends keyof HTMLElementTagNameMap>(
         continue;
       }
 
+      // disabled用于button, input, select, textarea, optgroup, option, fieldset
+      if (key === 'disabled') {
+        // HTMLInputElement一定拥有disabled属性
+        if (element instanceof HTMLInputElement || element instanceof HTMLButtonElement) {
+          element.disabled = Boolean(o);
+        } else {
+          element.setAttribute(key, o);
+        }
+        continue;
+      }
+
       // * 如果属性是on开头，就说明要注册事件
       if (key.match(/^on/g) && typeof o === 'function') {
         element.addEventListener(key.replace(/^on/g, ''), o);

@@ -8,7 +8,7 @@ input[type='radio']
   padding: 0px
   border: 0px
 
-  ::before
+  &::before
     content: ''
     position: relative
     display: block
@@ -19,10 +19,10 @@ input[type='radio']
     border: #{theme.$input-border}
     background-color: #{theme.$input-bg-color}
 
-  :hover::before
+  &:hover::before
     background-color: #{theme.$primary-light}
 
-  :checked::after
+  &:checked::after
     content: ''
     position: absolute
     margin: -10px 0px 0px 3px

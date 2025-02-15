@@ -113,8 +113,6 @@ const comp = h('div', 'form-wrapper').appendChild(
   (asr = h('button', { id: 'asr', class: 'execute' }, { zh: '执行', en: 'Execute' }))
 );
 
-setLabel({ zh: '正在提取音频', en: 'Extracting Audio' });
-
 let isConvertingToAudioFile = false;
 let audioFile: File | null = null;
 
@@ -137,19 +135,21 @@ download.on('click', () => {
 });
 
 fileInput.on('change', () => {
+  fileInput.disabled = true;
   const file = fileInput.files && fileInput.files[0];
 
   if (!file) {
     console.log('未选择文件');
+    fileInput.disabled = false;
     return;
   }
 
   // 设置label里的文件名
-  fileLabel.el.textContent = file.name;
+  fileLabel.text = file.name;
 
   // 预览
-  audioPlayer.el.style.display = 'none';
-  videoPlayer.el.style.display = 'none';
+  audioPlayer.style.display = 'none';
+  videoPlayer.style.display = 'none';
   audioPlayer.el.pause();
   videoPlayer.el.pause();
 
@@ -157,6 +157,7 @@ fileInput.on('change', () => {
     audioPlayer.el.style.display = '';
     audioFile = file;
     play(file, audioPlayer.el);
+    fileInput.disabled = false;
   }
 
   if (isVideo(file)) {
@@ -165,12 +166,16 @@ fileInput.on('change', () => {
     isConvertingToAudioFile = true;
     download.disabled = true;
     setProgress(0.001);
+    setLabel({ zh: '正在提取音频', en: 'Extracting Audio' });
     loadAudioBuffer(file)
       .then((ab) => audioBufferToWav(ab, setProgress))
       .then((file) => {
-        download.disabled = false;
         audioFile = file;
         isConvertingToAudioFile = false;
+        download.disabled = false;
+      })
+      .finally(() => {
+        fileInput.disabled = false;
       });
   }
 });
@@ -224,7 +229,6 @@ asr.on('click', () => {
       return response.json();
     })
     .then((data) => {
-      // console.log('%c/was/asr Request sent successfully!', 'color:rgb(6, 175, 105);');
       console.log('data', data);
       dialog.alert(`/was/asr Request sent successfully!`);
     })

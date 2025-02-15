@@ -1,5 +1,5 @@
 import './init';
-import './styles';
+import './styles/index.sass';
 
 import { I18NConfig } from './types';
 import { Yuka, YukaAttribute } from './yuka.class';
