@@ -25,6 +25,6 @@
 
 .bar {
   display: grid;
-  grid-template-columns: 1fr 100px;
+  grid-template-columns: 1fr auto;
   grid-column-gap: 5px;
 }

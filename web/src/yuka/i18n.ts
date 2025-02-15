@@ -11,11 +11,7 @@ export const i18n = {
   },
 
   get locale() {
-    let lang = localStorage.getItem(i18n.UI_LANGUAGE) as LanguageType;
-    if (!LanguageTypes.includes(lang)) {
-      lang = i18n.DEFAULT_LANGUAGE;
-    }
-    return lang;
+    return (localStorage.getItem(i18n.UI_LANGUAGE) || i18n.DEFAULT_LANGUAGE) as LanguageType;
   },
 
   set locale(lang: LanguageType) {
@@ -33,7 +29,13 @@ export const i18n = {
     }
 
     localStorage.setItem(i18n.UI_LANGUAGE, lang);
+
     yukaEvent.emitI18NUpdated();
+  },
+
+  get(i18nConfig: I18NConfig) {
+    // 此处不进行isValid判定，因为理论上需要使用它的地方都是已经校验过的
+    return i18nConfig[i18n.locale] || '';
   },
 
   isValidConfig(i18nConfig: any) {

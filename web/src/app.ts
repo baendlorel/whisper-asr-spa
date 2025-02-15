@@ -19,11 +19,14 @@ export default h('div', { class: 'container' }).appendChild(
     {
       onclick: () => {
         dialog
-          .confirm('Are you sure?', {
-            onYes: () => {
-              return dialog.confirm('sure again?');
-            },
-          })
+          .confirm(
+            { zh: '你确定吗', en: 'Are you sure?' },
+            {
+              onYes: () => {
+                return dialog.confirm({ zh: '你真的确定吗', en: 'Are you sure2?' });
+              },
+            }
+          )
           .then((result) => {
             console.log('result', result);
           });

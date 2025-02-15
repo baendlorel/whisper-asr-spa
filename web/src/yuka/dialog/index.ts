@@ -50,7 +50,7 @@ const normalize = (arg1: string | I18NConfig | DialogOption, options?: DialogOpt
   }
   // 用i18nConfig的
   else if (i18n.isValidConfig(arg1)) {
-    options = Object.assign(options || {}, { body: (arg1 as I18NConfig)[i18n.locale] });
+    options = Object.assign(options || {}, { body: i18n.get(arg1 as I18NConfig) });
   }
   // 直接用options的
   else {
@@ -68,9 +68,9 @@ const createFooterButton = (options: DialogOptionExt, type: 'yes' | 'no') => {
   if (typeof content === 'string') {
     b.textContent = content;
   } else if (i18n.isValidConfig(content)) {
-    b.textContent = content[i18n.locale];
+    b.textContent = i18n.get(content);
   } else {
-    b.textContent = DEFAULT_FOOTER_BUTTON_I18N[type][i18n.locale];
+    b.textContent = i18n.get(DEFAULT_FOOTER_BUTTON_I18N[type]);
   }
 
   // 设置样式
@@ -86,7 +86,7 @@ const createFooterButton = (options: DialogOptionExt, type: 'yes' | 'no') => {
 const closeDialog = (dialog: HTMLDialogElement) => {
   dialog.classList.remove('show');
   dialog.addEventListener('transitionend', (e: TransitionEvent) => {
-    if (dialog.isSameNode(e.target as Node) && e.propertyName === 'opacity') {
+    if (dialog === (e.target as Node) && e.propertyName === 'opacity') {
       dialog.close();
       dialog.remove();
     }
@@ -109,7 +109,7 @@ const applyTitle = (dialog: HTMLDialogElement, title: HTMLElement, options: Dial
   }
 
   if (i18n.isValidConfig(options.title)) {
-    title.textContent = (options.title as I18NConfig)[i18n.locale];
+    title.textContent = i18n.get(options.title as I18NConfig);
     return { title };
   }
 
@@ -140,7 +140,7 @@ const applyBody = (dialog: HTMLDialogElement, body: HTMLElement, options: Dialog
   }
 
   if (i18n.isValidConfig(options.body)) {
-    body.textContent = (options.body as I18NConfig)[i18n.locale];
+    body.textContent = i18n.get(options.body as I18NConfig);
     return { body };
   }
 

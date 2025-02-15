@@ -167,8 +167,33 @@ export class Yuka<T extends HTMLElementType> {
     if (!this[i18nSymbol]) {
       return;
     }
-    this[textNodeSymbol].textContent = this[i18nSymbol][i18n.locale];
+    this[textNodeSymbol].textContent = i18n.get(this[i18nSymbol]);
   }
+
+  // duplicate() {
+  //   const newYuka = new Yuka(
+  //     this.el.cloneNode() as T,
+  //     this[textNodeSymbol].cloneNode(),
+  //     this[i18nSymbol]
+  //   );
+
+  //   for (let i = 0; i < this.el.childNodes.length; i++) {
+  //     const node = this.el.childNodes[i];
+  //     if (node === newYuka[textNodeSymbol]) {
+  //       newYuka.el.appendChild(node);
+  //       continue;
+  //     }
+
+  //     const yukaNode = Yuka.reverseMap.get(node as HTMLElement);
+  //     if (yukaNode) {
+  //       yukaNode.duplicate().mount(newYuka);
+  //     } else {
+  //       newYuka.el.appendChild(node.cloneNode());
+  //     }
+  //   }
+
+  //   return newYuka;
+  // }
 }
 
 export type YukaAttribute = {
