@@ -5,7 +5,7 @@ const { h } = useYuka();
 let videoPlayer: Yuka<HTMLVideoElement>;
 let audioPlayer: Yuka<HTMLAudioElement>;
 
-export default h('div', { class: 'player-wrapper' }).appendChild(
+export default h('div', { class: 'player-wrapper' }).append(
   (videoPlayer = h('video', {
     id: 'video-player',
     controls: 'controls',

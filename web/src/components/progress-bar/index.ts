@@ -10,8 +10,8 @@ export default () => {
   let spanLabel: Yuka<HTMLSpanElement>;
   let spanPercent: Yuka<HTMLSpanElement>;
 
-  const component = h('div', { class: 'progress-wrapper' }).appendChild(
-    (progressBar = h('div', 'progress-bar')).appendChild(
+  const component = h('div', { class: 'progress-wrapper' }).append(
+    (progressBar = h('div', 'progress-bar')).append(
       (spanLabel = h('span', { style: { paddingRight: '5px' } })),
       (spanPercent = h('span'))
     )

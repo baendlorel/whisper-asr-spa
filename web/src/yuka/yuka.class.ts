@@ -130,7 +130,7 @@ export class Yuka<T extends HTMLElementType> {
     return this.el.style;
   }
 
-  appendChild(...yukaEls: Yuka<HTMLElementType>[]): Yuka<T> {
+  append(...yukaEls: Yuka<HTMLElementType>[]): Yuka<T> {
     for (const r of yukaEls) {
       this.el.appendChild(r.el);
     }
@@ -157,7 +157,7 @@ export class Yuka<T extends HTMLElementType> {
   mount(yukaElement: HTMLElement): void;
   mount(element: Yuka<HTMLElementType> | HTMLElement) {
     if (element instanceof Yuka) {
-      element.appendChild(this);
+      element.append(this);
     } else {
       element.appendChild(this.el);
     }

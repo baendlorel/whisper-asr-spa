@@ -9,8 +9,8 @@ const { h } = useYuka();
 
 dialog;
 
-export default h('div', { class: 'container' }).appendChild(
-  h('h2', { class: 'title' }).appendChild(
+export default h('div', { class: 'container' }).append(
+  h('h2', { class: 'title' }).append(
     h('img', { src: typescriptLogo, class: 'logo' }),
     h('span', undefined, 'Whisper ASR')
   ),

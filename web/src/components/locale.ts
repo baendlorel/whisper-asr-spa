@@ -7,7 +7,7 @@ css(`.locale{
   text-align: center;
 }`);
 
-const comp = h('div', 'locale').appendChild(
+const comp = h('div', 'locale').append(
   h('input', {
     type: 'radio',
     id: 'ui-zh',

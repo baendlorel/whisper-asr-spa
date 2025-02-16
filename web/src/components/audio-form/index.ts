@@ -19,13 +19,13 @@ let fileLabel: Yuka<HTMLLabelElement>;
 let audioForm: Yuka<HTMLFormElement>;
 let asr: Yuka<HTMLButtonElement>;
 
-const comp = h('div', 'form-wrapper').appendChild(
-  h('div', 'bar').appendChild(
+const comp = h('div', 'form-wrapper').append(
+  h('div', 'bar').append(
     progressBarComponent,
     (download = h('button', { disabled: 'true' }, { zh: '下载音频', en: 'Download' }))
   ),
-  (audioForm = h('form', { id: 'audio-form' }).appendChild(
-    h('div', 'basic-options-wrapper').appendChild(
+  (audioForm = h('form', { id: 'audio-form' }).append(
+    h('div', 'basic-options-wrapper').append(
       h(
         'label',
         { for: 'audio_file' },
@@ -34,7 +34,7 @@ const comp = h('div', 'form-wrapper').appendChild(
           en: 'Media',
         }
       ),
-      h('div').appendChild(
+      h('div').append(
         h(
           'button',
           { id: 'file-selector', type: 'button', onclick: () => fileInput.el.click() },
@@ -59,7 +59,7 @@ const comp = h('div', 'form-wrapper').appendChild(
           en: 'Output',
         }
       ),
-      h('select', { id: 'output', name: 'output' }).appendChild(
+      h('select', { id: 'output', name: 'output' }).append(
         h('option', { value: 'text' }, { zh: '文本', en: 'Text' }),
         h('option', { value: 'json' }, { zh: 'JSON', en: 'JSON' }),
         h('option', { value: 'vtt' }, { zh: 'VTT', en: 'VTT' }),
@@ -68,8 +68,8 @@ const comp = h('div', 'form-wrapper').appendChild(
       )
     ),
     h('h4', undefined, { zh: '以下都推荐默认设置', en: 'We suggest not to change options below' }),
-    h('div', 'advanced-options-wrapper').appendChild(
-      h('div', 'col-half').appendChild(
+    h('div', 'advanced-options-wrapper').append(
+      h('div', 'col-half').append(
         h(
           'label',
           { for: 'task' },
@@ -78,7 +78,7 @@ const comp = h('div', 'form-wrapper').appendChild(
             en: 'Task',
           }
         ),
-        h('select', { id: 'task', name: 'task' }).appendChild(
+        h('select', { id: 'task', name: 'task' }).append(
           h(
             'option',
             { value: 'transcribe', selected: true },
@@ -87,23 +87,23 @@ const comp = h('div', 'form-wrapper').appendChild(
           h('option', { value: 'translate' }, { zh: '翻译（仅能译为英文）', en: 'translate' })
         )
       ),
-      h('div', 'col-half').appendChild(
+      h('div', 'col-half').append(
         h('label', { for: 'language' }, { zh: '语言选择', en: 'Language' }),
-        h('select', { id: 'language', name: 'language' }).appendChild(
+        h('select', { id: 'language', name: 'language' }).append(
           h('option', { value: '', selected: true }, { zh: '自动检测', en: 'auto detect' }),
           ...languageOptions.map((o) => h('option', { value: o.value }, o.label))
         )
       ),
-      h('div', 'col-half').appendChild(
+      h('div', 'col-half').append(
         h('label', { for: 'encode' }, { zh: '编码音频', en: 'Encode' }),
-        h('select', { id: 'encode', name: 'encode' }).appendChild(
+        h('select', { id: 'encode', name: 'encode' }).append(
           h('option', { value: 'true', selected: true }, { zh: '是（默认）', en: 'true' }),
           h('option', { value: 'false' }, { zh: '否', en: 'false' })
         )
       ),
-      h('div', 'col-half').appendChild(
+      h('div', 'col-half').append(
         h('label', { for: 'word_timestamps' }, { zh: '字词级时间戳', en: 'Word Timestamps' }),
-        h('select', { id: 'word_timestamps', name: 'word_timestamps' }).appendChild(
+        h('select', { id: 'word_timestamps', name: 'word_timestamps' }).append(
           h('option', { value: 'true' }, { zh: '是', en: 'true' }),
           h('option', { value: 'false', selected: true }, { zh: '否（默认）', en: 'false' })
         )
