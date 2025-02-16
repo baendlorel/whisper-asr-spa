@@ -8,8 +8,19 @@ const textNodeSymbol = Symbol('textNode');
 
 yukaEvent.onI18NUpdated(() => Yuka.reverseMap.forEach((yukaEl) => yukaEl.applyLocale()));
 
+type YukaCreator = (...args: any[]) => Yuka<HTMLElementType>;
+
 export class Yuka<T extends HTMLElementType> {
+  /**
+   * 所有的element到Yuka的映射
+   */
   static readonly reverseMap: Map<HTMLElementType, Yuka<HTMLElementType>> = new Map();
+
+  /**
+   * 以函数创建的yuka，可以通过再次执行函数重新创建并挂载在原来的位置
+   */
+  static readonly recreatableMap: WeakMap<YukaCreator, Node> = new Map();
+
   static [uidSymbol]: number = 0;
 
   readonly uid: number;
@@ -130,9 +141,41 @@ export class Yuka<T extends HTMLElementType> {
     return this.el.style;
   }
 
-  append(...yukaEls: Yuka<HTMLElementType>[]): Yuka<T> {
-    for (const r of yukaEls) {
-      this.el.appendChild(r.el);
+  append(...yukas: (Yuka<HTMLElementType> | YukaCreator)[]): Yuka<T> {
+    for (const r of yukas) {
+      // 直接是yuka对象
+      if (r instanceof Yuka) {
+        this.el.appendChild(r.el);
+        continue;
+      }
+      // 用函数创建的yuka对象
+      if (typeof r === 'function') {
+        const yuka = r();
+        if (yuka instanceof Promise) {
+          yuka.then((asyncYuka) => {
+            if (asyncYuka instanceof Yuka) {
+              this.el.appendChild(yuka.el);
+              Yuka.recreatableMap.set(r, this.el);
+            } else {
+              throw new Error(
+                '[Yuka:Yuka.append] The given function must return a Yuka/Promise<Yuka> instance'
+              );
+            }
+          });
+        }
+        if (yuka instanceof Yuka) {
+          this.el.appendChild(yuka.el);
+          Yuka.recreatableMap.set(r, this.el);
+        } else {
+          throw new Error(
+            '[Yuka:Yuka.append] The given function must return a Yuka/Promise<Yuka> instance'
+          );
+        }
+        continue;
+      }
+      throw new Error(
+        '[Yuka:Yuka.append] The given argument must be a Yuka instance or a function that returns a Yuka/Promise<Yuka> instance'
+      );
     }
     return this;
   }
