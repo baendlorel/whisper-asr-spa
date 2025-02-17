@@ -49,11 +49,6 @@ if path.exists(assets_path + "/swagger-ui.css") and path.exists(assets_path + "/
     applications.get_swagger_ui_html = swagger_monkey_patch
 
 
-html_path = os.getcwd() + "/app/html"
-if path.exists(assets_path):
-    # 无需定义路由，html=True会自动返回index.html
-    app.mount("/", StaticFiles(directory=html_path, html=True), name="static")
-
 
 # @app.get("/", response_class=RedirectResponse, include_in_schema=False)
 # async def index():
@@ -98,6 +93,11 @@ async def detect_language(
     return {"detected_language": tokenizer.LANGUAGES[detected_lang_code], "language_code": detected_lang_code,
             "confidence": confidence}
 
+
+html_path = os.getcwd() + "/app/html"
+if path.exists(assets_path):
+    # 无需定义路由，html=True会自动返回index.html
+    app.mount("/", StaticFiles(directory=html_path, html=True), name="static")
 
 @click.command()
 @click.option(
