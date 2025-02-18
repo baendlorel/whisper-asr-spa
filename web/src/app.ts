@@ -1,4 +1,4 @@
-import { dialog, useYuka } from './yuka';
+import { dialog, i18n, useYuka } from './yuka';
 import typescriptLogo from './assets/typescript.svg';
 import locale from './components/locale';
 import players from './components/players';
@@ -16,9 +16,18 @@ export default h('div', { class: 'container' }).append(
     'button',
     {
       onclick: () => {
-        dialog.wait({ zh: '等5秒', en: 'wait 5s' }, 5).then(() => {
-          console.log('wait end');
-        });
+        dialog
+          .wait({ zh: '等5秒', en: 'wait 5s' }, 5, {
+            countDownText(timeLeft) {
+              return i18n.get({
+                zh: `还剩${timeLeft}秒，已经过去了${5 - timeLeft}秒`,
+                en: `left ${timeLeft}s, passed ${5 - timeLeft}s`,
+              });
+            },
+          })
+          .then(() => {
+            console.log('wait end');
+          });
       },
     },
     'click me'

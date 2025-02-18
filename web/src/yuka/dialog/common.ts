@@ -23,14 +23,24 @@ type DialogOptionStrict = {
   width: string;
 
   /**
-   * 确认按钮的文本，可以是字符串或i18n配置
+   * 确认按钮的文本，可以是字符串或i18n配置，在alert和confirm中会用到
+   * @function alert,confirm
    */
   yesText: string | I18NConfig;
 
   /**
-   * 取消按钮的文本，可以是字符串或i18n配置
+   * 取消按钮的文本，可以是字符串或i18n配置，在confirm中会用到
+   * @function confirm
    */
   noText: string | I18NConfig;
+
+  /**
+   * 在对话框中显示包含剩余时间的字符串，会覆盖message或i18n配置
+   * @function wait
+   * @param timeLeft 剩余时间，可制作倒计时
+   * @returns
+   */
+  countDownText: (timeLeft: number) => string;
 
   /**
    * 按下确认时绑定的事件

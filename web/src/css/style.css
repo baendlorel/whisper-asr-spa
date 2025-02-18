@@ -1,5 +1,5 @@
 body {
-  font-family: '微软雅黑', '黑体', Arial, sans-serif;
+  font-family: 'Noto Sans CJK', 'Microsoft YaHei UI', Arial, sans-serif;
   margin: 20px;
 }
 
@@ -8,12 +8,11 @@ body {
 }
 
 .title {
-  width: 600px;
-  margin: auto;
+  margin: 0px auto;
   text-align: center;
 }
 
 .container {
-  max-width: 600px;
   margin: 0px auto;
+  max-width: 720px;
 }
