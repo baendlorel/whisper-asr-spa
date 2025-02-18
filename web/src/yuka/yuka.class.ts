@@ -255,6 +255,8 @@ export type YukaAttribute = {
   checked?: boolean;
   class?: string | string[];
   style?: string | Partial<CSSStyleDeclaration>;
+  action?: string;
+  method?: 'POST' | 'GET' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS' | 'CONNECT' | 'TRACE';
 
   onabort?: (event: UIEvent) => void;
   onanimationcancel?: (event: AnimationEvent) => void;

@@ -43,12 +43,13 @@ export const i18n = {
       return false;
     }
 
+    // 只要有一个配置符合条件就可以
     for (const key of LanguageTypes) {
-      if (typeof i18nConfig[key] !== 'string') {
-        return false;
+      if (typeof i18nConfig[key] === 'string') {
+        return true;
       }
     }
 
-    return true;
+    return false;
   },
 };
