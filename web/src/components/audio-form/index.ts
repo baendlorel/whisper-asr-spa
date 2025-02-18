@@ -220,11 +220,13 @@ audioForm.on('submit', (event) => {
       console.log('resp', data); // 显示服务器返回的内容
     });
 
-  dialog.wait(
-    { zh: '请求已发送，请稍候...', en: 'Request sent successfully! Please wait...' },
-    resp
-  );
   resp.catch((error) => console.error('Error:', error));
+
+  dialog
+    .wait({ zh: '请求已发送，请稍候...', en: 'Request sent successfully! Please wait...' }, resp)
+    .then(() => {
+      dialog.alert({ zh: '处理完成', en: 'Request completed!' });
+    });
 });
 
 export default comp;

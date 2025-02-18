@@ -18,6 +18,21 @@ export default h('div', { class: 'container' }).append(
       onclick: () => {
         dialog
           .wait({ zh: '等5秒', en: 'wait 5s' }, 5, {
+            title: { zh: '等待测试', en: 'wait test' },
+            onOpen() {
+              console.time('dialog');
+              console.timeLog('dialog', 'onOpen');
+            },
+            onOpened() {
+              console.timeLog('dialog', 'onOpened');
+            },
+            onClose() {
+              console.timeLog('dialog', 'onClose');
+            },
+            onClosed() {
+              console.timeLog('dialog', 'onClosed');
+              console.timeEnd('dialog');
+            },
             countDownText(timeLeft) {
               return i18n.get({
                 zh: `还剩${timeLeft}秒，已经过去了${5 - timeLeft}秒`,

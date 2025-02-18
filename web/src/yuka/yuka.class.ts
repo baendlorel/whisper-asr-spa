@@ -80,7 +80,7 @@ export class Yuka<T extends HTMLElementType> {
           if (typeof newValue !== 'string') {
             throw new Error('[Yuka:Yuka.i18n] The given i18nConfig is not a valid config object.');
           }
-          Reflect.set(currentI18NConfig, key, newValue);
+          currentI18NConfig[key] = newValue;
           thisArg.applyLocale();
         },
       });

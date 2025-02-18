@@ -3,6 +3,7 @@ import { isDialogSupported, createDialog, closeDialog, DialogOption, normalize }
 
 /**
  * 根据配置弹出wait窗口，窗口是以DOM标签dialog制作的
+ * wait窗口的文字默认居中显示
  * @param message 消息内容
  * @param until 如果是秒数，则等待这么多秒。如果是Promise，则等待这个Promise.finally触发
  * @param options 详细配置，根据TS类型提示进行配置即可
@@ -16,6 +17,7 @@ export async function wait(
 
 /**
  * 根据配置弹出wait窗口，窗口是以DOM标签dialog制作的
+ * wait窗口的文字默认居中显示
  * @param i18nConfig 多国语言的消息配置，会根据现在的语言环境自动显示对应文字
  * @param until 如果是秒数，则等待这么多秒。如果是Promise，则等待这个Promise.finally触发
  * @param options 详细配置，根据TS类型提示进行配置即可
@@ -29,6 +31,7 @@ export async function wait(
 
 /**
  * 根据配置弹出wait窗口，窗口是以DOM标签dialog制作的
+ * wait窗口的文字默认居中显示
  * @param until 如果是秒数，则等待这么多秒。如果是Promise，则等待这个Promise.finally触发
  * @param options 详细配置，根据TS类型提示进行配置即可
  * @returns Promise<void> 在返回Promise，当resolve时表示等待已经结束
@@ -53,6 +56,21 @@ export async function wait(
     ) => {
       const normalizedOpt = normalize(arg1, options);
       normalizedOpt.type = 'wait';
+
+      normalizedOpt.bodyStyle = Object.assign(
+        {
+          textAlign: 'center',
+        },
+        normalizedOpt.bodyStyle
+      );
+
+      normalizedOpt.titleStyle = Object.assign(
+        {
+          textAlign: 'center',
+        },
+        normalizedOpt.titleStyle
+      );
+
       const { dialog, body, footer } = createDialog(normalizedOpt);
       footer.remove();
 
@@ -72,14 +90,14 @@ export async function wait(
           refreshCountDown();
           if (timeLeft <= 0) {
             clearInterval(counter);
-            closeDialog(dialog);
+            closeDialog(dialog, options);
             resolve();
             return;
           }
         }, 1000);
       } else if (until instanceof Promise) {
         until.finally(() => {
-          closeDialog(dialog);
+          closeDialog(dialog, options);
           resolve();
         });
       }

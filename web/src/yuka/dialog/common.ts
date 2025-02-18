@@ -23,6 +23,26 @@ type DialogOptionStrict = {
   width: string;
 
   /**
+   * 对话框样式
+   */
+  dialogStyle: Partial<CSSStyleDeclaration>;
+
+  /**
+   * 标题样式
+   */
+  titleStyle: Partial<CSSStyleDeclaration>;
+
+  /**
+   * 内容样式
+   */
+  bodyStyle: Partial<CSSStyleDeclaration>;
+
+  /**
+   * 底部样式
+   */
+  footerStyle: Partial<CSSStyleDeclaration>;
+
+  /**
    * 确认按钮的文本，可以是字符串或i18n配置，在alert和confirm中会用到
    * @function alert,confirm
    */
@@ -54,14 +74,24 @@ type DialogOptionStrict = {
   onNo: () => void;
 
   /**
-   * 对话框开启时触发（淡出开始时）
+   * 对话框开启时，还在渐变的时候触发
    */
   onOpen: () => void;
 
   /**
-   * 对话框关闭时触发
+   * 对话框开启完成，渐变结束时触发
+   */
+  onOpened: () => void;
+
+  /**
+   * 对话框开始关闭时触发
    */
   onClose: () => void;
+
+  /**
+   * 对话框关闭完成时触发
+   */
+  onClosed: () => void;
 };
 
 /**
@@ -87,6 +117,12 @@ export const DEFAULT_FOOTER_BUTTON_I18N = {
   },
 };
 
+const DialogState = {
+  ATTR_NAME: 'yk-state',
+  OPENED: 'opened',
+  OPENING: 'opening',
+  CLOSING: 'closing',
+};
 export const DIALOG_CONFIRM_ATTR = 'yk-confirm';
 export const DIALOG_ROLE = 'yk-role';
 
@@ -141,14 +177,19 @@ export const createFooterButton = (options: DialogOptionExt, type: 'yes' | 'no')
   return b;
 };
 
-export const closeDialog = (dialog: HTMLDialogElement) => {
+export const closeDialog = (dialog: HTMLDialogElement, options?: DialogOption) => {
   dialog.classList.remove('show');
-  dialog.addEventListener('transitionend', (e: TransitionEvent) => {
-    if (dialog === (e.target as Node) && e.propertyName === 'opacity') {
-      dialog.close();
-      dialog.remove();
+
+  // 使用flag来避免其他设置opacity为0但不需要关闭的情况
+  dialog.setAttribute(DialogState.ATTR_NAME, DialogState.CLOSING);
+};
+
+const applyStyle = (el: HTMLElement, style: Partial<CSSStyleDeclaration>) => {
+  for (const k in style) {
+    if (style.hasOwnProperty(k)) {
+      (el.style as any)[k] = style[k];
     }
-  });
+  }
 };
 
 export const applyTitle = (
@@ -156,9 +197,13 @@ export const applyTitle = (
   title: HTMLElement,
   options: DialogOptionExt
 ) => {
-  if (options.title === undefined) {
+  if (options.title === undefined || options.title === null) {
     title.remove();
     return { title: undefined };
+  }
+
+  if (options.titleStyle && typeof options === 'object') {
+    applyStyle(title, options.titleStyle);
   }
 
   if (options.variant) {
@@ -198,6 +243,10 @@ export const applyBody = (
   if (options.body === undefined) {
     body.remove();
     return { body: undefined };
+  }
+
+  if (options.bodyStyle && typeof options === 'object') {
+    applyStyle(body, options.bodyStyle);
   }
 
   if (typeof options.body === 'string') {
@@ -243,7 +292,7 @@ export const applyFooter = (
     (handler: ((event: Event) => void) | undefined, type: 'yes' | 'no') => (e: Event) => {
       if (typeof handler !== 'function') {
         dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
-        closeDialog(dialog);
+        closeDialog(dialog, options);
         return;
       }
       const returnValue = handler(e) as Promise<any> | any;
@@ -251,13 +300,13 @@ export const applyFooter = (
         returnValue.then((result) => {
           if (result !== false) {
             dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
-            closeDialog(dialog);
+            closeDialog(dialog, options);
           }
         });
         return;
       } else if (returnValue !== false) {
         dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
-        closeDialog(dialog);
+        closeDialog(dialog, options);
         return;
       }
     };
@@ -266,6 +315,10 @@ export const applyFooter = (
   const no = createFooterButton(options, 'no');
   yes.addEventListener('click', createHandler(options.onYes, 'yes'));
   no.addEventListener('click', createHandler(options.onNo, 'no'));
+
+  if (options.footerStyle && typeof options === 'object') {
+    applyStyle(footer, options.footerStyle);
+  }
 
   if (options.type === 'alert') {
     footer.appendChild(yes);
@@ -329,20 +382,69 @@ export const createDialog = (options: DialogOptionExt) => {
   const { title } = applyTitle(dialog, rawTitle, options);
   const { footer, yes, no } = applyFooter(dialog, rawFooter, options);
 
+  if (options.dialogStyle && typeof options === 'object') {
+    applyStyle(dialog, options.dialogStyle);
+  }
+
   document.body.appendChild(dialog);
 
   dialog.showModal();
 
-  if (typeof options.onOpen === 'function') {
-    options.onOpen();
-  }
-
-  if (typeof options.onClose === 'function') {
-    dialog.addEventListener('close', options.onClose);
-  }
-
   requestAnimationFrame(() => {
     dialog.classList.add('show');
+    // 使用flag来避免其他设置opacity为1但不需要开启的情况
+    dialog.setAttribute(DialogState.ATTR_NAME, DialogState.OPENING);
+
+    dialog.addEventListener('transitionend', (e: TransitionEvent) => {
+      if (dialog !== (e.target as Node) || e.propertyName !== 'opacity') {
+        return;
+      }
+      console.log(dialog.getAttribute(DialogState.ATTR_NAME), getComputedStyle(dialog).opacity);
+
+      const compare = (state: string, opacity: string) =>
+        dialog.getAttribute(DialogState.ATTR_NAME) === state &&
+        getComputedStyle(dialog).opacity === opacity;
+
+      if (compare(DialogState.OPENING, '1')) {
+        dialog.setAttribute(DialogState.ATTR_NAME, DialogState.OPENED);
+        if (typeof options.onOpened === 'function') {
+          options.onOpened();
+        }
+      }
+
+      if (compare(DialogState.CLOSING, '0')) {
+        dialog.close();
+        dialog.remove();
+        if (typeof options.onClosed === 'function') {
+          options.onClosed();
+        }
+      }
+    });
+
+    dialog.addEventListener('transitionstart', (e: TransitionEvent) => {
+      if (dialog !== (e.target as Node) || e.propertyName !== 'opacity') {
+        return;
+      }
+
+      console.log(dialog.getAttribute(DialogState.ATTR_NAME), getComputedStyle(dialog).opacity);
+
+      const compare = (state: string, opacity: string) =>
+        dialog.getAttribute(DialogState.ATTR_NAME) === state &&
+        getComputedStyle(dialog).opacity === opacity;
+
+      if (compare(DialogState.OPENING, '0')) {
+        dialog.setAttribute(DialogState.ATTR_NAME, DialogState.OPENED);
+        if (typeof options.onOpen === 'function') {
+          options.onOpen();
+        }
+      }
+
+      if (compare(DialogState.CLOSING, '1')) {
+        if (typeof options.onClose === 'function') {
+          options.onClose();
+        }
+      }
+    });
   });
 
   return { dialog, title, body, footer, yes, no };
