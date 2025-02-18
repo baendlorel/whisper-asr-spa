@@ -18,13 +18,19 @@ let fileLabel: Yuka<HTMLLabelElement>;
 
 let audioForm: Yuka<HTMLFormElement>;
 let asr: Yuka<HTMLButtonElement>;
+let submit: Yuka<HTMLButtonElement>;
 
 const comp = h('div', 'form-wrapper').append(
   h('div', 'bar').append(
     progressBarComponent,
     (download = h('button', { disabled: 'true' }, { zh: '下载音频', en: 'Download' }))
   ),
-  (audioForm = h('form', { id: 'audio-form' }).append(
+  (audioForm = h('form', {
+    id: 'audio-form',
+    method: 'POST',
+    action: '/was/asr',
+    enctype: 'multipart/form-data',
+  }).append(
     h('div', 'basic-options-wrapper').append(
       h(
         'label',
@@ -108,9 +114,10 @@ const comp = h('div', 'form-wrapper').append(
           h('option', { value: 'false', selected: true }, { zh: '否（默认）', en: 'false' })
         )
       )
-    )
+    ),
+    (submit = h('button', { class: 'execute', type: 'submit' }, { zh: '提交', en: 'Submit' }))
   )),
-  (asr = h('button', { id: 'asr', class: 'execute' }, { zh: '执行', en: 'Execute' }))
+  (asr = h('button', 'execute', { zh: '执行', en: 'Execute' }))
 );
 
 let isConvertingToAudioFile = false;
@@ -236,6 +243,44 @@ asr.on('click', () => {
       console.info('Error sending request.');
       console.error('9000/was/asr Error:', error);
     });
+});
+
+audioForm.on('submit', (event) => {
+  event.preventDefault(); // 阻止默认提交（防止页面刷新）
+
+  if (!isAudio(audioFile)) {
+    dialog.alert({ zh: '不是音视频文件', en: 'Not an audio file!' });
+    return;
+  }
+
+  if (isConvertingToAudioFile) {
+    dialog.alert({ zh: '还在转换中，请稍后提交', en: 'Still converting! Please try again later.' });
+    return;
+  }
+
+  const form = event.target as HTMLFormElement;
+  const formData = new FormData(form); // 创建 FormData 对象，自动收集表单数据
+  formData.set('audio_file', audioFile as Blob);
+
+  if (formData.get('language') === '') {
+    formData.delete('language');
+  }
+
+  const resp = fetch(form.action, {
+    // 发送请求到服务器
+    method: form.method,
+    body: formData,
+  })
+    .then((response) => response.json()) // 解析服务器返回的数据
+    .then((data) => {
+      console.log('resp', data); // 显示服务器返回的内容
+    });
+
+  dialog.wait(
+    { zh: '请求已发送，请稍候...', en: 'Request sent successfully! Please wait...' },
+    resp
+  );
+  resp.catch((error) => console.error('Error:', error));
 });
 
 console.log('audioform comp', comp);
