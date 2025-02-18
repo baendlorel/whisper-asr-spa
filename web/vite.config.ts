@@ -29,7 +29,7 @@ export default defineConfig({
         changeOrigin: true,
         ws: false,
         secure: false,
-        proxyTimeout: 60000, // 60秒超时
+        proxyTimeout: 600000, // 60秒超时
         configure: (proxy, options) => {
           proxy.on('proxyReq', (proxyReq, req, res) => {
             console.log('代理请求:', req.method, req.url);
