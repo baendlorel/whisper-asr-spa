@@ -45,6 +45,7 @@ export async function wait(
       reject('[Yuka:dialog wait] Dialog is not supported in this browser.');
     }
 
+    // 此为参数归一化后通用的wait函数
     const _wait = (
       arg1: string | I18NConfig | undefined,
       until: number | Promise<any>,
@@ -52,14 +53,30 @@ export async function wait(
     ) => {
       const normalizedOpt = normalize(arg1, options);
       normalizedOpt.type = 'wait';
-      const { dialog, footer } = createDialog(normalizedOpt);
+      const { dialog, body, footer } = createDialog(normalizedOpt);
       footer.remove();
 
       if (typeof until === 'number') {
-        setTimeout(() => {
-          closeDialog(dialog);
-          resolve();
-        }, until * 1000);
+        let timeLeft = until;
+
+        const countDownText = options?.countDownText;
+        const refreshCountDown =
+          body !== undefined && typeof countDownText === 'function'
+            ? () => (body.textContent = countDownText(timeLeft))
+            : () => void 0;
+
+        // 先展示第一次的文本
+        refreshCountDown();
+        const counter = setInterval(() => {
+          timeLeft--;
+          refreshCountDown();
+          if (timeLeft <= 0) {
+            clearInterval(counter);
+            closeDialog(dialog);
+            resolve();
+            return;
+          }
+        }, 1000);
       } else if (until instanceof Promise) {
         until.finally(() => {
           closeDialog(dialog);
@@ -67,6 +84,7 @@ export async function wait(
         });
       }
     };
+
     // 开始检测参数是哪一种重载
     // 1. wait(message: string, until: number | Promise<any>, options?: DialogOption): void;
     if (typeof arg1 === 'string' && (typeof until === 'number' || until instanceof Promise)) {

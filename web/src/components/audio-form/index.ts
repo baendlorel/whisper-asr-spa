@@ -4,9 +4,8 @@ import { audioPlayer, videoPlayer } from '../players';
 import progressBar from '../progress-bar';
 import { languageOptions } from './language-options';
 import style from './style.css?raw';
-import wasService from '@/services/was.service';
 
-const { css, h, eventBus } = useYuka();
+const { css, h } = useYuka();
 
 css(style);
 
@@ -17,8 +16,6 @@ let fileInput: Yuka<HTMLInputElement>;
 let fileLabel: Yuka<HTMLLabelElement>;
 
 let audioForm: Yuka<HTMLFormElement>;
-let asr: Yuka<HTMLButtonElement>;
-let submit: Yuka<HTMLButtonElement>;
 
 const comp = h('div', 'form-wrapper').append(
   h('div', 'bar').append(
@@ -115,9 +112,8 @@ const comp = h('div', 'form-wrapper').append(
         )
       )
     ),
-    (submit = h('button', { class: 'execute', type: 'submit' }, { zh: '提交', en: 'Submit' }))
-  )),
-  (asr = h('button', 'execute', { zh: '执行', en: 'Execute' }))
+    h('button', { class: 'execute', type: 'submit' }, { zh: '提交', en: 'Submit' })
+  ))
 );
 
 let isConvertingToAudioFile = false;
@@ -187,64 +183,6 @@ fileInput.on('change', () => {
   }
 });
 
-asr.on('click', () => {
-  if (isConvertingToAudioFile) {
-    alert('Still converting! Please try again later.');
-    return;
-  }
-
-  const formData = new FormData(audioForm.el);
-
-  if (formData.get('language') === '') {
-    formData.delete('language');
-  }
-
-  formData.set('audio_file', audioFile as Blob);
-  if (!isAudio(audioFile)) {
-    alert('不是音视频文件');
-    return;
-  }
-
-  const args: any = {};
-
-  formData.forEach((value, key) => {
-    args[key] = value;
-  });
-
-  console.log('args', args);
-
-  // wasService
-  //   .asrForm(formData)
-  //   .then((data) => {
-  //     console.log(data);
-  //     eventBus.emit('display-result', data);
-  //   })
-  //   .catch((e) => {
-  //     console.log({ args });
-  //     console.log(e);
-  //   });
-
-  fetch('/was/asr', {
-    method: 'POST',
-    body: args,
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  })
-    .then((response) => {
-      console.log('resp', response);
-      return response.json();
-    })
-    .then((data) => {
-      console.log('data', data);
-      dialog.alert(`/was/asr Request sent successfully!`);
-    })
-    .catch((error) => {
-      console.info('Error sending request.');
-      console.error('9000/was/asr Error:', error);
-    });
-});
-
 audioForm.on('submit', (event) => {
   event.preventDefault(); // 阻止默认提交（防止页面刷新）
 
@@ -258,16 +196,22 @@ audioForm.on('submit', (event) => {
     return;
   }
 
-  const form = event.target as HTMLFormElement;
-  const formData = new FormData(form); // 创建 FormData 对象，自动收集表单数据
+  const form = audioForm.el;
+  const formData = new FormData(audioForm.el); // 创建 FormData 对象，自动收集表单数据
   formData.set('audio_file', audioFile as Blob);
 
   if (formData.get('language') === '') {
     formData.delete('language');
   }
 
+  // 以下axios可行
+  // const args = {} as any;
+  // formData.forEach((v, k) => {
+  //   args[k] = v;
+  // });
+  // axios.post('/was/asr', args, { headers: { 'content-type': 'multipart/form-data' } });
+
   const resp = fetch(form.action, {
-    // 发送请求到服务器
     method: form.method,
     body: formData,
   })
@@ -282,8 +226,5 @@ audioForm.on('submit', (event) => {
   );
   resp.catch((error) => console.error('Error:', error));
 });
-
-console.log('audioform comp', comp);
-console.log('asr', asr);
 
 export default comp;
