@@ -7,8 +7,6 @@ import displayer from './components/displayer';
 
 const { h } = useYuka();
 
-dialog;
-
 export default h('div', { class: 'container' }).append(
   h('h2', { class: 'title' }).append(
     h('img', { src: typescriptLogo, class: 'logo' }),
@@ -18,18 +16,9 @@ export default h('div', { class: 'container' }).append(
     'button',
     {
       onclick: () => {
-        dialog
-          .confirm(
-            { zh: '你确定吗', en: 'Are you sure?' },
-            {
-              onYes: () => {
-                return dialog.confirm({ zh: '你真的确定吗', en: 'Are you sure2?' });
-              },
-            }
-          )
-          .then((result) => {
-            console.log('result', result);
-          });
+        dialog.wait({ zh: '等5秒', en: 'wait 5s' }, 5).then(() => {
+          console.log('wait end');
+        });
       },
     },
     'click me'

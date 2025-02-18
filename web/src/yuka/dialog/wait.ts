@@ -1,17 +1,40 @@
 import { i18n, I18NConfig } from '..';
 import { isDialogSupported, createDialog, closeDialog, DialogOption, normalize } from './common';
 
+/**
+ * 根据配置弹出wait窗口，窗口是以DOM标签dialog制作的
+ * @param message 消息内容
+ * @param until 如果是秒数，则等待这么多秒。如果是Promise，则等待这个Promise.finally触发
+ * @param options 详细配置，根据TS类型提示进行配置即可
+ * @returns Promise<void> 在返回Promise，当resolve时表示等待已经结束
+ */
 export async function wait(
   message: string,
   until: number | Promise<any>,
   options?: DialogOption
 ): Promise<void>;
+
+/**
+ * 根据配置弹出wait窗口，窗口是以DOM标签dialog制作的
+ * @param i18nConfig 多国语言的消息配置，会根据现在的语言环境自动显示对应文字
+ * @param until 如果是秒数，则等待这么多秒。如果是Promise，则等待这个Promise.finally触发
+ * @param options 详细配置，根据TS类型提示进行配置即可
+ * @returns Promise<void> 在返回Promise，当resolve时表示等待已经结束
+ */
 export async function wait(
   i18nConfig: I18NConfig,
   until: number | Promise<any>,
   options?: DialogOption
 ): Promise<void>;
+
+/**
+ * 根据配置弹出wait窗口，窗口是以DOM标签dialog制作的
+ * @param until 如果是秒数，则等待这么多秒。如果是Promise，则等待这个Promise.finally触发
+ * @param options 详细配置，根据TS类型提示进行配置即可
+ * @returns Promise<void> 在返回Promise，当resolve时表示等待已经结束
+ */
 export async function wait(until: number | Promise<any>, options?: DialogOption): Promise<void>;
+
 export async function wait(
   arg1: string | I18NConfig | number | Promise<any>,
   until?: number | Promise<any> | DialogOption,
@@ -38,7 +61,7 @@ export async function wait(
           resolve();
         }, until * 1000);
       } else if (until instanceof Promise) {
-        until.then(() => {
+        until.finally(() => {
           closeDialog(dialog);
           resolve();
         });

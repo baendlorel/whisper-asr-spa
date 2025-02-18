@@ -1,18 +1,63 @@
 import { i18n, Yuka } from '..';
 import { HTMLElementType, I18NConfig } from '../types';
 
-export type DialogOption = {
-  title?: string | I18NConfig | HTMLElement | Yuka<HTMLElementType>;
-  body?: string | I18NConfig | HTMLElement | Yuka<HTMLElementType>;
-  variant?: 'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
-  width?: string;
-  yesText?: string | I18NConfig;
-  noText?: string | I18NConfig;
-  onYes?: () => void;
-  onNo?: () => void;
-  onOpen?: () => void;
-  onClose?: () => void;
+type DialogOptionStrict = {
+  /**
+   * 对话框的标题，
+   */
+  title: string | I18NConfig | HTMLElement | Yuka<HTMLElementType>;
+
+  /**
+   *  对话框的内容，可以是字符串、i18n配置、HTMLElement、Yuka实例
+   */
+  body: string | I18NConfig | HTMLElement | Yuka<HTMLElementType>;
+
+  /**
+   * 对话框的类型，会影响title的配色
+   */
+  variant: 'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
+
+  /**
+   * 对话框的宽度，直接设置到dialog.style.width上
+   */
+  width: string;
+
+  /**
+   * 确认按钮的文本，可以是字符串或i18n配置
+   */
+  yesText: string | I18NConfig;
+
+  /**
+   * 取消按钮的文本，可以是字符串或i18n配置
+   */
+  noText: string | I18NConfig;
+
+  /**
+   * 按下确认时绑定的事件
+   */
+  onYes: () => void;
+
+  /**
+   * 按下取消时绑定的事件
+   */
+
+  onNo: () => void;
+
+  /**
+   * 对话框开启时触发（淡出开始时）
+   */
+  onOpen: () => void;
+
+  /**
+   * 对话框关闭时触发
+   */
+  onClose: () => void;
 };
+
+/**
+ * 对话框的详细配置
+ */
+export type DialogOption = Partial<DialogOptionStrict>;
 
 export type DialogOptionExt = DialogOption & { type: 'alert' | 'confirm' | 'wait' };
 
