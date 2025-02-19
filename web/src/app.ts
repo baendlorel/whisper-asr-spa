@@ -15,9 +15,10 @@ export default h('div', { class: 'container' }).append(
   h(
     'button',
     {
-      onclick: () => {
-        dialog
-          .wait({ zh: '等5秒', en: 'wait 5s' }, 5, {
+      onclick: () =>
+        dialog.alert(
+          { zh: '等5秒', en: 'wait 5s' },
+          {
             title: { zh: '等待测试', en: 'wait test' },
             onOpen() {
               console.time('dialog');
@@ -39,11 +40,8 @@ export default h('div', { class: 'container' }).append(
                 en: `left ${timeLeft}s, passed ${5 - timeLeft}s`,
               });
             },
-          })
-          .then(() => {
-            console.log('wait end');
-          });
-      },
+          }
+        ),
     },
     'click me'
   ),

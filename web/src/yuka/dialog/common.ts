@@ -177,11 +177,14 @@ export const createFooterButton = (options: DialogOptionExt, type: 'yes' | 'no')
   return b;
 };
 
-export const closeDialog = (dialog: HTMLDialogElement, options?: DialogOption) => {
-  dialog.classList.remove('show');
-
-  // 使用flag来避免其他设置opacity为0但不需要关闭的情况
+export const closeDialog = (dialog: HTMLDialogElement) => {
   dialog.setAttribute(DialogState.ATTR_NAME, DialogState.CLOSING);
+  dialog.classList.remove('show');
+};
+
+export const openDialog = (dialog: HTMLDialogElement) => {
+  dialog.setAttribute(DialogState.ATTR_NAME, DialogState.OPENING);
+  dialog.classList.add('show');
 };
 
 const applyStyle = (el: HTMLElement, style: Partial<CSSStyleDeclaration>) => {
@@ -292,7 +295,7 @@ export const applyFooter = (
     (handler: ((event: Event) => void) | undefined, type: 'yes' | 'no') => (e: Event) => {
       if (typeof handler !== 'function') {
         dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
-        closeDialog(dialog, options);
+        closeDialog(dialog);
         return;
       }
       const returnValue = handler(e) as Promise<any> | any;
@@ -300,13 +303,13 @@ export const applyFooter = (
         returnValue.then((result) => {
           if (result !== false) {
             dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
-            closeDialog(dialog, options);
+            closeDialog(dialog);
           }
         });
         return;
       } else if (returnValue !== false) {
         dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
-        closeDialog(dialog, options);
+        closeDialog(dialog);
         return;
       }
     };
@@ -390,62 +393,76 @@ export const createDialog = (options: DialogOptionExt) => {
 
   dialog.showModal();
 
-  requestAnimationFrame(() => {
-    dialog.classList.add('show');
-    // 使用flag来避免其他设置opacity为1但不需要开启的情况
-    dialog.setAttribute(DialogState.ATTR_NAME, DialogState.OPENING);
+  const compare = (state: string, targetOpacity: string) => {
+    const isRightState = dialog.getAttribute(DialogState.ATTR_NAME) === state;
+    const elOpacity = Number(getComputedStyle(dialog).opacity);
+    const opacity = Number(targetOpacity);
+    return isRightState && Math.abs(elOpacity - opacity) < 0.06;
+  };
 
-    dialog.addEventListener('transitionend', (e: TransitionEvent) => {
-      if (dialog !== (e.target as Node) || e.propertyName !== 'opacity') {
-        return;
-      }
-      console.log(dialog.getAttribute(DialogState.ATTR_NAME), getComputedStyle(dialog).opacity);
+  dialog.addEventListener('transitionstart', (e: TransitionEvent) => {
+    // 确定是dialog元素、确定转换的属性是opacity、确定不是dialog的backdrop在重复触发事件
+    if (dialog !== (e.target as Node) || e.propertyName !== 'opacity' || e.pseudoElement !== '') {
+      return;
+    }
 
-      const compare = (state: string, opacity: string) =>
-        dialog.getAttribute(DialogState.ATTR_NAME) === state &&
-        getComputedStyle(dialog).opacity === opacity;
+    console.log(
+      '%ctransitionstart',
+      'color:red',
+      'tag:',
+      dialog.getAttribute(DialogState.ATTR_NAME),
+      getComputedStyle(dialog).opacity,
+      'OPENING to 0',
+      compare(DialogState.OPENING, '0'),
+      'CLOSING to 1',
+      compare(DialogState.CLOSING, '1')
+    );
 
-      if (compare(DialogState.OPENING, '1')) {
-        dialog.setAttribute(DialogState.ATTR_NAME, DialogState.OPENED);
-        if (typeof options.onOpened === 'function') {
-          options.onOpened();
-        }
-      }
+    // 检测opacity从0向1变化，触发onOpen
+    if (compare(DialogState.OPENING, '0')) {
+      typeof options.onOpen === 'function' && options.onOpen();
+    }
 
-      if (compare(DialogState.CLOSING, '0')) {
-        dialog.close();
-        dialog.remove();
-        if (typeof options.onClosed === 'function') {
-          options.onClosed();
-        }
-      }
-    });
-
-    dialog.addEventListener('transitionstart', (e: TransitionEvent) => {
-      if (dialog !== (e.target as Node) || e.propertyName !== 'opacity') {
-        return;
-      }
-
-      console.log(dialog.getAttribute(DialogState.ATTR_NAME), getComputedStyle(dialog).opacity);
-
-      const compare = (state: string, opacity: string) =>
-        dialog.getAttribute(DialogState.ATTR_NAME) === state &&
-        getComputedStyle(dialog).opacity === opacity;
-
-      if (compare(DialogState.OPENING, '0')) {
-        dialog.setAttribute(DialogState.ATTR_NAME, DialogState.OPENED);
-        if (typeof options.onOpen === 'function') {
-          options.onOpen();
-        }
-      }
-
-      if (compare(DialogState.CLOSING, '1')) {
-        if (typeof options.onClose === 'function') {
-          options.onClose();
-        }
-      }
-    });
+    // 检测opacity从1向0变化，触发onClose
+    if (compare(DialogState.CLOSING, '1')) {
+      typeof options.onClose === 'function' && options.onClose();
+    }
   });
 
+  dialog.addEventListener('transitionend', (e: TransitionEvent) => {
+    // 确定是dialog元素、确定转换的属性是opacity、确定不是dialog的backdrop在重复触发事件
+    if (dialog !== (e.target as Node) || e.propertyName !== 'opacity' || e.pseudoElement !== '') {
+      return;
+    }
+
+    console.log(
+      '%ctransitionend',
+      'color:blue',
+      'tag:',
+      dialog.getAttribute(DialogState.ATTR_NAME),
+      getComputedStyle(dialog).opacity,
+      'OPENING to 0',
+      compare(DialogState.OPENING, '1'),
+      'CLOSING to 1',
+      compare(DialogState.CLOSING, '0')
+    );
+
+    if (compare(DialogState.OPENING, '1')) {
+      dialog.setAttribute(DialogState.ATTR_NAME, DialogState.OPENED);
+      typeof options.onOpened === 'function' && options.onOpened();
+    }
+
+    if (compare(DialogState.CLOSING, '0')) {
+      typeof options.onClosed === 'function' && options.onClosed();
+      dialog.close();
+
+      // 延迟删除，防止触发的close事件取不到dialog
+      setTimeout(() => {
+        dialog.remove();
+      }, 1000);
+    }
+  });
+
+  openDialog(dialog);
   return { dialog, title, body, footer, yes, no };
 };
