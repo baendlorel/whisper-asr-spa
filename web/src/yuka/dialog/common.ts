@@ -55,12 +55,12 @@ type DialogOptionStrict = {
   noText: string | I18NConfig;
 
   /**
-   * 在对话框中显示包含剩余时间的字符串，会覆盖message或i18n配置
+   * 在对话框中显示包含剩余时间的字符串，会覆盖message或i18n配置。支持但不推荐使用Promise
    * @function wait
    * @param timeLeft 剩余时间，可制作倒计时
    * @returns
    */
-  countDownText: (timeLeft: number) => string;
+  countDownText: (timePast: number) => string | I18NConfig | Promise<string> | Promise<I18NConfig>;
 
   /**
    * 按下确认时绑定的事件
@@ -92,14 +92,42 @@ type DialogOptionStrict = {
    * 对话框关闭完成时触发
    */
   onClosed: () => void;
+
+  /**
+   * @description 如果该Promise完成，则强行关闭dialog
+   */
+  forceCloseFlag: Promise<any>;
 };
 
-/**
- * 对话框的详细配置
- */
+type DialogType = 'alert' | 'confirm' | 'wait' | 'progress';
+
 export type DialogOption = Partial<DialogOptionStrict>;
 
-export type DialogOptionExt = DialogOption & { type: 'alert' | 'confirm' | 'wait' };
+export type DialogOptionExt = DialogOption & { type: DialogType };
+
+type DialogReturnType = {
+  alert: void;
+  confirm: boolean;
+  wait: number;
+  progress: void;
+};
+
+export type DialogController<T extends DialogType> = {
+  /**
+   * 表示对话框的结果，如果是alert则为Promise<void>，如果是confirm则为true/false
+   */
+  result: Promise<DialogReturnType[T]>;
+
+  /**
+   * 链接了result的Promise.then，方便直接使用
+   */
+  then: (onFulfilled: (value: DialogReturnType[T]) => any) => Promise<any>;
+
+  /**
+   * 谨慎使用！强制关闭对话框，可能会导致confirm.result的Promise永远不会resolve
+   */
+  close: () => void;
+};
 
 export const isDialogSupported = (() => {
   const dialog = document.createElement('dialog');
@@ -123,7 +151,9 @@ const DialogState = {
   OPENING: 'opening',
   CLOSING: 'closing',
 };
+
 export const DIALOG_CONFIRM_ATTR = 'yk-confirm';
+
 export const DIALOG_ROLE = 'yk-role';
 
 export const normalize = (arg1?: string | I18NConfig | DialogOption, options?: DialogOption) => {

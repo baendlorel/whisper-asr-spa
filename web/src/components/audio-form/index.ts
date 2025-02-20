@@ -67,7 +67,7 @@ const comp = h('div', 'form-wrapper').append(
         h('option', { value: 'json' }, { zh: 'JSON', en: 'JSON' }),
         h('option', { value: 'vtt' }, { zh: 'VTT', en: 'VTT' }),
         h('option', { value: 'srt', selected: true }, { zh: 'SRT', en: 'SRT' }),
-        h('option', { value: 'text' }, { zh: 'TSV', en: 'TSV' })
+        h('option', { value: 'tsv' }, { zh: 'TSV', en: 'TSV' })
       )
     ),
     h('h4', undefined, { zh: '以下都推荐默认设置', en: 'We suggest not to change options below' }),
@@ -183,6 +183,34 @@ fileInput.on('change', () => {
   }
 });
 
+const downloadSubtitle = (formData: FormData, subtitle: string) => {
+  if (typeof subtitle !== 'string') {
+    throw new Error('subtitle must be a string');
+  }
+  const audioFile = formData.get('audio_file');
+  if (audioFile instanceof File === false) {
+    throw new Error('audioFile must be a file');
+  }
+
+  const suffix = ((v) => (v === null || v === 'text' ? 'txt' : v))(formData.get('output'));
+
+  const file = new File([subtitle], audioFile.name.replace(/.[^.]+$/g, '.' + suffix), {
+    type: 'text/plain',
+  });
+
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(file);
+  link.href = url;
+  link.download = file.name;
+
+  link.click();
+
+  // 释放 URL 对象，避免内存泄漏
+  URL.revokeObjectURL(url);
+
+  link.remove();
+};
+
 audioForm.on('submit', (event) => {
   event.preventDefault(); // 阻止默认提交（防止页面刷新）
 
@@ -211,17 +239,27 @@ audioForm.on('submit', (event) => {
   const resp = fetch(url, {
     method: form.method,
     body: formData,
-  })
-    .then((response) => response.text()) // 解析服务器返回的数据
-    .then((data) => {
-      console.log('resp', data); // 显示服务器返回的内容
-    });
+  }).then((response) => response.text()); // 解析服务器返回的数据
 
   resp.catch((error) => console.error('Error:', error));
 
   dialog
-    .wait({ zh: '请求已发送，请稍候...', en: 'Request sent successfully! Please wait...' }, resp)
-    .then(() => dialog.alert({ zh: '处理完成', en: 'Request completed!' }));
+    .wait('', resp, {
+      countDownText(timePast: number) {
+        return {
+          zh: `处理中，请稍候...${timePast}`,
+          en: `Processing, please wait...${timePast}`,
+        };
+      },
+    })
+    .then(() =>
+      dialog
+        .alert(
+          { zh: '处理完成！', en: 'Request completed!' },
+          { yesText: { zh: '下载字幕', en: 'Download Subtitle' } }
+        )
+        .then(() => resp.then((text) => downloadSubtitle(formData, text)))
+    );
 });
 
 export default comp;

@@ -16,32 +16,29 @@ export default h('div', { class: 'container' }).append(
     'button',
     {
       onclick: () =>
-        dialog.alert(
-          { zh: '等5秒', en: 'wait 5s' },
-          {
-            title: { zh: '等待测试', en: 'wait test' },
-            onOpen() {
-              console.time('dialog');
-              console.timeLog('dialog', 'onOpen');
-            },
-            onOpened() {
-              console.timeLog('dialog', 'onOpened');
-            },
-            onClose() {
-              console.timeLog('dialog', 'onClose');
-            },
-            onClosed() {
-              console.timeLog('dialog', 'onClosed');
-              console.timeEnd('dialog');
-            },
-            countDownText(timeLeft) {
-              return i18n.get({
-                zh: `还剩${timeLeft}秒，已经过去了${5 - timeLeft}秒`,
-                en: `left ${timeLeft}s, passed ${5 - timeLeft}s`,
-              });
-            },
-          }
-        ),
+        dialog.wait({ zh: '等3秒', en: 'wait 3s' }, 3, {
+          title: { zh: '等待测试', en: 'wait test' },
+          onOpen() {
+            console.time('dialog');
+            console.timeLog('dialog', 'onOpen');
+          },
+          onOpened() {
+            console.timeLog('dialog', 'onOpened');
+          },
+          onClose() {
+            console.timeLog('dialog', 'onClose');
+          },
+          onClosed() {
+            console.timeLog('dialog', 'onClosed');
+            console.timeEnd('dialog');
+          },
+          async countDownText(timePast: number) {
+            return {
+              zh: `还剩${3 - timePast}秒，已经过去了${timePast}秒`,
+              en: `left ${3 - timePast}s, passed ${timePast}s`,
+            };
+          },
+        }),
     },
     'click me'
   ),
