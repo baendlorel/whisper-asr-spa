@@ -200,22 +200,19 @@ audioForm.on('submit', (event) => {
   const formData = new FormData(audioForm.el); // 创建 FormData 对象，自动收集表单数据
   formData.set('audio_file', audioFile as Blob);
 
-  if (formData.get('language') === '') {
-    formData.delete('language');
-  }
+  const url = new URL(form.action);
 
-  // 以下axios可行
-  // const args = {} as any;
-  // formData.forEach((v, k) => {
-  //   args[k] = v;
-  // });
-  // axios.post('/was/asr', args, { headers: { 'content-type': 'multipart/form-data' } });
+  formData.forEach((v, k) => {
+    if (typeof v === 'string') {
+      url.searchParams.append(k, v);
+    }
+  });
 
-  const resp = fetch(form.action, {
+  const resp = fetch(url, {
     method: form.method,
     body: formData,
   })
-    .then((response) => response.json()) // 解析服务器返回的数据
+    .then((response) => response.text()) // 解析服务器返回的数据
     .then((data) => {
       console.log('resp', data); // 显示服务器返回的内容
     });
@@ -224,9 +221,7 @@ audioForm.on('submit', (event) => {
 
   dialog
     .wait({ zh: '请求已发送，请稍候...', en: 'Request sent successfully! Please wait...' }, resp)
-    .then(() => {
-      dialog.alert({ zh: '处理完成', en: 'Request completed!' });
-    });
+    .then(() => dialog.alert({ zh: '处理完成', en: 'Request completed!' }));
 });
 
 export default comp;

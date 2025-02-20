@@ -406,18 +406,6 @@ export const createDialog = (options: DialogOptionExt) => {
       return;
     }
 
-    console.log(
-      '%ctransitionstart',
-      'color:red',
-      'tag:',
-      dialog.getAttribute(DialogState.ATTR_NAME),
-      getComputedStyle(dialog).opacity,
-      'OPENING to 0',
-      compare(DialogState.OPENING, '0'),
-      'CLOSING to 1',
-      compare(DialogState.CLOSING, '1')
-    );
-
     // 检测opacity从0向1变化，触发onOpen
     if (compare(DialogState.OPENING, '0')) {
       typeof options.onOpen === 'function' && options.onOpen();
@@ -434,18 +422,6 @@ export const createDialog = (options: DialogOptionExt) => {
     if (dialog !== (e.target as Node) || e.propertyName !== 'opacity' || e.pseudoElement !== '') {
       return;
     }
-
-    console.log(
-      '%ctransitionend',
-      'color:blue',
-      'tag:',
-      dialog.getAttribute(DialogState.ATTR_NAME),
-      getComputedStyle(dialog).opacity,
-      'OPENING to 0',
-      compare(DialogState.OPENING, '1'),
-      'CLOSING to 1',
-      compare(DialogState.CLOSING, '0')
-    );
 
     if (compare(DialogState.OPENING, '1')) {
       dialog.setAttribute(DialogState.ATTR_NAME, DialogState.OPENED);
