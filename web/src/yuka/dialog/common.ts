@@ -1,140 +1,18 @@
-import { i18n, Yuka } from '..';
-import { HTMLElementType, I18NConfig } from '../types';
+import { i18n, Yuka, I18NConfig } from '..';
+import { DialogOption, DialogOptionExt } from './types';
 
-type DialogOptionStrict = {
-  /**
-   * 对话框的标题，
-   */
-  title: string | I18NConfig | HTMLElement | Yuka<HTMLElementType>;
+export const isDialogSupported = ((supported) => {
+  if (supported) {
+    console.error('[Yuka:dialog] dialog is not supported in this browser!');
+  }
+  return supported;
+})(typeof document.createElement('dialog').showModal === 'function');
 
-  /**
-   *  对话框的内容，可以是字符串、i18n配置、HTMLElement、Yuka实例
-   */
-  body: string | I18NConfig | HTMLElement | Yuka<HTMLElementType>;
+export const DIALOG_CONFIRM_ATTR = 'yk-confirm';
 
-  /**
-   * 对话框的类型，会影响title的配色
-   */
-  variant: 'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
+const DIALOG_ROLE = 'yk-role';
 
-  /**
-   * 对话框的宽度，直接设置到dialog.style.width上
-   */
-  width: string;
-
-  /**
-   * 对话框样式
-   */
-  dialogStyle: Partial<CSSStyleDeclaration>;
-
-  /**
-   * 标题样式
-   */
-  titleStyle: Partial<CSSStyleDeclaration>;
-
-  /**
-   * 内容样式
-   */
-  bodyStyle: Partial<CSSStyleDeclaration>;
-
-  /**
-   * 底部样式
-   */
-  footerStyle: Partial<CSSStyleDeclaration>;
-
-  /**
-   * 确认按钮的文本，可以是字符串或i18n配置，在alert和confirm中会用到
-   * @function alert,confirm
-   */
-  yesText: string | I18NConfig;
-
-  /**
-   * 取消按钮的文本，可以是字符串或i18n配置，在confirm中会用到
-   * @function confirm
-   */
-  noText: string | I18NConfig;
-
-  /**
-   * 在对话框中显示包含剩余时间的字符串，会覆盖message或i18n配置。支持但不推荐使用Promise
-   * @function wait
-   * @param timeLeft 剩余时间，可制作倒计时
-   * @returns
-   */
-  countDownText: (timePast: number) => string | I18NConfig | Promise<string> | Promise<I18NConfig>;
-
-  /**
-   * 按下确认时绑定的事件
-   */
-  onYes: () => void;
-
-  /**
-   * 按下取消时绑定的事件
-   */
-
-  onNo: () => void;
-
-  /**
-   * 对话框开启时，还在渐变的时候触发
-   */
-  onOpen: () => void;
-
-  /**
-   * 对话框开启完成，渐变结束时触发
-   */
-  onOpened: () => void;
-
-  /**
-   * 对话框开始关闭时触发
-   */
-  onClose: () => void;
-
-  /**
-   * 对话框关闭完成时触发
-   */
-  onClosed: () => void;
-
-  /**
-   * @description 如果该Promise完成，则强行关闭dialog
-   */
-  forceCloseFlag: Promise<any>;
-};
-
-type DialogType = 'alert' | 'confirm' | 'wait' | 'progress';
-
-export type DialogOption = Partial<DialogOptionStrict>;
-
-export type DialogOptionExt = DialogOption & { type: DialogType };
-
-type DialogReturnType = {
-  alert: void;
-  confirm: boolean;
-  wait: number;
-  progress: void;
-};
-
-export type DialogController<T extends DialogType> = {
-  /**
-   * 表示对话框的结果，如果是alert则为Promise<void>，如果是confirm则为true/false
-   */
-  result: Promise<DialogReturnType[T]>;
-
-  /**
-   * 链接了result的Promise.then，方便直接使用
-   */
-  then: (onFulfilled: (value: DialogReturnType[T]) => any) => Promise<any>;
-
-  /**
-   * 谨慎使用！强制关闭对话框，可能会导致confirm.result的Promise永远不会resolve
-   */
-  close: () => void;
-};
-
-export const isDialogSupported = (() => {
-  const dialog = document.createElement('dialog');
-  return typeof dialog.showModal === 'function';
-})();
-
-export const DEFAULT_FOOTER_BUTTON_I18N = {
+const DEFAULT_FOOTER_BUTTON_I18N = {
   yes: {
     zh: '确定',
     en: 'Yes',
@@ -152,38 +30,7 @@ const DialogState = {
   CLOSING: 'closing',
 };
 
-export const DIALOG_CONFIRM_ATTR = 'yk-confirm';
-
-export const DIALOG_ROLE = 'yk-role';
-
-export const normalize = (arg1?: string | I18NConfig | DialogOption, options?: DialogOption) => {
-  if ((arg1 === undefined || arg1 === null) && (options === undefined || options === null)) {
-    throw new Error('[Yuka:dialog normalize] arg1 and options cannot be both undefined/null.');
-  }
-
-  if (typeof arg1 !== 'string' && typeof arg1 !== 'object') {
-    throw new Error('[Yuka:dialog normalize] arg1 must be a string or an i18nConfig object.');
-  }
-  if (options !== undefined && options !== null && typeof options !== 'object') {
-    throw new Error('[Yuka:dialog normalize] options must be a DialogOption object.');
-  }
-
-  // 只用message的
-  if (typeof arg1 === 'string') {
-    options = Object.assign(options || {}, { body: arg1 });
-  }
-  // 用i18nConfig的
-  else if (i18n.isValidConfig(arg1)) {
-    options = Object.assign(options || {}, { body: i18n.get(arg1 as I18NConfig) });
-  }
-  // 直接用options的
-  else {
-    options = arg1 as DialogOption;
-  }
-  return options as DialogOptionExt;
-};
-
-export const createFooterButton = (options: DialogOptionExt, type: 'yes' | 'no') => {
+const createFooterButton = (options: DialogOptionExt, type: 'yes' | 'no') => {
   const b = document.createElement('button');
   const i18nKey = type === 'yes' ? 'yesText' : 'noText';
   const content = options[i18nKey] as I18NConfig;
@@ -207,16 +54,6 @@ export const createFooterButton = (options: DialogOptionExt, type: 'yes' | 'no')
   return b;
 };
 
-export const closeDialog = (dialog: HTMLDialogElement) => {
-  dialog.setAttribute(DialogState.ATTR_NAME, DialogState.CLOSING);
-  dialog.classList.remove('show');
-};
-
-export const openDialog = (dialog: HTMLDialogElement) => {
-  dialog.setAttribute(DialogState.ATTR_NAME, DialogState.OPENING);
-  dialog.classList.add('show');
-};
-
 const applyStyle = (el: HTMLElement, style: Partial<CSSStyleDeclaration>) => {
   for (const k in style) {
     if (style.hasOwnProperty(k)) {
@@ -225,11 +62,7 @@ const applyStyle = (el: HTMLElement, style: Partial<CSSStyleDeclaration>) => {
   }
 };
 
-export const applyTitle = (
-  dialog: HTMLDialogElement,
-  title: HTMLElement,
-  options: DialogOptionExt
-) => {
+const applyTitle = (dialog: HTMLDialogElement, title: HTMLElement, options: DialogOptionExt) => {
   if (options.title === undefined || options.title === null) {
     title.remove();
     return { title: undefined };
@@ -268,11 +101,7 @@ export const applyTitle = (
   throw new Error("[Yuka:dialog applyTitle] options.title's type is invalid");
 };
 
-export const applyBody = (
-  dialog: HTMLDialogElement,
-  body: HTMLElement,
-  options: DialogOptionExt
-) => {
+const applyBody = (dialog: HTMLDialogElement, body: HTMLElement, options: DialogOptionExt) => {
   if (options.body === undefined) {
     body.remove();
     return { body: undefined };
@@ -315,11 +144,7 @@ export const applyBody = (
  * @param options 扩展type后的配置
  * @returns
  */
-export const applyFooter = (
-  dialog: HTMLDialogElement,
-  footer: HTMLElement,
-  options: DialogOptionExt
-) => {
+const applyFooter = (dialog: HTMLDialogElement, footer: HTMLElement, options: DialogOptionExt) => {
   // 创建yes按钮的事件并绑定
   const createHandler =
     (handler: ((event: Event) => void) | undefined, type: 'yes' | 'no') => (e: Event) => {
@@ -393,6 +218,43 @@ export const applyFooter = (
   // }
 
   // throw new Error("[Yuka:dialog applyFooter] options.footer's type is invalid");
+};
+
+export const normalize = (arg1?: string | I18NConfig | DialogOption, options?: DialogOption) => {
+  if ((arg1 === undefined || arg1 === null) && (options === undefined || options === null)) {
+    throw new Error('[Yuka:dialog normalize] arg1 and options cannot be both undefined/null.');
+  }
+
+  if (typeof arg1 !== 'string' && typeof arg1 !== 'object') {
+    throw new Error('[Yuka:dialog normalize] arg1 must be a string or an i18nConfig object.');
+  }
+  if (options !== undefined && options !== null && typeof options !== 'object') {
+    throw new Error('[Yuka:dialog normalize] options must be a DialogOption object.');
+  }
+
+  // 只用message的
+  if (typeof arg1 === 'string') {
+    options = Object.assign(options || {}, { body: arg1 });
+  }
+  // 用i18nConfig的
+  else if (i18n.isValidConfig(arg1)) {
+    options = Object.assign(options || {}, { body: i18n.get(arg1 as I18NConfig) });
+  }
+  // 直接用options的
+  else {
+    options = arg1 as DialogOption;
+  }
+  return options as DialogOptionExt;
+};
+
+export const closeDialog = (dialog: HTMLDialogElement) => {
+  dialog.setAttribute(DialogState.ATTR_NAME, DialogState.CLOSING);
+  dialog.classList.remove('show');
+};
+
+const openDialog = (dialog: HTMLDialogElement) => {
+  dialog.setAttribute(DialogState.ATTR_NAME, DialogState.OPENING);
+  dialog.classList.add('show');
 };
 
 export const createDialog = (options: DialogOptionExt) => {
