@@ -44,9 +44,8 @@ export function confirm(
   arg1: string | I18NConfig | DialogConfirmOption,
   options?: DialogConfirmOption
 ): DialogController<'confirm'> {
-  const normalizedOpt = normalize(arg1, options);
-  normalizedOpt.type = 'confirm';
-  const { dialog } = createDialog(normalizedOpt);
+  const opt = normalize('confirm', arg1, options);
+  const { dialog } = createDialog(opt);
 
   const result = new Promise((resolve) => {
     dialog.addEventListener('close', () => {

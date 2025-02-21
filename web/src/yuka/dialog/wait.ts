@@ -10,8 +10,7 @@ const _wait = (
   until: number | Promise<any>,
   options?: DialogWaitOption
 ): DialogController<'wait'> => {
-  const opt = normalize(arg1, options);
-  opt.type = 'wait';
+  const opt = normalize('wait', arg1, options);
 
   // wait样式默认文字居中
   opt.bodyStyle = Object.assign({ textAlign: 'center' }, opt.bodyStyle);

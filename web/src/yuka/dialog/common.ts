@@ -1,5 +1,5 @@
 import { i18n, Yuka, I18NConfig } from '..';
-import { DialogOption, DialogOptionExt } from './types';
+import { DialogOption, DialogType } from './types';
 
 export const isDialogSupported = ((supported) => {
   if (supported) {
@@ -30,7 +30,7 @@ const DialogState = {
   CLOSING: 'closing',
 };
 
-const createFooterButton = (options: DialogOptionExt, type: 'yes' | 'no') => {
+const createFooterButton = (options: DialogOption, type: 'yes' | 'no') => {
   const b = document.createElement('button');
   const i18nKey = type === 'yes' ? 'yesText' : 'noText';
   const content = options[i18nKey] as I18NConfig;
@@ -62,7 +62,7 @@ const applyStyle = (el: HTMLElement, style: Partial<CSSStyleDeclaration>) => {
   }
 };
 
-const applyTitle = (dialog: HTMLDialogElement, title: HTMLElement, options: DialogOptionExt) => {
+const applyTitle = (dialog: HTMLDialogElement, title: HTMLElement, options: DialogOption) => {
   if (options.title === undefined || options.title === null) {
     title.remove();
     return { title: undefined };
@@ -87,24 +87,60 @@ const applyTitle = (dialog: HTMLDialogElement, title: HTMLElement, options: Dial
   }
 
   if (options.title instanceof HTMLElement) {
-    title.append(options.title);
-    title.remove();
+    title.replaceWith(options.title);
     return { title: options.title };
   }
 
   if (options.title instanceof Yuka) {
-    title.append(options.title.el);
-    title.remove();
+    title.replaceWith(options.title.el);
     return { title: options.title.el };
   }
 
   throw new Error("[Yuka:dialog applyTitle] options.title's type is invalid");
 };
 
-const applyBody = (dialog: HTMLDialogElement, body: HTMLElement, options: DialogOptionExt) => {
+const appendPromptInput = (body: HTMLElement, options: DialogOption) => {
+  if (options.type !== 'prompt') {
+    return { label: undefined, input: undefined };
+  }
+
+  const promptInput = document.createElement('input');
+  const promptLabel = document.createElement('label');
+
+  if (typeof options.promptDefault === 'string') {
+    promptInput.value = options.promptDefault;
+  }
+
+  body.append(promptLabel);
+  body.append(promptInput);
+
+  if (typeof options.promptLabel === 'string') {
+    promptLabel.textContent = options.promptLabel;
+    return { label: promptLabel, input: promptInput };
+  }
+
+  if (i18n.isValidConfig(options.promptLabel)) {
+    promptLabel.textContent = i18n.get(options.promptLabel as I18NConfig);
+    return { label: promptLabel, input: promptInput };
+  }
+
+  if (options.promptLabel instanceof HTMLElement) {
+    promptLabel.replaceWith(options.promptLabel);
+    return { label: options.promptLabel, input: promptInput };
+  }
+
+  if (options.promptLabel instanceof Yuka) {
+    promptLabel.replaceWith(options.promptLabel.el);
+    return { label: options.promptLabel.el, input: promptInput };
+  }
+
+  throw new Error("[Yuka:dialog appendPromptInput] options.promptLabel's type is invalid");
+};
+
+const applyBody = (dialog: HTMLDialogElement, body: HTMLElement, options: DialogOption) => {
   if (options.body === undefined) {
     body.remove();
-    return { body: undefined };
+    return { body: undefined, prompt: { input: undefined, label: undefined } };
   }
 
   if (options.bodyStyle && typeof options === 'object') {
@@ -113,24 +149,26 @@ const applyBody = (dialog: HTMLDialogElement, body: HTMLElement, options: Dialog
 
   if (typeof options.body === 'string') {
     body.textContent = options.body;
-    return { body };
+    const prompt = appendPromptInput(body, options);
+    return { body, prompt };
   }
 
   if (i18n.isValidConfig(options.body)) {
     body.textContent = i18n.get(options.body as I18NConfig);
-    return { body };
+    const prompt = appendPromptInput(body, options);
+    return { body, prompt };
   }
 
   if (options.body instanceof HTMLElement) {
-    body.append(options.body);
-    body.remove();
-    return { body: options.body };
+    body.replaceWith(options.body);
+    const prompt = appendPromptInput(body, options);
+    return { body: options.body, prompt };
   }
 
   if (options.body instanceof Yuka) {
-    body.append(options.body.el);
-    body.remove();
-    return { body: options.body.el };
+    body.replaceWith(options.body.el);
+    const prompt = appendPromptInput(body, options);
+    return { body: options.body.el, prompt };
   }
 
   throw new Error("[Yuka:dialog applyBody] options.body's type is invalid");
@@ -144,29 +182,24 @@ const applyBody = (dialog: HTMLDialogElement, body: HTMLElement, options: Dialog
  * @param options 扩展type后的配置
  * @returns
  */
-const applyFooter = (dialog: HTMLDialogElement, footer: HTMLElement, options: DialogOptionExt) => {
+const applyFooter = (dialog: HTMLDialogElement, footer: HTMLElement, options: DialogOption) => {
   // 创建yes按钮的事件并绑定
   const createHandler =
-    (handler: ((event: Event) => void) | undefined, type: 'yes' | 'no') => (e: Event) => {
+    (handler: ((event: Event) => any) | undefined, type: 'yes' | 'no') => (e: Event) => {
       if (typeof handler !== 'function') {
         dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
         closeDialog(dialog);
         return;
       }
-      const returnValue = handler(e) as Promise<any> | any;
-      if (returnValue instanceof Promise) {
-        returnValue.then((result) => {
-          if (result !== false) {
-            dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
-            closeDialog(dialog);
-          }
-        });
-        return;
-      } else if (returnValue !== false) {
-        dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
-        closeDialog(dialog);
-        return;
-      }
+      // 归一化为Promise的情形
+      const returnValue = Promise.resolve(handler(e));
+      returnValue.then((result) => {
+        if (result !== false) {
+          dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
+          closeDialog(dialog);
+        }
+      });
+      return;
     };
 
   const yes = createFooterButton(options, 'yes');
@@ -201,8 +234,7 @@ const applyFooter = (dialog: HTMLDialogElement, footer: HTMLElement, options: Di
   //       "[Yuka:dialog applyFooter] options.footer doesn't have any button, there might be no way to close the dialog"
   //     );
   //   }
-  //   footer.append(options.footer);
-  //   footer.remove();
+  //   footer.replaceWith(options.footer);
   //   return { footer: options.footer };
   // }
 
@@ -212,15 +244,19 @@ const applyFooter = (dialog: HTMLDialogElement, footer: HTMLElement, options: Di
   //       "[Yuka:dialog applyFooter] options.footer doesn't have any button, there might be no way to close the dialog"
   //     );
   //   }
-  //   footer.append(options.footer.el);
-  //   footer.remove();
+  //   footer.replaceWith(options.footer.el);
   //   return { footer: options.footer.el };
   // }
 
   // throw new Error("[Yuka:dialog applyFooter] options.footer's type is invalid");
 };
 
-export const normalize = (arg1?: string | I18NConfig | DialogOption, options?: DialogOption) => {
+export const normalize = (
+  type: DialogType,
+  arg1: string | I18NConfig | DialogOption | undefined,
+  options: Partial<DialogOption> | undefined
+) => {
+  // 这里只做一些通用的必要的校验，更细致的校验将在其他函数中完成
   if ((arg1 === undefined || arg1 === null) && (options === undefined || options === null)) {
     throw new Error('[Yuka:dialog normalize] arg1 and options cannot be both undefined/null.');
   }
@@ -232,19 +268,24 @@ export const normalize = (arg1?: string | I18NConfig | DialogOption, options?: D
     throw new Error('[Yuka:dialog normalize] options must be a DialogOption object.');
   }
 
+  // 确保options一定是一个对象而非undefined
+  options = Object.assign({ type }, options) as DialogOption;
+
   // 只用message的
   if (typeof arg1 === 'string') {
-    options = Object.assign(options || {}, { body: arg1 });
+    options.body = arg1;
+    options.promptLabel = options.promptLabel || arg1;
   }
   // 用i18nConfig的
   else if (i18n.isValidConfig(arg1)) {
-    options = Object.assign(options || {}, { body: i18n.get(arg1 as I18NConfig) });
+    options.body = i18n.get(arg1 as I18NConfig);
+    options.promptLabel = options.promptLabel || i18n.get(arg1 as I18NConfig);
   }
   // 直接用options的
   else {
     options = arg1 as DialogOption;
   }
-  return options as DialogOptionExt;
+  return options as DialogOption;
 };
 
 export const closeDialog = (dialog: HTMLDialogElement) => {
@@ -257,7 +298,7 @@ const openDialog = (dialog: HTMLDialogElement) => {
   dialog.classList.add('show');
 };
 
-export const createDialog = (options: DialogOptionExt) => {
+export const createDialog = (options: DialogOption) => {
   const dialog = document.createElement('dialog');
   const rawTitle = document.createElement('div');
   const rawBody = document.createElement('div');
@@ -273,7 +314,7 @@ export const createDialog = (options: DialogOptionExt) => {
   dialog.appendChild(rawBody);
   dialog.appendChild(rawFooter);
 
-  const { body } = applyBody(dialog, rawBody, options);
+  const { body, prompt } = applyBody(dialog, rawBody, options);
   const { title } = applyTitle(dialog, rawTitle, options);
   const { footer, yes, no } = applyFooter(dialog, rawFooter, options);
 
@@ -332,5 +373,5 @@ export const createDialog = (options: DialogOptionExt) => {
   });
 
   openDialog(dialog);
-  return { dialog, title, body, footer, yes, no };
+  return { dialog, title, body, prompt, footer, yes, no };
 };

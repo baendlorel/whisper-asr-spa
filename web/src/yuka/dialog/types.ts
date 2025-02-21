@@ -99,23 +99,40 @@ export type DialogCountDownOption = {
   countDownText: (timePast: number) => string | I18NConfig | Promise<string> | Promise<I18NConfig>;
 };
 
-type DialogOptionStrict = DialogBasicOption &
+export type DialogPromptInputOption = {
+  /**
+   * 输入框的标签
+   */
+  promptLabel: string | I18NConfig | HTMLElement | Yuka<HTMLElementType>;
+
+  /**
+   * 输入框的默认值
+   */
+  promptDefault: string | I18NConfig;
+
+  /**
+   * 输入框的检测器，支持Promise但不推荐
+   */
+  promptValidator: (value: string) => boolean | Promise<boolean>;
+};
+
+type DialogFullOption = DialogBasicOption &
   DialogFooterOption &
   DialogYesOption &
   DialogNoOption &
-  DialogCountDownOption;
+  DialogCountDownOption &
+  DialogPromptInputOption;
 
-type DialogType = 'alert' | 'confirm' | 'wait' | 'progress';
+export type DialogType = 'alert' | 'confirm' | 'wait' | 'prompt' | 'progress';
 
-export type DialogOption = Partial<DialogOptionStrict>;
-
-export type DialogOptionExt = DialogOption & { type: DialogType };
+export type DialogOption = Partial<DialogFullOption> & { type: DialogType };
 
 type DialogReturnType = {
   alert: void;
   confirm: boolean;
   wait: number;
   progress: void;
+  prompt: string;
 };
 
 export type DialogController<T extends DialogType> = {

@@ -31,9 +31,8 @@ export function alert(
   arg1: string | I18NConfig | DialogAlertOption,
   options?: DialogAlertOption
 ): DialogController<'alert'> {
-  const normalizedOpt = normalize(arg1, options);
-  normalizedOpt.type = 'alert';
-  const { dialog, yes } = createDialog(normalizedOpt);
+  const opt = normalize('alert', arg1, options);
+  const { dialog, yes } = createDialog(opt);
 
   const result = new Promise((resolve) => {
     yes.addEventListener('click', () => {
