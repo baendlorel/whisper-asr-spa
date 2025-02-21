@@ -1,17 +1,17 @@
-@use 'theme'
+@use 'color'
 button
   padding: 8px 20px
   height: 36px
-  background-color: #{theme.$primary}
+  background-color: color.$primary
   color: white
   border: none
-  border-radius: #{theme.$border-radius}
+  border-radius: color.$border-radius
   cursor: pointer
   font-size: 15px
 
-  :hover
-    background-color: #{theme.$primary-hover}
+  &:hover
+    background-color: color.$primary-light
 
   &[disabled]
-    background-color: #{theme.$primary-light}
+    background-color: color.$primary-light
     cursor: not-allowed

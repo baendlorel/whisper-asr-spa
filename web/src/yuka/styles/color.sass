@@ -1,0 +1,58 @@
+@use  'theme' as *
+
+@function light($color)
+  @return saturate(lighten($color,5%),15%)
+
+@function lighter($color)
+  @return saturate(lighten($color,15%),25%)
+
+$primary: map-get($colors, primary)
+$secondary: map-get($colors, secondary)
+$success: map-get($colors, success)
+$info: map-get($colors, info)
+$warning: map-get($colors, warning)
+$danger: map-get($colors, danger)
+$light: map-get($colors, light)
+$dark: map-get($colors, dark)
+$blue: map-get($colors, blue)
+
+$primary-light: light($primary)
+$secondary-light: light($secondary)
+$success-light: light($success)
+$info-light: light($info)
+$warning-light: light($warning)
+$danger-light: light($danger)
+$light-light: light($light)
+$dark-light: light($dark)
+$blue-light: light($blue)
+$primary-lighter: lighter($primary)
+$secondary-lighter: lighter($secondary)
+$success-lighter: lighter($success)
+$info-lighter: lighter($info)
+$warning-lighter: lighter($warning)
+$danger-lighter: lighter($danger)
+$light-lighter: lighter($light)
+$dark-lighter: lighter($dark)
+$blue-lighter: lighter($blue)
+
+:root
+  --yk-primary: $primary
+  --yk-blue: $blue
+  --yk-secondary: $secondary
+  --yk-success: $success
+  --yk-info: $info
+  --yk-warning: $warning
+  --yk-danger: $danger
+  --yk-light: $light
+  --yk-dark: $dark
+
+$input-bg-color: #f9f9f9
+$input-border: 1px solid #e4e4e4
+$border-radius: 5px
+
+// $colors: (
+// primary: #3498db,
+// secondary: #2ecc71,
+// danger: #e74c3c,
+// warning: #f39c12,
+// )

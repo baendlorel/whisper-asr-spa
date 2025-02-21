@@ -1,4 +1,5 @@
-@use 'theme'
+@use 'color' as *
+
 input[type='radio']
   appearance: none
   -moz-appearance: none
@@ -16,11 +17,11 @@ input[type='radio']
     width: 13px
     height: 13px
     border-radius: 50%
-    border: #{theme.$input-border}
-    background-color: #{theme.$input-bg-color}
+    border: $input-border
+    background-color: $input-bg-color
 
   &:hover::before
-    background-color: #{theme.$primary-light}
+    background-color: $primary-light
 
   &:checked::after
     content: ''
@@ -30,4 +31,4 @@ input[type='radio']
     height: 9px
     border-radius: 50%
     border: 0
-    background-color: #{theme.$primary}
+    background-color: $primary
