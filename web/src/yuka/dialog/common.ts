@@ -1,9 +1,8 @@
 import { i18n, Yuka, I18NConfig } from '..';
-import { getText } from '../utils';
 import { DialogOption, DialogType } from './types';
 
 export const isDialogSupported = ((supported) => {
-  if (supported) {
+  if (!supported) {
     console.error('[Yuka:dialog] dialog is not supported in this browser!');
   }
   return supported;
@@ -31,6 +30,15 @@ const DialogState = {
   CLOSING: 'closing',
 };
 
+/**
+ * 制作出基于onYes和onNo回调函数的按钮点击事件处理器
+ * 会在回调函数返回值为false时阻止dialog关闭，其余情况不阻止
+ * 会在prompt中使用，使得此函数运行在promptValidator之后
+ * @param dialog
+ * @param handler 使用者给出的onYes和onNo
+ * @param type
+ * @returns
+ */
 export const createFooterButtonClickHandler =
   (dialog: HTMLDialogElement, handler: ((event?: Event) => any) | undefined, type: 'yes' | 'no') =>
   (e?: Event) => {
@@ -129,17 +137,23 @@ const appendPromptInput = (body: HTMLElement, options: DialogOption) => {
   }
 
   const promptLabel = document.createElement('label');
+  const promptInputDiv = document.createElement('div');
   const promptInput = document.createElement('input');
   const promptFeedback = document.createElement('div');
 
+  promptInput.type = 'text';
   if (typeof options.promptDefault === 'string') {
     promptInput.value = options.promptDefault;
   }
 
   promptFeedback.classList.add('feedback');
-
+  promptInputDiv.style.display = 'grid';
+  promptInputDiv.style.marginTop = '8px';
+  promptInputDiv.style.gridTemplateColumns = '1fr';
+  promptInputDiv.style.width = '100%';
+  promptInputDiv.append(promptInput);
   body.append(promptLabel);
-  body.append(promptInput);
+  body.append(promptInputDiv);
   body.append(promptFeedback);
 
   const result = {
@@ -227,13 +241,14 @@ const applyFooter = (dialog: HTMLDialogElement, footer: HTMLElement, options: Di
     applyStyle(footer, options.footerStyle);
   }
 
-  if (options.type === 'alert') {
-    footer.appendChild(yes);
-  }
-
-  if (options.type === 'confirm') {
-    footer.appendChild(no);
-    footer.appendChild(yes);
+  switch (options.type) {
+    case 'alert':
+    case 'prompt':
+      footer.appendChild(yes);
+      break;
+    case 'confirm':
+      footer.appendChild(no);
+      footer.appendChild(yes);
   }
 
   return { footer, yes, no };

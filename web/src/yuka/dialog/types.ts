@@ -116,7 +116,9 @@ export type DialogPromptInputOption = {
    * 输入框的检测器，支持Promise但不推荐
    * 只有返回值是true或Promisetrue时，才算通过检测。如果返回string，则会作为错误信息展示在输入框下面
    */
-  promptValidator: (value: string) => (true | string) | Promise<true | string>;
+  promptValidator: (
+    value: string
+  ) => (true | string | I18NConfig) | Promise<true | string | I18NConfig>;
 };
 
 type DialogFullOption = DialogBasicOption &

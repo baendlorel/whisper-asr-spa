@@ -1,4 +1,4 @@
-import { I18NConfig } from '..';
+import { i18n, I18NConfig } from '..';
 import { createDialog, normalize, closeDialog, createFooterButtonClickHandler } from './common';
 import {
   DialogBasicOption,
@@ -25,7 +25,7 @@ export function prompt(
   const opt = normalize('prompt', label, options);
 
   const { dialog, prompt, yes } = createDialog(opt);
-  const newYes = yes.cloneNode() as HTMLButtonElement;
+  const newYes = yes.cloneNode(true) as HTMLButtonElement;
   const yesThenClose = createFooterButtonClickHandler(dialog, opt.onYes, 'yes');
   yes.replaceWith(newYes);
 
@@ -40,7 +40,7 @@ export function prompt(
         throw new Error('[Yuka:dialog prompt] Prompt elements is missing');
       }
 
-      // 没有设置validator，直接关闭窗口resolve输入框的值
+      // 没有设置validator，直接关闭窗口，resolve输入框的值
       if (typeof opt.promptValidator !== 'function') {
         yesThenClose().then(() => resolve(prompt.input.value));
         return;
@@ -53,12 +53,26 @@ export function prompt(
       // 如果有validator，就先执行validator
       const isValid = Promise.resolve(opt.promptValidator(prompt.input.value));
       isValid.then((valid) => {
+        // 校验通过，直接关闭窗口，resolve输入框的值
         if (valid === true) {
           yesThenClose().then(() => resolve(prompt.input.value));
-        } else {
-          prompt.input.classList.add('invalid');
-          prompt.feedback.textContent = valid;
+          return;
         }
+
+        prompt.input.classList.add('invalid');
+
+        if (typeof valid === 'string') {
+          prompt.feedback.textContent = valid;
+          return;
+        }
+        if (i18n.isValidConfig(valid)) {
+          prompt.feedback.textContent = i18n.get(valid);
+          return;
+        }
+
+        throw new Error(
+          '[Yuka:dialog prompt] Invalid promptValidator return value, must be a string/true/I18NConfig or Promised these types.'
+        );
       });
     });
   }) as Promise<string>;
