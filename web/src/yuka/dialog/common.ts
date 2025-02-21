@@ -1,4 +1,5 @@
 import { i18n, Yuka, I18NConfig } from '..';
+import { getText } from '../utils';
 import { DialogOption, DialogType } from './types';
 
 export const isDialogSupported = ((supported) => {
@@ -30,16 +31,37 @@ const DialogState = {
   CLOSING: 'closing',
 };
 
-const createFooterButton = (options: DialogOption, type: 'yes' | 'no') => {
+export const createFooterButtonClickHandler =
+  (dialog: HTMLDialogElement, handler: ((event?: Event) => any) | undefined, type: 'yes' | 'no') =>
+  (e?: Event) => {
+    if (typeof handler !== 'function') {
+      dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
+      closeDialog(dialog);
+      return Promise.resolve();
+    }
+    // 归一化为Promise的情形
+    return Promise.resolve(handler(e)).then((result) => {
+      // 只有false会阻止dialog关闭
+      if (result !== false) {
+        dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
+        closeDialog(dialog);
+      }
+    });
+  };
+
+const createFooterButton = (
+  dialog: HTMLDialogElement,
+  options: DialogOption,
+  type: 'yes' | 'no'
+) => {
   const b = document.createElement('button');
-  const i18nKey = type === 'yes' ? 'yesText' : 'noText';
-  const content = options[i18nKey] as I18NConfig;
+  const content = type === 'yes' ? options.yesText : options.noText;
 
   // 填充按钮文字
   if (typeof content === 'string') {
     b.textContent = content;
   } else if (i18n.isValidConfig(content)) {
-    b.textContent = i18n.get(content);
+    b.textContent = i18n.get(content as I18NConfig);
   } else {
     b.textContent = i18n.get(DEFAULT_FOOTER_BUTTON_I18N[type]);
   }
@@ -50,6 +72,8 @@ const createFooterButton = (options: DialogOption, type: 'yes' | 'no') => {
     b.style.color = 'black';
     b.style.marginRight = '8px';
   }
+
+  b.addEventListener('click', createFooterButtonClickHandler(dialog, options.onYes, type));
 
   return b;
 };
@@ -104,34 +128,46 @@ const appendPromptInput = (body: HTMLElement, options: DialogOption) => {
     return { label: undefined, input: undefined };
   }
 
-  const promptInput = document.createElement('input');
   const promptLabel = document.createElement('label');
+  const promptInput = document.createElement('input');
+  const promptFeedback = document.createElement('div');
 
   if (typeof options.promptDefault === 'string') {
     promptInput.value = options.promptDefault;
   }
 
+  promptFeedback.classList.add('feedback');
+
   body.append(promptLabel);
   body.append(promptInput);
+  body.append(promptFeedback);
+
+  const result = {
+    label: promptLabel as HTMLElement,
+    input: promptInput,
+    feedback: promptFeedback,
+  };
 
   if (typeof options.promptLabel === 'string') {
     promptLabel.textContent = options.promptLabel;
-    return { label: promptLabel, input: promptInput };
+    return result;
   }
 
   if (i18n.isValidConfig(options.promptLabel)) {
     promptLabel.textContent = i18n.get(options.promptLabel as I18NConfig);
-    return { label: promptLabel, input: promptInput };
+    return result;
   }
 
   if (options.promptLabel instanceof HTMLElement) {
     promptLabel.replaceWith(options.promptLabel);
-    return { label: options.promptLabel, input: promptInput };
+    result.label = options.promptLabel;
+    return result;
   }
 
   if (options.promptLabel instanceof Yuka) {
     promptLabel.replaceWith(options.promptLabel.el);
-    return { label: options.promptLabel.el, input: promptInput };
+    result.label = options.promptLabel.el;
+    return result;
   }
 
   throw new Error("[Yuka:dialog appendPromptInput] options.promptLabel's type is invalid");
@@ -140,7 +176,7 @@ const appendPromptInput = (body: HTMLElement, options: DialogOption) => {
 const applyBody = (dialog: HTMLDialogElement, body: HTMLElement, options: DialogOption) => {
   if (options.body === undefined) {
     body.remove();
-    return { body: undefined, prompt: { input: undefined, label: undefined } };
+    return { body: undefined, prompt: { input: undefined, label: undefined, feedback: undefined } };
   }
 
   if (options.bodyStyle && typeof options === 'object') {
@@ -184,27 +220,8 @@ const applyBody = (dialog: HTMLDialogElement, body: HTMLElement, options: Dialog
  */
 const applyFooter = (dialog: HTMLDialogElement, footer: HTMLElement, options: DialogOption) => {
   // 创建yes按钮的事件并绑定
-  const createHandler =
-    (handler: ((event: Event) => any) | undefined, type: 'yes' | 'no') => (e: Event) => {
-      if (typeof handler !== 'function') {
-        dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
-        closeDialog(dialog);
-        return;
-      }
-      // 归一化为Promise的情形
-      const returnValue = Promise.resolve(handler(e));
-      returnValue.then((result) => {
-        if (result !== false) {
-          dialog.setAttribute(DIALOG_CONFIRM_ATTR, type);
-          closeDialog(dialog);
-        }
-      });
-    };
-
-  const yes = createFooterButton(options, 'yes');
-  const no = createFooterButton(options, 'no');
-  yes.addEventListener('click', createHandler(options.onYes, 'yes'));
-  no.addEventListener('click', createHandler(options.onNo, 'no'));
+  const yes = createFooterButton(dialog, options, 'yes');
+  const no = createFooterButton(dialog, options, 'no');
 
   if (options.footerStyle && typeof options === 'object') {
     applyStyle(footer, options.footerStyle);
@@ -252,7 +269,7 @@ const applyFooter = (dialog: HTMLDialogElement, footer: HTMLElement, options: Di
 
 export const normalize = (
   type: DialogType,
-  arg1: string | I18NConfig | DialogOption | undefined,
+  arg1: string | I18NConfig | Partial<DialogOption> | undefined,
   options: Partial<DialogOption> | undefined
 ) => {
   // 这里只做一些通用的必要的校验，更细致的校验将在其他函数中完成

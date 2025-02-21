@@ -73,8 +73,9 @@ export type DialogYesOption = {
 
   /**
    * 按下确认时绑定的事件
+   * @returns 返回false/Promise<false>可以阻止dialog关闭
    */
-  onYes: () => void;
+  onYes: () => any;
 };
 
 export type DialogNoOption = {
@@ -86,8 +87,9 @@ export type DialogNoOption = {
 
   /**
    * 按下取消时绑定的事件
+   * @returns 返回false/Promise<false>可以阻止dialog关闭
    */
-  onNo: () => void;
+  onNo: () => any;
 };
 
 export type DialogCountDownOption = {
@@ -112,8 +114,9 @@ export type DialogPromptInputOption = {
 
   /**
    * 输入框的检测器，支持Promise但不推荐
+   * 只有返回值是true或Promisetrue时，才算通过检测。如果返回string，则会作为错误信息展示在输入框下面
    */
-  promptValidator: (value: string) => boolean | Promise<boolean>;
+  promptValidator: (value: string) => (true | string) | Promise<true | string>;
 };
 
 type DialogFullOption = DialogBasicOption &

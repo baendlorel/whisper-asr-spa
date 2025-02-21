@@ -47,12 +47,11 @@ export function confirm(
   const opt = normalize('confirm', arg1, options);
   const { dialog } = createDialog(opt);
 
-  const result = new Promise((resolve) => {
-    dialog.addEventListener('close', () => {
-      const confirmResult = dialog.getAttribute(DIALOG_CONFIRM_ATTR);
-      resolve(confirmResult === 'yes');
-    });
-  }) as Promise<boolean>;
+  const result = new Promise((resolve) =>
+    dialog.addEventListener('close', () =>
+      resolve(dialog.getAttribute(DIALOG_CONFIRM_ATTR) === 'yes')
+    )
+  ) as Promise<boolean>;
 
   return {
     result,
