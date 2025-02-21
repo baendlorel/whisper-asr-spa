@@ -27,81 +27,55 @@ const _wait = (
   let refreshCountDown =
     body === undefined || typeof countDownText !== 'function'
       ? () => undefined
-      : () => {
-          const returnValue = countDownText(timePast);
+      : () =>
+          Promise.resolve(countDownText(timePast)).then((localizedText) => {
+            if (typeof localizedText === 'string') {
+              body.textContent = localizedText;
+              refreshCountDown = () =>
+                Promise.resolve(countDownText(timePast)).then(
+                  (t) => (body.textContent = t as string)
+                ) as Promise<void>;
+              return;
+            }
 
-          if (typeof returnValue === 'string') {
-            body.textContent = returnValue;
-            refreshCountDown = () => (body.textContent = countDownText(timePast) as string);
-            return;
-          }
+            if (i18n.isValidConfig(localizedText)) {
+              body.textContent = i18n.get(localizedText as I18NConfig);
+              refreshCountDown = () =>
+                Promise.resolve(countDownText(timePast)).then(
+                  (t) => (body.textContent = i18n.get(t as I18NConfig))
+                ) as Promise<void>;
+              return;
+            }
 
-          if (i18n.isValidConfig(returnValue)) {
-            body.textContent = i18n.get(returnValue as I18NConfig);
-            refreshCountDown = () =>
-              (body.textContent = i18n.get(countDownText(timePast) as I18NConfig));
-            return;
-          }
-
-          if (returnValue instanceof Promise) {
-            returnValue.then((v) => {
-              if (typeof v === 'string') {
-                body.textContent = v;
-                refreshCountDown = () =>
-                  (countDownText(timePast) as Promise<string>).then((t) => (body.textContent = t));
-                return;
-              }
-
-              if (i18n.isValidConfig(v)) {
-                body.textContent = i18n.get(v as I18NConfig);
-                refreshCountDown = () =>
-                  (countDownText(timePast) as Promise<I18NConfig>).then(
-                    (t) => (body.textContent = i18n.get(t))
-                  );
-                return;
-              }
-
-              throw new Error(
-                '[Yuka:dialog wait.countDownText] countDownText must return a string/I18NConfig/Promise<string>/Promise<I18NConfig> .'
-              );
-            });
-            return;
-          }
-
-          throw new Error(
-            '[Yuka:dialog wait.countDownText] countDownText must return a string/I18NConfig/Promise<string>/Promise<I18NConfig> .'
-          );
-        };
+            throw new TypeError(
+              '[Yuka:dialog wait.countDownText] countDownText must return a string/I18NConfig/Promise<string>/Promise<I18NConfig> .'
+            );
+          });
 
   // 先展示第一次的文本，同时达到重载此函数的效果
   refreshCountDown();
 
   const result = new Promise((resolve) => {
-    // 等待时间为秒数的情形
-    if (typeof until === 'number') {
-      const counter = setInterval(() => {
-        timePast++;
-        refreshCountDown();
-        if (timePast >= until) {
-          clearInterval(counter);
-          closeDialog(dialog);
-          resolve(timePast);
-          return;
-        }
-      }, 1000);
+    if (typeof until !== 'number' && until instanceof Promise === false) {
+      throw new TypeError('[Yuka:dialog wait] until must be a number or Promise.');
     }
-    // 等待给定的Promise完成的情形
-    else if (until instanceof Promise) {
-      const counter = setInterval(() => {
-        timePast++;
-        refreshCountDown();
-      }, 1000);
-      until.finally(() => {
-        clearInterval(counter);
-        closeDialog(dialog);
-        resolve(timePast);
-      });
-    }
+
+    // 归一化为Promise的情形
+    let prom =
+      typeof until === 'number'
+        ? new Promise((resolve) => setTimeout(resolve, until * 1000))
+        : until;
+
+    const counter = setInterval(() => {
+      timePast++;
+      refreshCountDown();
+    }, 1000);
+
+    prom.finally(() => {
+      clearInterval(counter);
+      closeDialog(dialog);
+      resolve(timePast);
+    });
   }) as Promise<number>;
 
   return {

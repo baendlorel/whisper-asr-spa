@@ -199,7 +199,6 @@ const applyFooter = (dialog: HTMLDialogElement, footer: HTMLElement, options: Di
           closeDialog(dialog);
         }
       });
-      return;
     };
 
   const yes = createFooterButton(options, 'yes');
