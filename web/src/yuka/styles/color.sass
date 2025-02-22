@@ -1,21 +1,25 @@
-@use  'theme' as *
+@use 'sass:color'
+@use 'sass:map'
+@use 'theme'
 
 @function light($color)
-  @return saturate(lighten($color,5%),15%)
-
+  @return color.adjust($color, $lightness:5%, $saturation: 15%)
 @function lighter($color)
-  @return saturate(lighten($color,15%),25%)
+  @return color.adjust($color, $lightness:15%, $saturation: 25%)
+@function darken($color)
+  @return color.adjust($color, $lightness:-5%)
 
-$primary: map-get($colors, primary)
-$secondary: map-get($colors, secondary)
-$success: map-get($colors, success)
-$info: map-get($colors, info)
-$warning: map-get($colors, warning)
-$danger: map-get($colors, danger)
-$light: map-get($colors, light)
-$dark: map-get($colors, dark)
-$blue: map-get($colors, blue)
-
+$primary: map.get(theme.$colors, primary)
+$secondary: map.get(theme.$colors, secondary)
+$success: map.get(theme.$colors, success)
+$info: map.get(theme.$colors, info)
+$warning: map.get(theme.$colors, warning)
+$danger: map.get(theme.$colors, danger)
+$light: map.get(theme.$colors, light)
+$dark: map.get(theme.$colors, dark)
+$ao: map.get(theme.$colors, ao)
+$sass: map.get(theme.$colors, sass)
+$yuka: map.get(theme.$colors, yuka)
 $primary-light: light($primary)
 $secondary-light: light($secondary)
 $success-light: light($success)
@@ -24,7 +28,9 @@ $warning-light: light($warning)
 $danger-light: light($danger)
 $light-light: light($light)
 $dark-light: light($dark)
-$blue-light: light($blue)
+$ao-light: light($ao)
+$sass-light: light($sass)
+$yuka-light: light($yuka)
 $primary-lighter: lighter($primary)
 $secondary-lighter: lighter($secondary)
 $success-lighter: lighter($success)
@@ -33,24 +39,53 @@ $warning-lighter: lighter($warning)
 $danger-lighter: lighter($danger)
 $light-lighter: lighter($light)
 $dark-lighter: lighter($dark)
-$blue-lighter: lighter($blue)
+$ao-lighter: lighter($ao)
+$sass-lighter: lighter($sass)
+$yuka-lighter: lighter($yuka)
 
 :root
-  --yk-primary: $primary
-  --yk-blue: $blue
-  --yk-secondary: $secondary
-  --yk-success: $success
-  --yk-info: $info
-  --yk-warning: $warning
-  --yk-danger: $danger
-  --yk-light: $light
-  --yk-dark: $dark
+  @each $name, $color in theme.$colors
+    --yk-#{$name}: #{$color}
+    --yk-#{$name}-light: #{light($color)}
+    --yk-#{$name}-lighter: #{lighter($color)}
+
+@each $name, $color in theme.$colors
+  .bg-#{$name}
+    background-color: var(--yk-#{$name})
+  .border-#{$name}
+    border-color: var(--yk-#{$name})
+  .text-#{$name}
+    color: var(--yk-#{$name})
+  .fill-#{$name}
+    fill: var(--yk-#{$name})
+  .stroke-#{$name}
+    stroke: var(--yk-#{$name})
+  .bg-#{$name}-light
+    background-color: var(--yk-#{$name}-light)
+  .border-#{$name}-light
+    border-color: var(--yk-#{$name}-light)
+  .text-#{$name}-light
+    color: var(--yk-#{$name}-light)
+  .fill-#{$name}-light
+    fill: var(--yk-#{$name}-light)
+  .stroke-#{$name}-light
+    stroke: var(--yk-#{$name}-light)
+  .bg-#{$name}-lighter
+    background-color: var(--yk-#{$name}-lighter)
+  .border-#{$name}-lighter
+    border-color: var(--yk-#{$name}-lighter)
+  .text-#{$name}-lighter
+    color: var(--yk-#{$name}-lighter)
+  .fill-#{$name}-lighter
+    fill: var(--yk-#{$name}-lighter)
+  .stroke-#{$name}-lighter
+    stroke: var(--yk-#{$name}-lighter)
 
 $input-bg-color: #f9f9f9
 $input-border: 1px solid #e4e4e4
 $border-radius: 5px
 
-// $colors: (
+// theme.$colors: (
 // primary: #3498db,
 // secondary: #2ecc71,
 // danger: #e74c3c,

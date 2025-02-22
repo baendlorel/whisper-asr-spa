@@ -7,18 +7,18 @@ var colors = {
   $danger: '#dc3545',
   $light: '#f8f9fa',
   $dark: '#212529',
-  $blue: '#0d6efd',
+  $ao: '#0d6efd',
+  $sass: '#c71585',
+  $yuka: '#a83eff',
 };
 var t = [];
 for (const k in colors) {
-  t.push(`${k}: ${colors[k]}`);
+  t.push(`${k}: map.get(theme.$colors, ${k.replace('$', '')})`);
 }
 for (const k in colors) {
   t.push(`${k}-light: light(${k})`);
-  // t.push(`${k}-light: saturate(lighten(${k},$lr),$ls)`);
 }
 for (const k in colors) {
   t.push(`${k}-lighter: lighter(${k})`);
-  // t.push(`${k}-lighter: saturate(lighten(${k},$lrp),$lsp)`);
 }
 console.log(t.join('\n'));
