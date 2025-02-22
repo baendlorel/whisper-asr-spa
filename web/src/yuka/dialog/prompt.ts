@@ -15,10 +15,6 @@ type DialogPromptOption = Omit<
 >;
 
 const createPrompt = (body: HTMLElement, options: DialogOption) => {
-  if (options.type !== 'prompt') {
-    return { label: undefined, input: undefined };
-  }
-
   const promptLabel = document.createElement('label');
   const promptInputDiv = document.createElement('div');
   const promptInput = document.createElement('input');
@@ -81,7 +77,7 @@ export function prompt(
 ): DialogController<'prompt'> {
   const opt = normalize('prompt', label, options);
   const { dialog, body, yes } = createDialog<'prompt'>(opt);
-  const prompt = createPrompt(body, opt);
+  const prompt = createPrompt(body, opt); // 会直接append好，无需手动操作
   const newYes = yes.cloneNode(true) as HTMLButtonElement;
   const yesThenClose = createFooterButtonClickHandler(dialog, opt.onYes, 'yes');
   yes.replaceWith(newYes);
@@ -89,14 +85,6 @@ export function prompt(
   // 这里要使得onYes在validator之后再执行，导致onYes的执行时机不确定
   const result = new Promise((resolve) => {
     newYes.addEventListener('click', () => {
-      if (
-        prompt.label === undefined ||
-        prompt.input === undefined ||
-        prompt.feedback === undefined
-      ) {
-        throw new Error('[Yuka:dialog prompt] Prompt elements is missing');
-      }
-
       // 没有设置validator，直接关闭窗口，resolve输入框的值
       if (typeof opt.promptValidator !== 'function') {
         yesThenClose().then(() => resolve(prompt.input.value));
@@ -107,30 +95,34 @@ export function prompt(
       prompt.input.classList.remove('invalid');
       prompt.feedback.textContent = '';
 
-      // 如果有validator，就先执行validator
-      const isValid = Promise.resolve(opt.promptValidator(prompt.input.value));
-      isValid.then((valid) => {
+      const judge = (v: string | I18NConfig | true) => {
         // 校验通过，直接关闭窗口，resolve输入框的值
-        if (valid === true) {
+        if (v === true) {
           yesThenClose().then(() => resolve(prompt.input.value));
           return;
         }
-
+        // 校验不通过，添加invalid样式和报错信息
         prompt.input.classList.add('invalid');
-
-        if (typeof valid === 'string') {
-          prompt.feedback.textContent = valid;
+        if (typeof v === 'string') {
+          prompt.feedback.textContent = v;
           return;
         }
-        if (i18n.isValidConfig(valid)) {
-          prompt.feedback.textContent = i18n.get(valid);
+        if (i18n.isValidConfig(v)) {
+          prompt.feedback.textContent = i18n.get(v);
           return;
         }
-
         throw new Error(
           '[Yuka:dialog prompt] Invalid promptValidator return value, must be a string/true/I18NConfig or Promised these types.'
         );
-      });
+      };
+
+      // 如果有validator，就先执行validator
+      const isValid = opt.promptValidator(prompt.input.value);
+      if (isValid instanceof Promise) {
+        isValid.then(judge);
+      } else {
+        judge(isValid);
+      }
     });
   }) as Promise<string>;
 

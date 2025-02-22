@@ -63,6 +63,13 @@ const promptbtn = h(
   'prompt btn'
 );
 
+const alertbtn = h(
+  'button',
+  {
+    onclick: () => dialog.alert({ zh: '输入校验码', en: 'Input check code' }),
+  },
+  'alert btn'
+);
 export default h('div', { class: 'container' }).append(
   h('h2', { class: 'title' }).append(
     h('img', { src: typescriptLogo, class: 'logo' }),
@@ -70,6 +77,7 @@ export default h('div', { class: 'container' }).append(
   ),
   waitbtn,
   promptbtn,
+  alertbtn,
   locale,
   displayer,
   players,

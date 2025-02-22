@@ -209,15 +209,11 @@ export const normalize = (
   options: Partial<DialogOption> | undefined
 ) => {
   // 这里只做一些通用的必要的校验，更细致的校验将在其他函数中完成
-  if ((arg1 === undefined || arg1 === null) && (options === undefined || options === null)) {
+  if (!arg1 && !options) {
     throw new Error('[Yuka:dialog normalize] arg1 and options cannot be both undefined/null.');
   }
-
   if (typeof arg1 !== 'string' && typeof arg1 !== 'object') {
     throw new Error('[Yuka:dialog normalize] arg1 must be a string or an i18nConfig object.');
-  }
-  if (options !== undefined && options !== null && typeof options !== 'object') {
-    throw new Error('[Yuka:dialog normalize] options must be a DialogOption object.');
   }
 
   // 确保options一定是一个对象而非undefined

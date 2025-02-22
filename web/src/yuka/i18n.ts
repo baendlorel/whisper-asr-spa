@@ -39,7 +39,7 @@ export const i18n = {
   },
 
   isValidConfig(i18nConfig: any) {
-    if (i18nConfig === null || typeof i18nConfig !== 'object') {
+    if (!i18nConfig || typeof i18nConfig !== 'object') {
       return false;
     }
 

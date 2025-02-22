@@ -10,53 +10,63 @@ const _wait = (
   until: number | Promise<any>,
   options?: DialogWaitOption
 ): DialogController<'wait'> => {
-  const opt = normalize('wait', arg1, options);
+  if (typeof until !== 'number' && until instanceof Promise === false) {
+    throw new TypeError('[Yuka:dialog wait] until must be a number or Promise.');
+  }
 
+  const opt = normalize('wait', arg1, options);
   // wait样式默认文字居中
   opt.bodyStyle = Object.assign({ textAlign: 'center' }, opt.bodyStyle);
   opt.titleStyle = Object.assign({ textAlign: 'center' }, opt.titleStyle);
   const { dialog, body } = createDialog<'wait'>(opt);
 
   let timePast = 0;
-  const countDownText = options?.countDownText;
+  const cdt = options?.countDownText;
   // 这里需要根据countDownText的返回值来重载refreshCountDown
-  // 不能提前运行来检测返回值，以避免countDownText本身设置得不好造成额外影响
-  let refreshCountDown =
-    body === undefined || typeof countDownText !== 'function'
-      ? () => undefined
-      : () =>
-          Promise.resolve(countDownText(timePast)).then((localizedText) => {
-            if (typeof localizedText === 'string') {
-              body.textContent = localizedText;
-              refreshCountDown = () =>
-                Promise.resolve(countDownText(timePast)).then(
-                  (t) => (body.textContent = t as string)
-                ) as Promise<void>;
-              return;
-            }
+  // 不能提前运行来检测返回值，以避免countDownText存在副作用
+  // * 不考虑返回值一会string一会Promise变来变去的情况
+  let refresh = () => undefined as any;
+  if (typeof cdt === 'function') {
+    refresh = () => {
+      const text = cdt(timePast);
+      if (typeof text === 'string') {
+        body.textContent = text;
+        refresh = () => (body.textContent = cdt(timePast) as string);
+        return;
+      }
+      if (i18n.isValidConfig(text)) {
+        body.textContent = i18n.get(text as I18NConfig);
+        refresh = () => (body.textContent = i18n.get(cdt(timePast) as I18NConfig));
+        return;
+      }
 
-            if (i18n.isValidConfig(localizedText)) {
-              body.textContent = i18n.get(localizedText as I18NConfig);
-              refreshCountDown = () =>
-                Promise.resolve(countDownText(timePast)).then(
-                  (t) => (body.textContent = i18n.get(t as I18NConfig))
-                ) as Promise<void>;
-              return;
-            }
+      if (!(text instanceof Promise)) {
+        throw new TypeError(
+          '[Yuka:dialog wait.countDownText] countDownText must return a string/I18NConfig/Promise<string>/Promise<I18NConfig> .'
+        );
+      }
 
-            throw new TypeError(
-              '[Yuka:dialog wait.countDownText] countDownText must return a string/I18NConfig/Promise<string>/Promise<I18NConfig> .'
-            );
-          });
+      text.then((v) => {
+        if (typeof v === 'string') {
+          body.textContent = v;
+          refresh = () => (cdt(timePast) as Promise<string>).then((t) => (body.textContent = t));
+          return;
+        }
+
+        if (i18n.isValidConfig(v)) {
+          body.textContent = i18n.get(v as I18NConfig);
+          refresh = () =>
+            (cdt(timePast) as Promise<I18NConfig>).then((t) => (body.textContent = i18n.get(t)));
+          return;
+        }
+      });
+    };
+  }
 
   // 先展示第一次的文本，同时达到重载此函数的效果
-  refreshCountDown();
+  refresh();
 
   const result = new Promise((resolve) => {
-    if (typeof until !== 'number' && until instanceof Promise === false) {
-      throw new TypeError('[Yuka:dialog wait] until must be a number or Promise.');
-    }
-
     // 归一化为Promise的情形
     let prom =
       typeof until === 'number'
@@ -65,7 +75,7 @@ const _wait = (
 
     const counter = setInterval(() => {
       timePast++;
-      refreshCountDown();
+      refresh();
     }, 1000);
 
     prom.finally(() => {
