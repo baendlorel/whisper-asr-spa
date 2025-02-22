@@ -45,7 +45,7 @@ export function confirm(
   options?: DialogConfirmOption
 ): DialogController<'confirm'> {
   const opt = normalize('confirm', arg1, options);
-  const { dialog } = createDialog(opt);
+  const { dialog } = createDialog<'confirm'>(opt);
 
   const result = new Promise((resolve) =>
     dialog.addEventListener('close', () =>

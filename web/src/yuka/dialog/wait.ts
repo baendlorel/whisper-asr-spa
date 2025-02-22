@@ -15,10 +15,7 @@ const _wait = (
   // wait样式默认文字居中
   opt.bodyStyle = Object.assign({ textAlign: 'center' }, opt.bodyStyle);
   opt.titleStyle = Object.assign({ textAlign: 'center' }, opt.titleStyle);
-  const { dialog, body, footer } = createDialog(opt);
-
-  // wait窗口不能点击退出，需要等待时机到了才能退出
-  footer.remove();
+  const { dialog, body } = createDialog<'wait'>(opt);
 
   let timePast = 0;
   const countDownText = options?.countDownText;

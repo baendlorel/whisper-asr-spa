@@ -7,11 +7,6 @@ export type DialogBasicOption = {
   title: string | I18NConfig | HTMLElement | Yuka<HTMLElementType>;
 
   /**
-   *  对话框的内容，可以是字符串、i18n配置、HTMLElement、Yuka实例
-   */
-  body: string | I18NConfig | HTMLElement | Yuka<HTMLElementType>;
-
-  /**
    * 对话框的类型，会影响title的配色
    */
   variant: 'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
@@ -32,11 +27,6 @@ export type DialogBasicOption = {
   titleStyle: Partial<CSSStyleDeclaration>;
 
   /**
-   * 内容样式
-   */
-  bodyStyle: Partial<CSSStyleDeclaration>;
-
-  /**
    * 对话框开启时，还在渐变的时候触发
    */
   onOpen: () => void;
@@ -55,6 +45,18 @@ export type DialogBasicOption = {
    * 对话框关闭完成时触发
    */
   onClosed: () => void;
+};
+
+export type DialogBodyOption = {
+  /**
+   *  对话框的内容，可以是字符串、i18n配置、HTMLElement、Yuka实例
+   */
+  body: string | I18NConfig | HTMLElement | Yuka<HTMLElementType>;
+
+  /**
+   * 内容样式
+   */
+  bodyStyle: Partial<CSSStyleDeclaration>;
 };
 
 export type DialogFooterOption = {
@@ -122,6 +124,7 @@ export type DialogPromptInputOption = {
 };
 
 type DialogFullOption = DialogBasicOption &
+  DialogBodyOption &
   DialogFooterOption &
   DialogYesOption &
   DialogNoOption &
@@ -155,4 +158,47 @@ export type DialogController<T extends DialogType> = {
    * 谨慎使用！强制关闭对话框，可能会导致confirm.result的Promise永远不会resolve
    */
   close: () => void;
+};
+
+export type DialogCreateResult = {
+  alert: {
+    dialog: HTMLDialogElement;
+    title?: HTMLDivElement;
+    body?: HTMLDivElement;
+    footer: HTMLDivElement;
+    yes: HTMLButtonElement;
+    no: undefined;
+  };
+  confirm: {
+    dialog: HTMLDialogElement;
+    title?: HTMLDivElement;
+    body?: HTMLDivElement;
+    footer: HTMLDivElement;
+    yes: HTMLButtonElement;
+    no: HTMLButtonElement;
+  };
+  wait: {
+    dialog: HTMLDialogElement;
+    title?: HTMLDivElement;
+    body: HTMLDivElement;
+    footer: undefined;
+    yes: undefined;
+    no: undefined;
+  };
+  prompt: {
+    dialog: HTMLDialogElement;
+    title?: HTMLDivElement;
+    body: HTMLDivElement;
+    footer: HTMLDivElement;
+    yes: HTMLButtonElement;
+    no: undefined;
+  };
+  progress: {
+    dialog: HTMLDialogElement;
+    title?: HTMLElement;
+    body: HTMLElement;
+    footer: undefined;
+    yes: undefined;
+    no: undefined;
+  };
 };

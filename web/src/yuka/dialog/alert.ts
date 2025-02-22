@@ -32,7 +32,7 @@ export function alert(
   options?: DialogAlertOption
 ): DialogController<'alert'> {
   const opt = normalize('alert', arg1, options);
-  const { dialog, yes } = createDialog(opt);
+  const { dialog, yes } = createDialog<'alert'>(opt);
 
   const result = new Promise((resolve) => {
     yes.addEventListener('click', () => {
