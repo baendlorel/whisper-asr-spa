@@ -1,6 +1,6 @@
 import { I18NConfig, HTMLElementType, Yuka } from '..';
 
-export type DialogBasicOption = {
+export type BasicOption = {
   /**
    * 对话框的标题，
    */
@@ -47,7 +47,7 @@ export type DialogBasicOption = {
   onClosed: () => void;
 };
 
-export type DialogBodyOption = {
+export type BodyOption = {
   /**
    *  对话框的内容，可以是字符串、i18n配置、HTMLElement、Yuka实例
    */
@@ -59,14 +59,14 @@ export type DialogBodyOption = {
   bodyStyle: Partial<CSSStyleDeclaration>;
 };
 
-export type DialogFooterOption = {
+export type FooterOption = {
   /**
    * 底部样式
    */
   footerStyle: Partial<CSSStyleDeclaration>;
 };
 
-export type DialogYesOption = {
+export type YesOption = {
   /**
    * 确认按钮的文本，可以是字符串或i18n配置，在alert和confirm中会用到
    * @function alert,confirm
@@ -80,7 +80,7 @@ export type DialogYesOption = {
   onYes: () => any;
 };
 
-export type DialogNoOption = {
+export type NoOption = {
   /**
    * 取消按钮的文本，可以是字符串或i18n配置，在confirm中会用到
    * @function confirm
@@ -94,7 +94,7 @@ export type DialogNoOption = {
   onNo: () => any;
 };
 
-export type DialogCountDownOption = {
+export type CountDownOption = {
   /**
    * 在对话框中显示包含剩余时间的字符串，会覆盖message或i18n配置。支持Promise但不推荐使用
    * @param timeLeft 剩余时间，可制作倒计时
@@ -103,7 +103,7 @@ export type DialogCountDownOption = {
   countDownText: (timePast: number) => string | I18NConfig | Promise<string> | Promise<I18NConfig>;
 };
 
-export type DialogPromptInputOption = {
+export type PromptInputOption = {
   /**
    * 输入框的标签
    */
@@ -123,13 +123,16 @@ export type DialogPromptInputOption = {
   ) => (true | string | I18NConfig) | Promise<true | string | I18NConfig>;
 };
 
-type DialogFullOption = DialogBasicOption &
-  DialogBodyOption &
-  DialogFooterOption &
-  DialogYesOption &
-  DialogNoOption &
-  DialogCountDownOption &
-  DialogPromptInputOption;
+export type ProgressOption = {};
+
+type DialogFullOption = BasicOption &
+  BodyOption &
+  FooterOption &
+  YesOption &
+  NoOption &
+  CountDownOption &
+  PromptInputOption &
+  ProgressOption;
 
 export type DialogType = 'alert' | 'confirm' | 'wait' | 'prompt' | 'progress';
 

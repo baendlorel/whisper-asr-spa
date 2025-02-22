@@ -1,17 +1,12 @@
 import { yukaEvent } from './event-bus';
 import { I18NConfig, LanguageType, LanguageTypes } from './types';
 
+const UI_LANGUAGE = 'UI_LANGUAGE';
+const DEFAULT_LANGUAGE = 'zh' as LanguageType;
+
 export const i18n = {
-  get UI_LANGUAGE() {
-    return 'UI_LANGUAGE';
-  },
-
-  get DEFAULT_LANGUAGE() {
-    return 'zh' as LanguageType;
-  },
-
   get locale() {
-    return (localStorage.getItem(i18n.UI_LANGUAGE) || i18n.DEFAULT_LANGUAGE) as LanguageType;
+    return (localStorage.getItem(UI_LANGUAGE) || DEFAULT_LANGUAGE) as LanguageType;
   },
 
   set locale(lang: LanguageType) {
@@ -21,24 +16,22 @@ export const i18n = {
 
     if (!LanguageTypes.includes(lang)) {
       console.warn(
-        `[Yuka:i18n.set locale] lang '${lang}' is not in [${LanguageTypes.join()}], use default '${
-          i18n.DEFAULT_LANGUAGE
-        } instead.'`
+        `[Yuka:i18n.set locale] lang '${lang}' is not in [${LanguageTypes.join()}], use default '${DEFAULT_LANGUAGE} instead.'`
       );
-      lang = i18n.DEFAULT_LANGUAGE;
+      lang = DEFAULT_LANGUAGE;
     }
 
-    localStorage.setItem(i18n.UI_LANGUAGE, lang);
+    localStorage.setItem(UI_LANGUAGE, lang);
 
     yukaEvent.emitI18NUpdated();
   },
 
-  get(i18nConfig: I18NConfig) {
+  get: (i18nConfig: I18NConfig) => {
     // 此处不进行isValid判定，因为理论上需要使用它的地方都是已经校验过的
     return i18nConfig[i18n.locale] || '';
   },
 
-  isValidConfig(i18nConfig: any) {
+  valid: (i18nConfig: any) => {
     if (!i18nConfig || typeof i18nConfig !== 'object') {
       return false;
     }

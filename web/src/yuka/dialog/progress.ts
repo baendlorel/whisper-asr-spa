@@ -1,8 +1,8 @@
 import { i18n, I18NConfig } from '..';
 import { createDialog, closeDialog, normalize } from './common';
-import { DialogBasicOption, DialogCountDownOption, DialogController } from './types';
+import { BasicOption, ProgressOption, DialogController } from './types';
 
-type DialogProgressOption = Partial<DialogBasicOption & DialogCountDownOption>;
+type DialogProgressOption = Partial<BasicOption & ProgressOption>;
 
 /**
  * 根据配置弹出wait窗口，窗口是以DOM标签dialog制作的

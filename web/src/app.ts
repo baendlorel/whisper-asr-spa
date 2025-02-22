@@ -70,6 +70,9 @@ const alertbtn = h(
   },
   'alert btn'
 );
+
+// TODO 测试读取i18n做valid判定时，memoize与否的耗时区别
+
 export default h('div', { class: 'container' }).append(
   h('h2', { class: 'title' }).append(
     h('img', { src: typescriptLogo, class: 'logo' }),

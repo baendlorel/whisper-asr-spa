@@ -1,16 +1,16 @@
 import { i18n, I18NConfig, Yuka } from '..';
 import { createDialog, normalize, closeDialog, createFooterButtonClickHandler } from './common';
 import {
-  DialogBasicOption,
-  DialogFooterOption,
-  DialogYesOption,
+  BasicOption,
+  FooterOption,
+  YesOption,
   DialogController,
-  DialogPromptInputOption,
+  PromptInputOption,
   DialogOption,
 } from './types';
 
 type DialogPromptOption = Omit<
-  Partial<DialogBasicOption & DialogFooterOption & DialogYesOption & DialogPromptInputOption>,
+  Partial<BasicOption & FooterOption & YesOption & PromptInputOption>,
   'body'
 >;
 
@@ -46,7 +46,7 @@ const createPrompt = (body: HTMLElement, options: DialogOption) => {
     return result;
   }
 
-  if (i18n.isValidConfig(options.promptLabel)) {
+  if (i18n.valid(options.promptLabel)) {
     promptLabel.textContent = i18n.get(options.promptLabel as I18NConfig);
     return result;
   }
@@ -107,7 +107,7 @@ export function prompt(
           prompt.feedback.textContent = v;
           return;
         }
-        if (i18n.isValidConfig(v)) {
+        if (i18n.valid(v)) {
           prompt.feedback.textContent = i18n.get(v);
           return;
         }

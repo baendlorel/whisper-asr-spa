@@ -1,16 +1,8 @@
 import { I18NConfig } from '..';
 import { createDialog, normalize, DIALOG_CONFIRM_ATTR, closeDialog } from './common';
-import {
-  DialogBasicOption,
-  DialogFooterOption,
-  DialogYesOption,
-  DialogController,
-  DialogNoOption,
-} from './types';
+import { BasicOption, FooterOption, YesOption, DialogController, NoOption } from './types';
 
-type DialogConfirmOption = Partial<
-  DialogBasicOption & DialogFooterOption & DialogYesOption & DialogNoOption
->;
+type DialogConfirmOption = Partial<BasicOption & FooterOption & YesOption & NoOption>;
 
 /**
  * 根据配置弹出confirm窗口，窗口是以DOM标签dialog制作的

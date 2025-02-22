@@ -68,7 +68,7 @@ const createFooterButton = (
   // 填充按钮文字
   if (typeof content === 'string') {
     b.textContent = content;
-  } else if (i18n.isValidConfig(content)) {
+  } else if (i18n.valid(content)) {
     b.textContent = i18n.get(content as I18NConfig);
   } else {
     b.textContent = i18n.get(DEFAULT_FOOTER_BUTTON_I18N[type]);
@@ -115,7 +115,7 @@ const applyTitle = (dialog: HTMLDialogElement, title: HTMLDivElement, options: D
     return { title };
   }
 
-  if (i18n.isValidConfig(options.title)) {
+  if (i18n.valid(options.title)) {
     title.textContent = i18n.get(options.title as I18NConfig);
     return { title };
   }
@@ -153,7 +153,7 @@ const applyBody = (dialog: HTMLDialogElement, body: HTMLDivElement, options: Dia
     return { body };
   }
 
-  if (i18n.isValidConfig(options.body)) {
+  if (i18n.valid(options.body)) {
     body.textContent = i18n.get(options.body as I18NConfig);
     return { body };
   }
@@ -225,7 +225,7 @@ export const normalize = (
     options.promptLabel = options.promptLabel || arg1;
   }
   // 用i18nConfig的
-  else if (i18n.isValidConfig(arg1)) {
+  else if (i18n.valid(arg1)) {
     options.body = i18n.get(arg1 as I18NConfig);
     options.promptLabel = options.promptLabel || i18n.get(arg1 as I18NConfig);
   }

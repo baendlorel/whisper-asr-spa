@@ -38,7 +38,7 @@ export class Yuka<T extends HTMLElementType> {
     if (textNode.parentElement !== el) {
       throw new Error('[Yuka:Yuka.constructor] textNode must be a child of el');
     }
-    if (i18nConfig !== undefined && !i18n.isValidConfig(i18nConfig)) {
+    if (i18nConfig !== undefined && !i18n.valid(i18nConfig)) {
       throw new Error('[Yuka:Yuka.constructor] i18nConfig not valid');
     }
 
@@ -56,7 +56,7 @@ export class Yuka<T extends HTMLElementType> {
   }
 
   set i18n(i18nConfig: I18NConfig) {
-    if (!i18n.isValidConfig(i18nConfig)) {
+    if (!i18n.valid(i18nConfig)) {
       throw new Error('[Yuka:Yuka.i18n] The given i18nConfig is not a valid config object.');
     }
     this[i18nSymbol] = i18nConfig;

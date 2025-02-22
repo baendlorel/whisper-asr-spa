@@ -1,8 +1,8 @@
 import { I18NConfig } from '..';
 import { createDialog, normalize, closeDialog } from './common';
-import { DialogBasicOption, DialogFooterOption, DialogYesOption, DialogController } from './types';
+import { BasicOption, FooterOption, YesOption, DialogController } from './types';
 
-type DialogAlertOption = Partial<DialogBasicOption & DialogFooterOption & DialogYesOption>;
+type DialogAlertOption = Partial<BasicOption & FooterOption & YesOption>;
 
 /**
  * 根据配置弹出alert窗口，窗口是以DOM标签dialog制作的

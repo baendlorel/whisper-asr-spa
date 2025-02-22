@@ -1,8 +1,8 @@
 import { i18n, I18NConfig } from '..';
 import { createDialog, closeDialog, normalize } from './common';
-import { DialogBasicOption, DialogCountDownOption, DialogController } from './types';
+import { BasicOption, CountDownOption, DialogController } from './types';
 
-type DialogWaitOption = Partial<DialogBasicOption & DialogCountDownOption>;
+type DialogWaitOption = Partial<BasicOption & CountDownOption>;
 
 // 此为参数归一化后通用的wait函数
 const _wait = (
@@ -34,7 +34,7 @@ const _wait = (
         refresh = () => (body.textContent = cdt(timePast) as string);
         return;
       }
-      if (i18n.isValidConfig(text)) {
+      if (i18n.valid(text)) {
         body.textContent = i18n.get(text as I18NConfig);
         refresh = () => (body.textContent = i18n.get(cdt(timePast) as I18NConfig));
         return;
@@ -53,7 +53,7 @@ const _wait = (
           return;
         }
 
-        if (i18n.isValidConfig(v)) {
+        if (i18n.valid(v)) {
           body.textContent = i18n.get(v as I18NConfig);
           refresh = () =>
             (cdt(timePast) as Promise<I18NConfig>).then((t) => (body.textContent = i18n.get(t)));
@@ -144,7 +144,7 @@ export function wait(
   }
 
   // 2. wait(i18nConfig: I18NConfig, until: number | Promise<any>, options?: DialogWaitOption): void;
-  if (i18n.isValidConfig(arg1) && (typeof until === 'number' || until instanceof Promise)) {
+  if (i18n.valid(arg1) && (typeof until === 'number' || until instanceof Promise)) {
     return _wait(arg1 as I18NConfig, until, options);
   }
 
