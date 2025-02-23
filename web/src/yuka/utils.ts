@@ -31,12 +31,11 @@ export const isAsyncFunction = (fn: any) => {
  * @param fn 第一个参数是对象的函数
  * @returns
  */
-export const objectArgMemoize = <T extends (...args: any[]) => any>(fn: T): T => {
+export const memoize = <T extends (...args: any[]) => any>(fn: T): T => {
   if (typeof fn !== 'function') {
-    throw new Error('[Yuka:objectArgMemoize] fn must be a function');
+    throw new Error('[Yuka:memoize] fn must be a function');
   }
-
-  const cache = new WeakMap<object, ReturnType<T>>();
+  const cache = new Map<object, ReturnType<T>>();
   return ((...args: Parameters<T>[]) => {
     const key = args[0];
     if (cache.has(key)) {

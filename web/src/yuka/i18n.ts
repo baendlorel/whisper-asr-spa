@@ -27,12 +27,15 @@ export const i18n = {
   },
 
   get: (i18nConfig: I18NConfig) => {
-    // 此处不进行isValid判定，因为理论上需要使用它的地方都是已经校验过的
-    return i18nConfig[i18n.locale] || '';
+    if (i18n.valid(i18nConfig)) {
+      return i18nConfig[i18n.locale] || '';
+    }
+    console.error('[Yuka:i18n.get] i18nConfig is invalid:', i18nConfig);
+    return '[Error i18nConfig]';
   },
 
   valid: (i18nConfig: any) => {
-    if (!i18nConfig || typeof i18nConfig !== 'object') {
+    if (typeof i18nConfig !== 'object' || !i18nConfig) {
       return false;
     }
 
