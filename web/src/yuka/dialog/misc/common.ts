@@ -1,4 +1,4 @@
-import { i18n, Yuka, I18NConfig } from '..';
+import { i18n, Yuka, I18NConfig } from '../..';
 import { DialogCreateResult, DialogOption, DialogType } from './types';
 
 export const isDialogSupported = ((supported) => {

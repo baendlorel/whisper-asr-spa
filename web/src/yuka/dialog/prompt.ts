@@ -1,5 +1,10 @@
 import { i18n, I18NConfig, Yuka } from '..';
-import { createDialog, normalize, closeDialog, createFooterButtonClickHandler } from './common';
+import {
+  createDialog,
+  normalize,
+  closeDialog,
+  createFooterButtonClickHandler,
+} from './misc/common';
 import {
   BasicOption,
   FooterOption,
@@ -7,7 +12,7 @@ import {
   DialogController,
   PromptInputOption,
   DialogOption,
-} from './types';
+} from './misc/types';
 
 type DialogPromptOption = Omit<
   Partial<BasicOption & FooterOption & YesOption & PromptInputOption>,

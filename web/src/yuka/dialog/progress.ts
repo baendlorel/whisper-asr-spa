@@ -1,6 +1,6 @@
 import { i18n, I18NConfig } from '..';
-import { createDialog, closeDialog, normalize } from './common';
-import { BasicOption, ProgressOption, DialogController } from './types';
+import { createDialog, closeDialog, normalize } from './misc/common';
+import { BasicOption, ProgressOption, DialogController } from './misc/types';
 
 type DialogProgressOption = Partial<BasicOption & ProgressOption>;
 

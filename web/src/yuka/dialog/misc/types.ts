@@ -1,4 +1,4 @@
-import { I18NConfig, HTMLElementType, Yuka } from '..';
+import { I18NConfig, HTMLElementType, Yuka } from '../..';
 
 export type BasicOption = {
   /**

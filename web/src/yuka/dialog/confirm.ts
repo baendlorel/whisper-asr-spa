@@ -1,6 +1,6 @@
 import { I18NConfig } from '..';
-import { createDialog, normalize, DIALOG_CONFIRM_ATTR, closeDialog } from './common';
-import { BasicOption, FooterOption, YesOption, DialogController, NoOption } from './types';
+import { createDialog, normalize, DIALOG_CONFIRM_ATTR, closeDialog } from './misc/common';
+import { BasicOption, FooterOption, YesOption, DialogController, NoOption } from './misc/types';
 
 type DialogConfirmOption = Partial<BasicOption & FooterOption & YesOption & NoOption>;
 

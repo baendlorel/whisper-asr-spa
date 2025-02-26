@@ -1,6 +1,6 @@
 import { I18NConfig } from '..';
-import { createDialog, normalize, closeDialog } from './common';
-import { BasicOption, FooterOption, YesOption, DialogController } from './types';
+import { createDialog, normalize, closeDialog } from './misc/common';
+import { BasicOption, FooterOption, YesOption, DialogController } from './misc/types';
 
 type DialogAlertOption = Partial<BasicOption & FooterOption & YesOption>;
 
