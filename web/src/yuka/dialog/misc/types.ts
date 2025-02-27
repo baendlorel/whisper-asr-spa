@@ -123,7 +123,27 @@ export type PromptInputOption = {
   ) => (true | string | I18NConfig) | Promise<true | string | I18NConfig>;
 };
 
-export type ProgressOption = {};
+export type ProgressOption = {
+  /**
+   * 显示在进度条上的文字，可以是字符串或i18n配置
+   */
+  progressLabel: string | I18NConfig;
+
+  /**
+   * 进度条上的百分比的小数位数
+   */
+  showPercentage: boolean;
+
+  /**
+   * 进度条上的百分比的小数位数
+   */
+  percentageFractionDigits: number;
+
+  /**
+   * 进度条的预设样式类型
+   */
+  barType: 'normal' | 'lightspot';
+};
 
 type DialogFullOption = BasicOption &
   BodyOption &
@@ -184,7 +204,7 @@ export type DialogCreateResult = {
     dialog: HTMLDialogElement;
     title?: HTMLDivElement;
     body: HTMLDivElement;
-    footer: undefined;
+    footer: HTMLDivElement;
     yes: undefined;
     no: undefined;
   };
@@ -200,7 +220,7 @@ export type DialogCreateResult = {
     dialog: HTMLDialogElement;
     title?: HTMLDivElement;
     body: HTMLDivElement;
-    footer: undefined;
+    footer: HTMLDivElement;
     yes: undefined;
     no: undefined;
   };

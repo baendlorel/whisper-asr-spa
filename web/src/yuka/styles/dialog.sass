@@ -9,10 +9,7 @@ dialog[yk-role='dialog']
 
   > div[yk-role='body']
     padding: 15px 12px
-    // > label[yk-role='prompt-label']
-    // > label[yk-role='prompt-input']
 
-  > div[yk-role='footer'],
   > div[yk-role='title']
     padding: 5px 12px
 
@@ -21,6 +18,7 @@ dialog[yk-role='dialog']
     font-size: 1.2em
 
   > div[yk-role='footer']
+    padding: 5px 12px
     text-align: right
 
   &,&::backdrop
@@ -35,3 +33,69 @@ dialog[yk-role='dialog']
 
   &.show
     margin-top: 200px
+
+[bar-type='normal']
+  --bar-height: 16px
+
+[bar-type='lightspot']
+  --bar-height: 8px
+
+div[yk-role='progress-wrapper']
+  display: grid
+  width: 100%
+  grid-template-columns: 1fr 60px
+  grid-template-rows: 35px var(--bar-height)
+
+div[yk-role='progress-percentage']
+  text-align: right
+
+div[yk-role='progress-background']
+  grid-column: 1/span 2
+  background-color: var(--yk-secondary-lighter)
+  border-radius: calc(var(--bar-height) / 2)
+
+div[yk-role='progress-bar']
+  background-color: var(--yk-primary-light)
+  border-radius: calc(var(--bar-height) / 2)
+  width: 0%
+  height: 100%
+  transition-duration: 0.3s
+
+  &[bar-type='normal']::after
+    content: ""
+    float: right
+    border-radius: calc(var(--bar-height) * 0.2)
+    box-shadow: 0px 0px 1px 1px white, 0 0 14px 4px hsl(204.1176470588, 105%, 55%)
+    width: calc(var(--bar-height) * 0.4)
+    height: calc(var(--bar-height) * 0.4)
+    margin: calc(var(--bar-height) * 0.3)
+    background-color: hsl(0deg 0% 100% / 86%)
+
+  &[bar-type='lightspot']::after
+    content: ""
+    float: right
+    border-radius: calc(var(--bar-height) / 2)
+    box-shadow: 4px 0px 4px 2px white, 0px 0 15px 5px var(--yk-primary-light)
+    width: var(--bar-height)
+    height: var(--bar-height)
+    background: linear-gradient(90deg,var(--yk-primary-light),var(--yk-primary-lighter))
+
+div[yk-role='progress-background']
+  background-size: 30px 30px
+  background-image: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, .15) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, .15) 50%,
+        rgba(255, 255, 255, .15) 75%,
+        transparent 75%,
+        transparent
+    )
+  animation: animate-stripes 1.5s linear infinite
+
+@keyframes animate-stripes
+  0%
+    background-position: 0 0
+  100%
+    background-position: 60px 0

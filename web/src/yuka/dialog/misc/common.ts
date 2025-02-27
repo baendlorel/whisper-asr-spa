@@ -144,10 +144,10 @@ const applyBody = (dialog: HTMLDialogElement, body: HTMLDivElement, options: Dia
     return { body };
   }
 
-  if (!options.body) {
-    body.remove();
-    return { body: undefined };
-  }
+  // if (!options.body) {
+  //   body.remove();
+  //   return { body: undefined };
+  // }
 
   if (typeof options.body === 'string') {
     body.textContent = options.body;
@@ -234,9 +234,13 @@ export const normalize = (
   else {
     options = arg1 as DialogOption;
   }
+
   return options as DialogOption;
 };
 
+/**
+ * 已经注册了事件，close之后dialog就会自动remove掉
+ */
 export const closeDialog = (dialog: HTMLDialogElement) => {
   dialog.setAttribute(DialogState.ATTR_NAME, DialogState.CLOSING);
   dialog.classList.remove('show');

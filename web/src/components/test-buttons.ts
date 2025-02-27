@@ -3,12 +3,12 @@ import { memoize } from '@/yuka/utils';
 
 const { h } = useYuka();
 
-const waitbtn = h(
+const waitBtn = h(
   'button',
   {
     onclick: () =>
       dialog
-        .wait({ zh: '等3秒', en: 'wait 3s' }, 3, {
+        .wait({ zh: '等3秒', en: 'wait 3s' }, 3000, {
           title: { zh: '等待测试', en: 'wait test' },
           onOpen() {
             console.time('dialog');
@@ -26,17 +26,19 @@ const waitbtn = h(
           },
           countDownText(timePast: number) {
             return {
-              zh: `还剩${3000 - timePast}毫秒，已经过去了${timePast}毫秒`,
-              en: `left ${3000 - timePast}ms, passed ${timePast}ms`,
+              zh: `已经过去了${(timePast / 1000).toFixed(3)}秒`,
+              en: `passed ${(timePast / 1000).toFixed(3)}s`,
             };
           },
         })
-        .then((ms) => dialog.alert({ zh: `总共花费${ms}ms`, en: `total cost ${ms}ms` })),
+        .then((ms) =>
+          dialog.alert({ zh: `总共花费${ms / 1000}s`, en: `total cost ${ms / 1000}s` })
+        ),
   },
   'wait'
 );
 
-const promptbtn = h(
+const promptBtn = h(
   'button',
   {
     onclick: () =>
@@ -61,7 +63,7 @@ const promptbtn = h(
   'prompt'
 );
 
-const alertbtn = h(
+const alertBtn = h(
   'button',
   {
     onclick: () => dialog.alert({ zh: '输入校验码', en: 'Input check code' }),
@@ -70,7 +72,7 @@ const alertbtn = h(
 );
 
 // * 经测试，memoize对i18n.valid的优化效果为负。100万次守卫代码比正向判定略微慢十几毫秒，不做更改
-const memoizei18nbtn = h(
+const memoizei18nBtn = h(
   'button',
   {
     onclick: () => {
@@ -127,11 +129,41 @@ const memoizei18nbtn = h(
   'memoizei18n'
 );
 
+const progresser = () => {
+  let p = 0.1;
+  return () => {
+    p += 0.01;
+    return p;
+  };
+};
+
+const progressBtn = h(
+  'button',
+  {
+    onclick: () =>
+      dialog.progress(progresser(), {
+        progressLabel: { zh: '进度条', en: 'progress bar' },
+        barType: 'lightspot',
+      }),
+  },
+  'progresslightspot'
+);
+
+const progressnormalBtn = h(
+  'button',
+  {
+    onclick: () =>
+      dialog.progress(progresser(), {
+        progressLabel: { zh: '进度条', en: 'progress bar' },
+        barType: 'normal',
+      }),
+  },
+  'progressnormal'
+);
+
 export default h('div', {
   style: {
-    display: 'grid',
+    display: 'flex',
     margin: '5px 0px',
-    gridTemplateColumns: 'repeat(10, 1fr)',
-    columnGap: '10px',
   },
-}).append(waitbtn, promptbtn, alertbtn, memoizei18nbtn);
+}).append(waitBtn, promptBtn, alertBtn, memoizei18nBtn, progressBtn, progressnormalBtn);

@@ -19,7 +19,7 @@ type DialogPromptOption = Omit<
   'body'
 >;
 
-const createPrompt = (body: HTMLElement, options: DialogOption) => {
+const createPrompt = (body: HTMLDivElement, options: DialogOption) => {
   const promptLabel = document.createElement('label');
   const promptInputDiv = document.createElement('div');
   const promptInput = document.createElement('input');
