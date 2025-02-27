@@ -96,8 +96,8 @@ export type NoOption = {
 
 export type CountDownOption = {
   /**
-   * 在对话框中显示包含剩余时间的字符串，会覆盖message或i18n配置。支持Promise但不推荐使用
-   * @param timeLeft 剩余时间，可制作倒计时
+   * 在对话框中显示包含经过时间的字符串，会覆盖message或i18n配置。支持Promise但不推荐使用
+   * @param timePast 经过时间毫秒数，可制作倒计时
    * @returns
    */
   countDownText: (timePast: number) => string | I18NConfig | Promise<string> | Promise<I18NConfig>;
@@ -198,8 +198,8 @@ export type DialogCreateResult = {
   };
   progress: {
     dialog: HTMLDialogElement;
-    title?: HTMLElement;
-    body: HTMLElement;
+    title?: HTMLDivElement;
+    body: HTMLDivElement;
     footer: undefined;
     yes: undefined;
     no: undefined;

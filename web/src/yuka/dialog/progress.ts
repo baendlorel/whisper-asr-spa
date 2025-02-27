@@ -5,14 +5,34 @@ import { BasicOption, ProgressOption, DialogController } from './misc/types';
 type DialogProgressOption = Partial<BasicOption & ProgressOption>;
 
 /**
- * 根据配置弹出wait窗口，窗口是以DOM标签dialog制作的
- * wait窗口的文字默认居中显示
- * @param i18nConfig 多国语言的消息配置，会根据现在的语言环境自动显示对应文字
- * @param until 如果是秒数，则等待这么多秒。如果是Promise，则等待这个Promise.finally触发
+ * 根据配置弹出progress窗口，窗口是以DOM标签dialog制作的
+ * progress窗口的文字默认居中显示
+ * @param percentageGetter 获取百分比用的函数，会经常调用它以刷新显示的百分比
  * @param options 详细配置，根据TS类型提示进行配置即可
- * @returns  DialogController<'wait'> 在返回Promise，当resolve时表示等待已经结束
+ * @returns  DialogController<'progress'> 在返回Promise，当resolve时表示进度条已达到100%
  */
-export function progress(options?: DialogProgressOption): DialogController<'progress'>;
-export function progress(options?: DialogProgressOption): DialogController<'progress'> {
+export function progress(
+  percentageGetter: () => number,
+  options?: DialogProgressOption
+): DialogController<'progress'>;
+
+export function progress(
+  percentageGetter: () => number,
+  options?: DialogProgressOption
+): DialogController<'progress'> {
+  const opt = normalize('progress', undefined, options);
+  // progress标题样式默认文字居中
+  opt.titleStyle = Object.assign({ textAlign: 'center' }, opt.titleStyle);
+  const { dialog, body } = createDialog<'progress'>(opt);
+
+  const _runner = () => {
+    const p = percentageGetter();
+    if (p >= 1) {
+      return;
+    }
+
+    requestAnimationFrame(_runner);
+  };
+
   return {} as any;
 }

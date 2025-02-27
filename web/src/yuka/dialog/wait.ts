@@ -20,8 +20,9 @@ const _wait = (
   opt.titleStyle = Object.assign({ textAlign: 'center' }, opt.titleStyle);
   const { dialog, body } = createDialog<'wait'>(opt);
 
-  let timePast = 0;
+  const startTime = Date.now();
   const cdt = options?.countDownText;
+  let timePast = 0;
   // 这里需要根据countDownText的返回值来重载refreshCountDown
   // 不能提前运行来检测返回值，以避免countDownText存在副作用
   // * 不考虑返回值一会string一会Promise变来变去的情况
@@ -40,54 +41,67 @@ const _wait = (
         return;
       }
 
-      if (!(text instanceof Promise)) {
-        throw new TypeError(
-          '[Yuka:dialog wait.countDownText] countDownText must return a string/I18NConfig/Promise<string>/Promise<I18NConfig> .'
-        );
+      if (text instanceof Promise) {
+        text.then((v) => {
+          if (typeof v === 'string') {
+            body.textContent = v;
+            refresh = () => (cdt(timePast) as Promise<string>).then((t) => (body.textContent = t));
+            return;
+          }
+
+          if (i18n.valid(v)) {
+            body.textContent = i18n.get(v as I18NConfig);
+            refresh = () =>
+              (cdt(timePast) as Promise<I18NConfig>).then((t) => (body.textContent = i18n.get(t)));
+            return;
+          }
+        });
       }
 
-      text.then((v) => {
-        if (typeof v === 'string') {
-          body.textContent = v;
-          refresh = () => (cdt(timePast) as Promise<string>).then((t) => (body.textContent = t));
-          return;
-        }
-
-        if (i18n.valid(v)) {
-          body.textContent = i18n.get(v as I18NConfig);
-          refresh = () =>
-            (cdt(timePast) as Promise<I18NConfig>).then((t) => (body.textContent = i18n.get(t)));
-          return;
-        }
-      });
+      throw new TypeError(
+        '[Yuka:dialog wait.countDownText] countDownText must return a string/I18NConfig/Promise<string>/Promise<I18NConfig> .'
+      );
     };
   }
 
   // 先展示第一次的文本，同时达到重载此函数的效果
   refresh();
 
+  // TODO interval不够精准，用request animation frame重写，设定starttime用减法决定变化
   const result = new Promise((resolve) => {
-    // 归一化为Promise的情形
-    let prom =
-      typeof until === 'number'
-        ? new Promise((resolve) => setTimeout(resolve, until * 1000))
-        : until;
+    const tick = (() => {
+      let fufilled = false;
 
-    const counter = setInterval(() => {
-      timePast++;
-      refresh();
-    }, 1000);
+      // 并非归一化变量，而是把判定终止的函数归一化，让tick得以有统一的写法而不用根据until类型来写
+      const checkFufilled = (() => {
+        if (until instanceof Promise) {
+          until.finally(() => (fufilled = true));
+          return () => fufilled;
+        }
+        if (typeof until === 'number') {
+          return () => timePast > until * 1000;
+        }
+        throw new Error('[Yuka:dialog wait] Invalid until type, must be a number or Promise.');
+      })();
 
-    prom.finally(() => {
-      clearInterval(counter);
-      closeDialog(dialog);
-      resolve(timePast);
-    });
+      return () => {
+        timePast = Date.now() - startTime;
+        refresh();
+        if (checkFufilled()) {
+          closeDialog(dialog);
+          resolve(timePast);
+          return;
+        }
+        requestAnimationFrame(tick);
+      };
+    })();
+
+    tick();
   }) as Promise<number>;
 
   return {
     result,
-    then: result.then,
+    then: result.then.bind(result),
     close: () => closeDialog(dialog),
   };
 };

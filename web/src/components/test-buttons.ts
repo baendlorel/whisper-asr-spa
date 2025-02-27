@@ -7,29 +7,31 @@ const waitbtn = h(
   'button',
   {
     onclick: () =>
-      dialog.wait({ zh: '等3秒', en: 'wait 3s' }, 3, {
-        title: { zh: '等待测试', en: 'wait test' },
-        onOpen() {
-          console.time('dialog');
-          console.timeLog('dialog', 'onOpen');
-        },
-        onOpened() {
-          console.timeLog('dialog', 'onOpened');
-        },
-        onClose() {
-          console.timeLog('dialog', 'onClose');
-        },
-        onClosed() {
-          console.timeLog('dialog', 'onClosed');
-          console.timeEnd('dialog');
-        },
-        async countDownText(timePast: number) {
-          return {
-            zh: `还剩${3 - timePast}秒，已经过去了${timePast}秒`,
-            en: `left ${3 - timePast}s, passed ${timePast}s`,
-          };
-        },
-      }),
+      dialog
+        .wait({ zh: '等3秒', en: 'wait 3s' }, 3, {
+          title: { zh: '等待测试', en: 'wait test' },
+          onOpen() {
+            console.time('dialog');
+            console.timeLog('dialog', 'onOpen');
+          },
+          onOpened() {
+            console.timeLog('dialog', 'onOpened');
+          },
+          onClose() {
+            console.timeLog('dialog', 'onClose');
+          },
+          onClosed() {
+            console.timeLog('dialog', 'onClosed');
+            console.timeEnd('dialog');
+          },
+          countDownText(timePast: number) {
+            return {
+              zh: `还剩${3000 - timePast}毫秒，已经过去了${timePast}毫秒`,
+              en: `left ${3000 - timePast}ms, passed ${timePast}ms`,
+            };
+          },
+        })
+        .then((ms) => dialog.alert({ zh: `总共花费${ms}ms`, en: `total cost ${ms}ms` })),
   },
   'wait'
 );

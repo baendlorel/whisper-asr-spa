@@ -74,6 +74,7 @@ const createFooterButton = (
     b.textContent = i18n.get(DEFAULT_FOOTER_BUTTON_I18N[type]);
   }
 
+  // TODO yes no的样式改为由sass决定
   // 设置样式
   if (type === 'no') {
     b.style.backgroundColor = '#F8F9FA';

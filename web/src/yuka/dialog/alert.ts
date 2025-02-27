@@ -42,7 +42,7 @@ export function alert(
 
   return {
     result,
-    then: result.then,
+    then: result.then.bind(result),
     close: () => closeDialog(dialog),
   };
 }

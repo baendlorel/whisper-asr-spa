@@ -133,7 +133,7 @@ export function prompt(
 
   return {
     result,
-    then: result.then,
+    then: result.then.bind(result),
     close: () => closeDialog(dialog),
   };
 }
