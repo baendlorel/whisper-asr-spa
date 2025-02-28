@@ -1,4 +1,3 @@
-import { title } from 'process';
 import { i18n, I18NConfig } from '..';
 import { createDialog, closeDialog, normalize } from './misc/common';
 import { BasicOption, CountDownOption, DialogController } from './misc/types';

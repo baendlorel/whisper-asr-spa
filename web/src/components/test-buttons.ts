@@ -98,14 +98,14 @@ const memoizei18nBtn = h(
       const pureGet = (i18nConfig: any) => i18nConfig[i18n.locale];
       const conf = { zh: '中文', en: 'English' };
       for (let i = 0; i < COUNT; i++) {
-        let a = pureGet(conf);
+        pureGet(conf);
       }
       console.timeEnd('pure get i18n');
 
       console.time('origini18n');
       for (let i = 0; i < COUNT; i++) {
         if (originValid(conf)) {
-          let a = pureGet(conf);
+          pureGet(conf);
         }
       }
       console.timeEnd('origini18n');
@@ -114,14 +114,14 @@ const memoizei18nBtn = h(
       const valid = memoize(originValid);
       for (let i = 0; i < COUNT; i++) {
         if (valid(conf)) {
-          let a = pureGet(conf);
+          pureGet(conf);
         }
       }
       console.timeEnd('memoizei18n');
 
       console.time('current');
       for (let i = 0; i < COUNT; i++) {
-        let a = i18n.get(conf);
+        i18n.get(conf);
       }
       console.timeEnd('current');
     },

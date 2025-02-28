@@ -1,7 +1,6 @@
 import { dialog, useYuka, Yuka } from '@/yuka';
 import { isAudio, isVideo, loadAudioBuffer, play, audioBufferToWav } from '@/media-handler';
 import { audioPlayer, videoPlayer } from '../players';
-import progressBar from '../progress-bar';
 import { languageOptions } from './language-options';
 import style from './style.css?raw';
 
@@ -9,19 +8,12 @@ const { css, h } = useYuka();
 
 css(style);
 
-const { component: progressBarComponent, setProgress, setLabel } = progressBar();
-
-let download: Yuka<HTMLButtonElement>;
 let fileInput: Yuka<HTMLInputElement>;
 let fileLabel: Yuka<HTMLLabelElement>;
 
 let audioForm: Yuka<HTMLFormElement>;
 
 const comp = h('div', 'form-wrapper').append(
-  h('div', 'bar').append(
-    progressBarComponent,
-    (download = h('button', { disabled: 'true' }, { zh: '下载音频', en: 'Download' }))
-  ),
   (audioForm = h('form', {
     id: 'audio-form',
     method: 'POST',
@@ -119,24 +111,6 @@ const comp = h('div', 'form-wrapper').append(
 let isConvertingToAudioFile = false;
 let audioFile: File | null = null;
 
-download.on('click', () => {
-  console.log('audioFile', audioFile);
-  if (audioFile === null) {
-    console.log('还没有音频文件');
-    return;
-  }
-
-  const url: any = URL.createObjectURL(audioFile);
-  const link = document.createElement('a');
-  link.style.display = 'none';
-  link.href = url;
-  link.setAttribute('download', audioFile.name);
-  document.body.appendChild(link);
-  link.click();
-  URL.revokeObjectURL(url.href);
-  document.body.removeChild(link);
-});
-
 fileInput.on('change', () => {
   fileInput.disabled = true;
   const file = fileInput.files && fileInput.files[0];
@@ -167,15 +141,41 @@ fileInput.on('change', () => {
     videoPlayer.el.style.display = '';
     play(file, videoPlayer.el);
     isConvertingToAudioFile = true;
-    download.disabled = true;
-    setProgress(0.001);
-    setLabel({ zh: '正在提取音频', en: 'Extracting Audio' });
-    loadAudioBuffer(file)
-      .then((ab) => audioBufferToWav(ab, setProgress))
-      .then((file) => {
+
+    let percentage = 0;
+
+    const progress = dialog.progress(() => percentage, {
+      progressLabel: { zh: '提取音频中', en: 'Extracting audio' },
+    });
+
+    const loader = loadAudioBuffer(file).then((ab) =>
+      audioBufferToWav(ab, (p) => (percentage = p))
+    );
+
+    Promise.all([progress, loader])
+      .then(([, file]) => {
         audioFile = file;
         isConvertingToAudioFile = false;
-        download.disabled = false;
+        dialog
+          .confirm(
+            { zh: '下载音频吗？', en: 'Download audio?' },
+            {
+              yesText: { zh: '下载', en: 'Download' },
+              noText: { zh: '不需要，谢谢', en: 'No thanks' },
+            }
+          )
+          .then((yes) => {
+            if (yes) {
+              const link = document.createElement('a');
+              const url = URL.createObjectURL(file);
+              link.href = url;
+              link.download = file.name;
+              link.click();
+              // 释放 URL 对象，避免内存泄漏
+              URL.revokeObjectURL(url);
+              link.remove();
+            }
+          });
       })
       .finally(() => {
         fileInput.disabled = false;
@@ -230,6 +230,7 @@ audioForm.on('submit', (event) => {
 
   const url = new URL(form.action);
 
+  // 接口的参数都得写在param上，body只留一个file
   formData.forEach((v, k) => {
     if (typeof v === 'string') {
       url.searchParams.append(k, v);
@@ -246,16 +247,20 @@ audioForm.on('submit', (event) => {
   dialog
     .wait('', resp, {
       countDownText(timePast: number) {
+        const t = (timePast / 1000).toFixed(3);
         return {
-          zh: `处理中，请稍候...${timePast}`,
-          en: `Processing, please wait...${timePast}`,
+          zh: `处理中，请稍候...已经过${t}秒`,
+          en: `Processing, please wait...${t}s passed`,
         };
       },
     })
-    .then(() =>
+    .then((ms) =>
       dialog
         .alert(
-          { zh: '处理完成！', en: 'Request completed!' },
+          {
+            zh: `处理完成！耗时${ms / 1000}秒`,
+            en: `Request completed! Total time use: ${ms / 1000}s`,
+          },
           { yesText: { zh: '下载字幕', en: 'Download Subtitle' } }
         )
         .then(() => resp.then((text) => downloadSubtitle(formData, text)))

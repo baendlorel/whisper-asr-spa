@@ -7,17 +7,17 @@ dialog[yk-role='dialog']
   border-radius: 5px
   box-shadow: 1px 1px 5px 2px rgba(0, 0, 0, 0.2)
 
-  > div[yk-role='body']
+  div[yk-role='body']
     padding: 15px 12px
 
-  > div[yk-role='title']
+  div[yk-role='title']
     padding: 5px 12px
 
-  > div[yk-role='title']
+  div[yk-role='title']
     font-weight: bold
     font-size: 1.2em
 
-  > div[yk-role='footer']
+  div[yk-role='footer']
     padding: 5px 12px
     text-align: right
 
@@ -34,34 +34,40 @@ dialog[yk-role='dialog']
   &.show
     margin-top: 200px
 
-[bar-type='normal']
-  --bar-height: 16px
-
-[bar-type='lightspot']
-  --bar-height: 8px
-
 div[yk-role='progress-wrapper']
   display: grid
   width: 100%
   grid-template-columns: 1fr 60px
   grid-template-rows: 35px var(--bar-height)
 
-div[yk-role='progress-percentage']
-  text-align: right
+  &[bar-type='normal']
+    --bar-height: 16px
 
-div[yk-role='progress-background']
-  grid-column: 1/span 2
-  background-color: var(--yk-secondary-lighter)
-  border-radius: calc(var(--bar-height) / 2)
+  &[bar-type='lightspot']
+    --bar-height: 8px
 
-div[yk-role='progress-bar']
-  background-color: var(--yk-primary-light)
-  border-radius: calc(var(--bar-height) / 2)
-  width: 0%
-  height: 100%
-  transition-duration: 0.3s
+  div[yk-role='progress-percentage']
+    text-align: right
 
-  &[bar-type='normal']::after
+  div[yk-role='progress-background']
+    grid-column: 1/span 2
+    background-color: var(--yk-secondary-lighter)
+    border-radius: calc(var(--bar-height) / 2)
+
+  &[bar-type='normal'] div[yk-role='progress-background']
+    overflow: hidden
+
+  &[bar-type='lightspot'] div[yk-role='progress-background']
+    // 无样式
+
+  div[yk-role='progress-bar']
+    background-color: var(--yk-primary-light)
+    border-radius: calc(var(--bar-height) / 2)
+    width: 0%
+    height: 100%
+    transition-duration: 0.3s
+
+  &[bar-type='normal'] div[yk-role='progress-bar']::after
     content: ""
     float: right
     border-radius: calc(var(--bar-height) * 0.2)
@@ -71,7 +77,7 @@ div[yk-role='progress-bar']
     margin: calc(var(--bar-height) * 0.3)
     background-color: hsl(0deg 0% 100% / 86%)
 
-  &[bar-type='lightspot']::after
+  &[bar-type='lightspot'] div[yk-role='progress-bar']::after
     content: ""
     float: right
     border-radius: calc(var(--bar-height) / 2)

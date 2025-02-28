@@ -7,7 +7,7 @@ import { I18NConfig } from './types';
  * @param t string或I18NConfig
  * @returns 如果不是这两者，那么返回false
  */
-const getText = (t: string | I18NConfig): string | false => {
+export const getText = (t: string | I18NConfig): string | false => {
   if (typeof t === 'string') {
     return t;
   }

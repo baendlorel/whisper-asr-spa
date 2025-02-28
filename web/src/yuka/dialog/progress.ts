@@ -1,4 +1,4 @@
-import { dialog, i18n, I18NConfig } from '..';
+import { i18n, I18NConfig } from '..';
 import { createDialog, closeDialog, normalize } from './misc/common';
 import { BasicOption, ProgressOption, DialogController, DialogOption } from './misc/types';
 
@@ -19,8 +19,6 @@ const createProgress = (body: HTMLDivElement, options: DialogOption) => {
 
   // 预设的barType样式，进入此函数前已经设置过默认值了
   wrapper.setAttribute('bar-type', options.barType as string);
-  background.setAttribute('bar-type', options.barType as string);
-  bar.setAttribute('bar-type', options.barType as string);
 
   // 文字
   if (typeof options.progressLabel === 'string') {
