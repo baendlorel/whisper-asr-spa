@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "lines": "find ./src -type f \\( -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.js\" -o -name \"*.mjs\" -o -name \"*.cjs\" -o -name \"*.cpp\" -o -name \"*.h\" -o -name \"*.py\"  -o -name \"*.css\" -o -name \"*.rs\" -o -name \"*.rc\" \\) | xargs wc -l",
     "dev": "clear && export DEBUG=vite:proxy && vite",
     "build": "rm -rf ../app/html && tsc && vite build",
     "preview": "vite preview",
@@ -17,6 +18,7 @@
     "vite": "^6.1.0"
   },
   "dependencies": {
-    "axios": "^1.7.9"
+    "axios": "^1.7.9",
+    "kt.js": "^0.4.1"
   }
 }

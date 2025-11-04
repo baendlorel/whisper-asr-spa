@@ -1,12 +1,7 @@
-import { dialog, useYuka, Yuka } from '@/yuka';
 import { isAudio, isVideo, loadAudioBuffer, play, audioBufferToWav } from '@/media-handler';
 import { audioPlayer, videoPlayer } from '../players';
 import { languageOptions } from './language-options';
-import style from './style.css?raw';
-
-const { css, h } = useYuka();
-
-css(style);
+import { h } from 'kt.js';
 
 let fileInput: Yuka<HTMLInputElement>;
 let fileLabel: Yuka<HTMLLabelElement>;
@@ -74,11 +69,7 @@ const comp = h('div', 'form-wrapper').append(
           }
         ),
         h('select', { id: 'task', name: 'task' }).append(
-          h(
-            'option',
-            { value: 'transcribe', selected: true },
-            { zh: '转录为文本/字幕', en: 'transcribe' }
-          ),
+          h('option', { value: 'transcribe', selected: true }, { zh: '转录为文本/字幕', en: 'transcribe' }),
           h('option', { value: 'translate' }, { zh: '翻译（仅能译为英文）', en: 'translate' })
         )
       ),
@@ -148,9 +139,7 @@ fileInput.on('change', () => {
       progressLabel: { zh: '提取音频中', en: 'Extracting audio' },
     });
 
-    const loader = loadAudioBuffer(file).then((ab) =>
-      audioBufferToWav(ab, (p) => (percentage = p))
-    );
+    const loader = loadAudioBuffer(file).then((ab) => audioBufferToWav(ab, (p) => (percentage = p)));
 
     Promise.all([progress, loader])
       .then(([, file]) => {

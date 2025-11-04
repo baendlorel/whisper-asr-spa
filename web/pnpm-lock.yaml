@@ -11,6 +11,9 @@ importers:
       axios:
         specifier: ^1.7.9
         version: 1.7.9
+      kt.js:
+        specifier: ^0.4.1
+        version: 0.4.1
     devDependencies:
       '@types/node':
         specifier: ^22.13.1
@@ -490,6 +493,9 @@ packages:
 
   js-tokens@9.0.1:
     resolution: {integrity: sha512-mxa9E9ITFOt0ban3j6L5MpjwegGz6lBQmM1IJkWeBZGcMxto50+eWdjC/52xDbS2vy0k7vIMK0Fe2wfL9OQSpQ==}
+
+  kt.js@0.4.1:
+    resolution: {integrity: sha512-bzSPpFEV6NAZJ6rzWwoiTJGBoSYz5XLkMiKHBkYGcprfKPi/zIOf593Aihz0oOCpuyFNqKx3hI2Nc5ppFcxDlg==}
 
   local-pkg@0.5.1:
     resolution: {integrity: sha512-9rrA30MRRP3gBD3HTGnC6cDFpaE1kVDWxWgqWJUN0RvDNAo+Nz/9GxB+nHOH0ifbVFy0hSA1V6vFDvnx54lTEQ==}
@@ -1002,6 +1008,8 @@ snapshots:
   is-number@7.0.0: {}
 
   js-tokens@9.0.1: {}
+
+  kt.js@0.4.1: {}
 
   local-pkg@0.5.1:
     dependencies:

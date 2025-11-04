@@ -1,23 +1,8 @@
 import path from 'path';
 import { defineConfig } from 'vite';
-import AutoImport from 'unplugin-auto-import/vite';
 
 export default defineConfig({
-  plugins: [
-    AutoImport({
-      include: [
-        /\.[tj]sx?$/, // .ts, .tsx, .js, .jsx
-      ],
-      imports: [
-        {
-          './src/yuka': [
-            ['Yuka', 'Yuka'],
-            ['useYuka', 'useYuka'],
-          ],
-        },
-      ],
-    }),
-  ],
+  plugins: [],
   build: {
     outDir: '../app/html',
     assetsDir: 'src',
