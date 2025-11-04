@@ -1,15 +1,15 @@
-import { useYuka } from '@/yuka';
-import style from './style.css?raw';
+import { div } from 'kt.js';
+import { css } from '@emotion/css';
+import { bus } from '@/lib/bus';
 
-const { h, css, eventBus } = useYuka();
-
-css(style);
-
-const displayer = h('div', { class: 'displayer' });
-
-export default displayer;
-
-eventBus.on('display-result', (data: any) => {
-  console.log('display-result', data);
-  displayer.text = data.toString();
+export const displayer = div({
+  class: css`
+    display: none;
+    padding: 5px 10px;
+    border: 1px solid rgb(192, 192, 192);
+    border-radius: var(--border-radius);
+    background-color: 1px solid rgb(225, 225, 225);
+  `,
 });
+
+bus.on('display-result', (data: any) => (displayer.textContent = data.toString()));
