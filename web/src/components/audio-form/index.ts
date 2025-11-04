@@ -1,7 +1,49 @@
+import { btn, div, form, h, input, label, select } from 'kt.js';
 import { isAudio, isVideo, loadAudioBuffer, play, audioBufferToWav } from '@/media-handler';
 import { audioPlayer, videoPlayer } from '../players';
 import { languageOptions } from './language-options';
-import { h } from 'kt.js';
+
+export class AudioForm {
+  private readonly input: HTMLInputElement;
+  private readonly label: HTMLLabelElement;
+  private readonly form: HTMLFormElement;
+
+  constructor() {
+    this.form = form(
+      {
+        id: 'audio-form',
+        method: 'POST',
+        action: '/was/asr',
+        enctype: 'multipart/form-data',
+      },
+      [
+        div('basic-options-wrapper', [
+          label({ for: 'audio_file' }, 'Media'),
+          div('', [
+            btn({ id: 'file-selector', type: 'button', click: () => fileInput.el.click() }, 'Choose File'),
+            (this.label = label({ id: 'file-label', style: 'margin-left: 5px' })),
+            (this.input = input({
+              id: 'audio_file',
+              type: 'file',
+              name: 'audio_file',
+              style: 'display: none; width:0px; height:0px;',
+            })),
+          ]),
+          label({ for: 'output' }, 'Output'),
+          select({ id: 'output', name: 'output' }, [
+            h('option', { value: 'srt', selected: true }, 'srt'),
+            h('option', { value: 'text' }, 'text'),
+            h('option', { value: 'json' }, 'json'),
+            h('option', { value: 'vtt' }, 'vtt'),
+            h('option', { value: 'tsv' }, 'tsv'),
+          ]),
+        ]),
+        h('h4', undefined, 'We suggest not to change options below'),
+        div('advanced-options-wrapper', []),
+      ]
+    );
+  }
+}
 
 let fileInput: Yuka<HTMLInputElement>;
 let fileLabel: Yuka<HTMLLabelElement>;
@@ -9,12 +51,7 @@ let fileLabel: Yuka<HTMLLabelElement>;
 let audioForm: Yuka<HTMLFormElement>;
 
 const comp = h('div', 'form-wrapper').append(
-  (audioForm = h('form', {
-    id: 'audio-form',
-    method: 'POST',
-    action: '/was/asr',
-    enctype: 'multipart/form-data',
-  }).append(
+  (audioForm = h('form').append(
     h('div', 'basic-options-wrapper').append(
       h(
         'label',
