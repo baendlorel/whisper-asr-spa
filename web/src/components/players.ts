@@ -1,21 +1,20 @@
-import { useYuka, Yuka } from '@/yuka';
+import { div, h } from 'kt.js';
 
-const { h } = useYuka();
-
-let videoPlayer: Yuka<HTMLVideoElement>;
-let audioPlayer: Yuka<HTMLAudioElement>;
-
-export default h('div', { class: 'player-wrapper' }).append(
-  (videoPlayer = h('video', {
-    id: 'video-player',
-    controls: 'controls',
-    style: 'display: none; width:100%;',
-  })),
-  (audioPlayer = h('audio', {
-    id: 'audio-player',
-    controls: 'controls',
-    style: 'display: none; width:100%;',
-  }))
-);
-
-export { videoPlayer, audioPlayer };
+export class Player {
+  readonly el: HTMLDivElement;
+  readonly video: HTMLVideoElement;
+  readonly audio: HTMLAudioElement;
+  constructor() {
+    this.video = h('video', {
+      id: 'video-player',
+      controls: 'controls',
+      style: 'display: none; width:100%;',
+    });
+    this.audio = h('audio', {
+      id: 'audio-player',
+      controls: 'controls',
+      style: 'display: none; width:100%;',
+    });
+    this.el = div('player-container', [this.video, this.audio]);
+  }
+}

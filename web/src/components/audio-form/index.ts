@@ -1,11 +1,13 @@
 import { btn, div, form, h, input, label, select } from 'kt.js';
 import { isAudio, isVideo, loadAudioBuffer, play, audioBufferToWav } from '@/media-handler';
-import { audioPlayer, videoPlayer } from '../players';
+import { Player } from '../players';
 import { languageOptions } from './language-options';
 import { TimerDialog } from '../timer-dialog';
 import { ProgressBar } from '../progress-bar';
 
 export class AudioForm {
+  private readonly player = new Player();
+
   readonly el: HTMLFormElement;
   private readonly input: HTMLInputElement;
   private readonly label: HTMLLabelElement;
@@ -97,24 +99,23 @@ export class AudioForm {
       this.label.textContent = file.name;
 
       // 预览
-      audioPlayer.style.display = 'none';
-      videoPlayer.style.display = 'none';
-      audioPlayer.el.pause();
-      videoPlayer.el.pause();
+      this.player.audio.style.display = 'none';
+      this.player.video.style.display = 'none';
+      this.player.audio.pause();
+      this.player.video.pause();
 
       if (isAudio(file)) {
-        audioPlayer.el.style.display = '';
+        this.player.audio.style.display = '';
         this.audioFile = file;
-        play(file, audioPlayer.el);
+        play(file, this.player.audio);
         this.input.disabled = false;
       }
 
       if (isVideo(file)) {
-        videoPlayer.el.style.display = '';
-        play(file, videoPlayer.el);
+        this.player.video.style.display = '';
+        play(file, this.player.video);
         this.convertingToAudio = true;
 
-        // todo 制作进度条
         const progressBar = new ProgressBar();
         const timerDialog = new TimerDialog(progressBar);
         timerDialog.start();
