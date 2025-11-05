@@ -8,5 +8,6 @@ export default div('container', [
   h2('title', [img({ src: typescriptLogo, class: 'logo' }), span(undefined, 'Whisper ASR')]),
   displayer,
   audioForm.el,
+  audioForm.mediaInfoDiv,
   audioForm.player.el,
 ]);

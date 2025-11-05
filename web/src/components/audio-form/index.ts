@@ -9,13 +9,53 @@ export class AudioForm {
   readonly player = new Player();
 
   readonly el: HTMLFormElement;
+  readonly mediaInfoDiv: HTMLDivElement;
   private readonly input: HTMLInputElement;
-  private readonly label: HTMLLabelElement;
+  private readonly advancedOptionsToggle: HTMLButtonElement;
+  private readonly advancedOptionsWrapper: HTMLDivElement;
 
   private convertingToAudio: boolean = false;
   private audioFile: File | null = null;
 
   constructor() {
+    // Create media info display
+    this.mediaInfoDiv = div({ class: 'media-info', style: 'display: none;' });
+
+    // Create advanced options wrapper with collapse functionality
+    this.advancedOptionsWrapper = div({ class: 'options-wrapper advanced-options', style: 'display: none;' }, [
+      div('form-entry', [
+        label({ for: 'task' }, 'Task'),
+        select({ id: 'task', name: 'task' }, [
+          h('option', { value: 'transcribe', selected: true }, 'transcribe'),
+          h('option', { value: 'translate' }, 'translate to English'),
+        ]),
+      ]),
+      div('form-entry', [
+        label({ for: 'language' }, 'Language'),
+        select({ id: 'language', name: 'language' }, [
+          h('option', { value: '', selected: true }, 'auto detect'),
+          ...languageOptions.map((o) => h('option', { value: o.value }, o.label)),
+        ]),
+      ]),
+      div('form-entry-single', [
+        input({ type: 'checkbox', id: 'encode', name: 'Encode', checked: true }),
+        label({ for: 'encode' }, 'Encode'),
+      ]),
+      div('form-entry-single', [
+        input({ type: 'checkbox', id: 'word_timestamps', name: 'word_timestamps', checked: false }),
+        label({ for: 'word_timestamps' }, 'Word Timestamps'),
+      ]),
+    ]);
+
+    // Create toggle button for advanced options
+    this.advancedOptionsToggle = btn(
+      {
+        type: 'button',
+        class: 'advanced-toggle',
+      },
+      '▼ Advanced Options'
+    );
+
     this.el = form(
       {
         id: 'audio-form',
@@ -29,7 +69,6 @@ export class AudioForm {
             label({ for: 'audio_file' }, 'Media'),
             div('', [
               btn({ id: 'file-selector', type: 'button', click: () => this.input.click() }, 'Choose File'),
-              (this.label = label({ id: 'file-label', style: 'margin-left: 5px' })),
               (this.input = input({
                 id: 'audio_file',
                 type: 'file',
@@ -49,32 +88,8 @@ export class AudioForm {
             ]),
           ]),
         ]),
-        h('h4', undefined, 'Advanced Options'),
-
-        div('options-wrapper', [
-          div('form-entry', [
-            label({ for: 'task' }, 'Task'),
-            select({ id: 'task', name: 'task' }, [
-              h('option', { value: 'transcribe', selected: true }, 'transcribe'),
-              h('option', { value: 'translate' }, 'translate to English'),
-            ]),
-          ]),
-          div('form-entry', [
-            label({ for: 'language' }, 'Language'),
-            select({ id: 'language', name: 'language' }, [
-              h('option', { value: '', selected: true }, 'auto detect'),
-              ...languageOptions.map((o) => h('option', { value: o.value }, o.label)),
-            ]),
-          ]),
-          div('form-entry-single', [
-            input({ type: 'checkbox', id: 'encode', name: 'Encode', checked: true }),
-            label({ for: 'encode' }, 'Encode'),
-          ]),
-          div('form-entry-single', [
-            input({ type: 'checkbox', id: 'word_timestamps', name: 'word_timestamps', checked: false }),
-            label({ for: 'word_timestamps' }, 'Word Timestamps'),
-          ]),
-        ]),
+        this.advancedOptionsToggle,
+        this.advancedOptionsWrapper,
 
         btn({ class: 'execute', type: 'submit' }, 'Submit'),
       ]
@@ -83,7 +98,28 @@ export class AudioForm {
     this.registerEvents();
   }
 
+  private toggleAdvancedOptions() {
+    const isHidden = this.advancedOptionsWrapper.style.display === 'none';
+    this.advancedOptionsWrapper.style.display = isHidden ? 'grid' : 'none';
+    this.advancedOptionsToggle.textContent = isHidden ? '▲ Advanced Options' : '▼ Advanced Options';
+  }
+
+  private updateMediaInfo(file: File) {
+    const sizeInMB = (file.size / 1024).toFixed(2);
+    const fileType = file.type || 'unknown';
+
+    this.mediaInfoDiv.innerHTML = `
+      <div class="info-item"><span class="info-label">File:</span> <span class="info-value">${file.name}</span></div>
+      <div class="info-item"><span class="info-label">Size:</span> <span class="info-value">${sizeInMB} KB</span></div>
+      <div class="info-item"><span class="info-label">Type:</span> <span class="info-value">${fileType}</span></div>
+    `;
+    this.mediaInfoDiv.style.display = 'block';
+  }
+
   private registerEvents() {
+    // Toggle button event
+    this.advancedOptionsToggle.addEventListener('click', () => this.toggleAdvancedOptions());
+
     this.input.addEventListener('change', async () => {
       this.input.disabled = true;
       const file = this.input.files && this.input.files[0];
@@ -94,7 +130,8 @@ export class AudioForm {
         return;
       }
 
-      this.label.textContent = file.name;
+      // Update media info display
+      this.updateMediaInfo(file);
 
       // 预览
       this.player.audio.style.display = 'none';
@@ -115,23 +152,36 @@ export class AudioForm {
         this.convertingToAudio = true;
 
         const progressBar = new ProgressBar();
+        progressBar.setLabel('Converting');
         const timerDialog = new TimerDialog(progressBar);
         timerDialog.start();
 
-        const loader = loadAudioBuffer(file).then((ab) => audioBufferToWav(ab, (p) => progressBar.set(p)));
-        const wav = await loader.finally(() => (this.input.disabled = false));
-        this.audioFile = wav;
-        this.convertingToAudio = false;
-        const yes = confirm('Download audio?');
-        if (yes) {
-          const link = document.createElement('a');
-          const url = URL.createObjectURL(wav);
-          link.href = url;
-          link.download = wav.name;
-          link.click();
-          // 释放 URL 对象，避免内存泄漏
-          URL.revokeObjectURL(url);
-          link.remove();
+        try {
+          const loader = loadAudioBuffer(file).then((ab) => audioBufferToWav(ab, (p) => progressBar.set(p)));
+          const wav = await loader;
+          this.audioFile = wav;
+          this.convertingToAudio = false;
+
+          // Auto stop when done (will also be triggered by progress reaching 100%)
+          timerDialog.stop();
+
+          const yes = confirm('Download audio?');
+          if (yes) {
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(wav);
+            link.href = url;
+            link.download = wav.name;
+            link.click();
+            // 释放 URL 对象，避免内存泄漏
+            URL.revokeObjectURL(url);
+            link.remove();
+          }
+        } catch (error) {
+          console.error('Error converting video to audio:', error);
+          alert('Failed to convert video to audio');
+          timerDialog.stop();
+        } finally {
+          this.input.disabled = false;
         }
       }
     });

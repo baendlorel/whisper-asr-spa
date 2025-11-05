@@ -10,7 +10,7 @@ export class ProgressBar {
   private _value: number = 0;
 
   constructor() {
-    this.label = span({ style: { paddingRight: '5px' } });
+    this.label = span({ style: 'padding-right:5px' });
     this.percent = span();
     this.bar = div('progress-bar', [this.label, this.percent]);
     this.el = div({ class: 'progress-wrapper' }, this.bar);
