@@ -6,7 +6,7 @@ import { TimerDialog } from '../timer-dialog';
 import { ProgressBar } from '../progress-bar';
 
 export class AudioForm {
-  private readonly player = new Player();
+  readonly player = new Player();
 
   readonly el: HTMLFormElement;
   private readonly input: HTMLInputElement;
