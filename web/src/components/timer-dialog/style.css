@@ -1,0 +1,42 @@
+.timer-dialog {
+  border: none;
+  padding: 30px 50px;
+  border-radius: 12px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 18px;
+  font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  min-width: 400px;
+}
+
+/* Remove default backdrop */
+.timer-dialog::backdrop {
+  background-color: transparent;
+}
+
+/* Opening animation */
+.timer-dialog.dialog-open {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Closing animation */
+.timer-dialog.dialog-close {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.timer-content {
+  text-align: center;
+  white-space: nowrap;
+  margin-bottom: 0;
+}
+
+.timer-progress-wrapper {
+  margin-top: 20px;
+  width: 100%;
+}

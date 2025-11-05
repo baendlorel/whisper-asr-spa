@@ -2,6 +2,7 @@ import { btn, div, form, h, input, label, select } from 'kt.js';
 import { isAudio, isVideo, loadAudioBuffer, play, audioBufferToWav } from '@/media-handler';
 import { audioPlayer, videoPlayer } from '../players';
 import { languageOptions } from './language-options';
+import { TimerDialog } from '../timer-dialog';
 
 export class AudioForm {
   private readonly input: HTMLInputElement;
@@ -113,6 +114,8 @@ export class AudioForm {
         let percentage = 0;
 
         // todo 制作进度条
+        const timerDialog = new TimerDialog();
+        timerDialog.start();
         const progress = dialog.progress(() => percentage, {
           progressLabel: { zh: '提取音频中', en: 'Extracting audio' },
         });

@@ -6,6 +6,8 @@ export class ProgressBar {
   private readonly label: HTMLSpanElement;
   private readonly percent: HTMLSpanElement;
 
+  private _value: number = 0;
+
   constructor() {
     this.label = span({ style: { paddingRight: '5px' } });
     this.percent = span();
@@ -17,6 +19,11 @@ export class ProgressBar {
     const p = (percent * 100).toFixed(2) + '%';
     this.bar.style.width = p;
     this.percent.textContent = p;
+    this._value = percent;
+  }
+
+  get value() {
+    return this._value;
   }
 
   setLabel(text: string) {
