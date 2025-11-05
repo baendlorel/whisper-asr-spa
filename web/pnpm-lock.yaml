@@ -15,8 +15,8 @@ importers:
         specifier: ^1.7.9
         version: 1.7.9
       kt.js:
-        specifier: ^0.4.1
-        version: 0.4.1
+        specifier: ^0.4.2
+        version: 0.4.2
       minimal-event-bus:
         specifier: ^1.0.0
         version: 1.0.0
@@ -654,8 +654,8 @@ packages:
   json-parse-even-better-errors@2.3.1:
     resolution: {integrity: sha512-xyFwyhro/JEof6Ghe2iz2NcXoj2sloNsWr/XsERDK/oiPCfaNhl5ONfp+jQdAZRQQ0IJWNzH9zIZF7li91kh2w==}
 
-  kt.js@0.4.1:
-    resolution: {integrity: sha512-bzSPpFEV6NAZJ6rzWwoiTJGBoSYz5XLkMiKHBkYGcprfKPi/zIOf593Aihz0oOCpuyFNqKx3hI2Nc5ppFcxDlg==}
+  kt.js@0.4.2:
+    resolution: {integrity: sha512-8Lelri+fHi2gk5Js+xwA9j9Iifzop5Gc86CH/s3wav7a10X1g8AEkjp+57C7qGalheIVcIao9zhk/xrlXZlYhQ==}
 
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
@@ -1396,7 +1396,7 @@ snapshots:
 
   json-parse-even-better-errors@2.3.1: {}
 
-  kt.js@0.4.1: {}
+  kt.js@0.4.2: {}
 
   lines-and-columns@1.2.4: {}
 

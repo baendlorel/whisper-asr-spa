@@ -20,7 +20,7 @@
   "dependencies": {
     "@emotion/css": "^11.13.5",
     "axios": "^1.7.9",
-    "kt.js": "^0.4.1",
+    "kt.js": "^0.4.2",
     "minimal-event-bus": "^1.0.0"
   }
 }

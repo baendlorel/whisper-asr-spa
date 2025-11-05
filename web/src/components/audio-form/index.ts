@@ -9,7 +9,6 @@ export class AudioForm {
   readonly player = new Player();
 
   readonly el: HTMLFormElement;
-  readonly mediaInfoDiv: HTMLDivElement;
   private readonly input: HTMLInputElement;
   private readonly advancedOptionsToggle: HTMLButtonElement;
   private readonly advancedOptionsWrapper: HTMLDivElement;
@@ -18,9 +17,6 @@ export class AudioForm {
   private audioFile: File | null = null;
 
   constructor() {
-    // Create media info display
-    this.mediaInfoDiv = div({ class: 'media-info', style: 'display: none;' });
-
     // Create advanced options wrapper with collapse functionality
     this.advancedOptionsWrapper = div({ class: 'options-wrapper advanced-options', style: 'display: none;' }, [
       div('form-entry', [
@@ -105,15 +101,11 @@ export class AudioForm {
   }
 
   private updateMediaInfo(file: File) {
-    const sizeInMB = (file.size / 1024).toFixed(2);
-    const fileType = file.type || 'unknown';
-
-    this.mediaInfoDiv.innerHTML = `
-      <div class="info-item"><span class="info-label">File:</span> <span class="info-value">${file.name}</span></div>
-      <div class="info-item"><span class="info-label">Size:</span> <span class="info-value">${sizeInMB} KB</span></div>
-      <div class="info-item"><span class="info-label">Type:</span> <span class="info-value">${fileType}</span></div>
-    `;
-    this.mediaInfoDiv.style.display = 'block';
+    this.player.setMediaInfo({
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type || 'unknown',
+    });
   }
 
   private registerEvents() {
