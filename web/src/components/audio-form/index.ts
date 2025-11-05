@@ -49,7 +49,7 @@ export class AudioForm {
             ]),
           ]),
         ]),
-        h('h4', undefined, 'We suggest not to change options below'),
+        h('h4', undefined, 'Advanced Options'),
 
         div('options-wrapper', [
           div('form-entry', [

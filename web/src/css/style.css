@@ -15,11 +15,15 @@ body {
 .container {
   margin: 0px auto;
   max-width: 720px;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 8px rgba(0, 122, 204, 0.1);
 }
 
 .options-wrapper {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: 1fr 1fr;
   column-gap: 10px;
 }
 

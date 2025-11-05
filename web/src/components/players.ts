@@ -8,12 +8,12 @@ export class Player {
     this.video = h('video', {
       id: 'video-player',
       controls: 'controls',
-      style: 'display: none; width:100%;',
+      style: 'display: none; width:100%; margin-top:15px',
     });
     this.audio = h('audio', {
       id: 'audio-player',
       controls: 'controls',
-      style: 'display: none; width:100%;',
+      style: 'display: none; width:100%; margin-top:15px',
     });
     this.el = div('player-container', [this.video, this.audio]);
   }
