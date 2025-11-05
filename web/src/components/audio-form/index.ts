@@ -24,57 +24,55 @@ export class AudioForm {
         enctype: 'multipart/form-data',
       },
       [
-        div('basic-options-wrapper', [
-          label({ for: 'audio_file' }, 'Media'),
-          div('', [
-            btn({ id: 'file-selector', type: 'button', click: () => this.input.click() }, 'Choose File'),
-            (this.label = label({ id: 'file-label', style: 'margin-left: 5px' })),
-            (this.input = input({
-              id: 'audio_file',
-              type: 'file',
-              name: 'audio_file',
-              style: 'display: none; width:0px; height:0px;',
-            })),
+        div('options-wrapper', [
+          div('form-entry', [
+            label({ for: 'audio_file' }, 'Media'),
+            div('', [
+              btn({ id: 'file-selector', type: 'button', click: () => this.input.click() }, 'Choose File'),
+              (this.label = label({ id: 'file-label', style: 'margin-left: 5px' })),
+              (this.input = input({
+                id: 'audio_file',
+                type: 'file',
+                name: 'audio_file',
+                style: 'display: none; width:0px; height:0px;',
+              })),
+            ]),
           ]),
-          label({ for: 'output' }, 'Output'),
-          select({ id: 'output', name: 'output' }, [
-            h('option', { value: 'srt', selected: true }, 'srt'),
-            h('option', { value: 'text' }, 'text'),
-            h('option', { value: 'json' }, 'json'),
-            h('option', { value: 'vtt' }, 'vtt'),
-            h('option', { value: 'tsv' }, 'tsv'),
+          div('form-entry', [
+            label({ for: 'output' }, 'Output'),
+            select({ id: 'output', name: 'output' }, [
+              h('option', { value: 'srt', selected: true }, 'srt'),
+              h('option', { value: 'text' }, 'text'),
+              h('option', { value: 'json' }, 'json'),
+              h('option', { value: 'vtt' }, 'vtt'),
+              h('option', { value: 'tsv' }, 'tsv'),
+            ]),
           ]),
         ]),
         h('h4', undefined, 'We suggest not to change options below'),
 
-        div('advanced-options-wrapper', [
-          div('col-half', [
+        div('options-wrapper', [
+          div('form-entry', [
             label({ for: 'task' }, 'Task'),
             select({ id: 'task', name: 'task' }, [
               h('option', { value: 'transcribe', selected: true }, 'transcribe'),
               h('option', { value: 'translate' }, 'translate to English'),
             ]),
           ]),
-          div('col-half', [
+          div('form-entry', [
             label({ for: 'language' }, 'Language'),
             select({ id: 'language', name: 'language' }, [
               h('option', { value: '', selected: true }, 'auto detect'),
               ...languageOptions.map((o) => h('option', { value: o.value }, o.label)),
             ]),
           ]),
-          div('col-half', [
+          div('form-entry-single', [
+            input({ type: 'checkbox', id: 'encode', name: 'Encode', checked: true }),
             label({ for: 'encode' }, 'Encode'),
-            select({ id: 'encode', name: 'encode' }, [
-              h('option', { value: 'true', selected: true }, 'true'),
-              h('option', { value: 'false' }, 'false'),
-            ]),
           ]),
-          div('col-half', [
+          div('form-entry-single', [
+            input({ type: 'checkbox', id: 'word_timestamps', name: 'word_timestamps', checked: false }),
             label({ for: 'word_timestamps' }, 'Word Timestamps'),
-            select({ id: 'word_timestamps', name: 'word_timestamps' }, [
-              h('option', { value: 'true' }, 'true'),
-              h('option', { value: 'false', selected: true }, 'false'),
-            ]),
           ]),
         ]),
 

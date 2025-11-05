@@ -99,4 +99,4 @@ export const languageOptions = [
   { value: 'jw', label: 'javanese' },
   { value: 'su', label: 'sundanese' },
   { value: 'yue', label: 'cantonese' },
-];
+].sort((a, b) => a.label.localeCompare(b.label));

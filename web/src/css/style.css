@@ -16,3 +16,23 @@ body {
   margin: 0px auto;
   max-width: 720px;
 }
+
+.options-wrapper {
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 10px;
+}
+
+.form-entry {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  column-gap: 10px;
+  margin: 10px 0px;
+}
+
+.form-entry-single {
+  display: flex;
+  margin: 10px 0px;
+  gap: 10px;
+  align-items: center;
+}

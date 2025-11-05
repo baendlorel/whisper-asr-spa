@@ -1,5 +1,6 @@
 import { div } from 'kt.js';
 import { ProgressBar } from '../progress-bar';
+import './style.css';
 
 export class TimerDialog {
   readonly el: HTMLDialogElement;

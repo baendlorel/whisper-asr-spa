@@ -1,0 +1,309 @@
+/* Form Theme Styles - Primary Color: #007acc */
+
+/* Form Container */
+form {
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 8px rgba(0, 122, 204, 0.1);
+}
+
+/* Labels */
+label {
+  font-weight: 500;
+  color: #333;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+/* Input Fields */
+input[type='text'],
+input[type='file'],
+input[type='email'],
+input[type='password'],
+input[type='number'],
+input[type='tel'],
+input[type='url'] {
+  padding: 8px 12px;
+  border: 2px solid #d0d0d0;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background-color: white;
+}
+
+input[type='text']:focus,
+input[type='file']:focus,
+input[type='email']:focus,
+input[type='password']:focus,
+input[type='number']:focus,
+input[type='tel']:focus,
+input[type='url']:focus {
+  outline: none;
+  border-color: #007acc;
+  box-shadow: 0 0 0 3px rgba(0, 122, 204, 0.1);
+}
+
+input[type='text']:hover,
+input[type='email']:hover,
+input[type='password']:hover,
+input[type='number']:hover,
+input[type='tel']:hover,
+input[type='url']:hover {
+  border-color: #007acc;
+}
+
+/* Select Dropdowns */
+select {
+  padding: 8px 12px;
+  border: 2px solid #d0d0d0;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23007acc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+  padding-right: 32px;
+}
+
+select:focus {
+  outline: none;
+  border-color: #007acc;
+  box-shadow: 0 0 0 3px rgba(0, 122, 204, 0.1);
+}
+
+select:hover {
+  border-color: #007acc;
+}
+
+select option {
+  padding: 8px;
+}
+
+/* Buttons */
+button,
+input[type='submit'],
+input[type='button'] {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #007acc;
+  color: white;
+}
+
+button:hover,
+input[type='submit']:hover,
+input[type='button']:hover {
+  background-color: #005a9e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 122, 204, 0.3);
+}
+
+button:active,
+input[type='submit']:active,
+input[type='button']:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 122, 204, 0.2);
+}
+
+button:disabled,
+input[type='submit']:disabled,
+input[type='button']:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Secondary Button Style */
+button.secondary {
+  background-color: white;
+  color: #007acc;
+  border: 2px solid #007acc;
+}
+
+button.secondary:hover {
+  background-color: #007acc;
+  color: white;
+}
+
+/* File Input Custom Style */
+#file-selector {
+  background-color: white;
+  color: #007acc;
+  border: 2px solid #007acc;
+  padding: 8px 16px;
+}
+
+#file-selector:hover {
+  background-color: #007acc;
+  color: white;
+}
+
+#file-label {
+  color: #666;
+  font-size: 14px;
+}
+
+/* Execute/Submit Button */
+.execute {
+  padding: 12px 32px;
+  font-size: 16px;
+  background: linear-gradient(135deg, #007acc 0%, #005a9e 100%);
+  box-shadow: 0 4px 12px rgba(0, 122, 204, 0.2);
+  display: block;
+}
+
+.execute:hover {
+  box-shadow: 0 6px 16px rgba(0, 122, 204, 0.4);
+  background: linear-gradient(135deg, #005a9e 0%, #004578 100%);
+}
+
+/* Form Sections */
+h4 {
+  color: #007acc;
+  font-size: 16px;
+  margin: 20px 0 15px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #007acc;
+}
+
+/* Focus Visible for Accessibility */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #007acc;
+  outline-offset: 2px;
+}
+
+/* Textarea */
+textarea {
+  padding: 8px 12px;
+  border: 2px solid #d0d0d0;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background-color: white;
+  resize: vertical;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #007acc;
+  box-shadow: 0 0 0 3px rgba(0, 122, 204, 0.1);
+}
+
+textarea:hover {
+  border-color: #007acc;
+}
+
+/* Checkbox and Radio */
+input[type='checkbox'],
+input[type='radio'] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #007acc;
+}
+
+input[type='checkbox']:focus,
+input[type='radio']:focus {
+  outline: 2px solid #007acc;
+  outline-offset: 2px;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  margin-bottom: 6px;
+}
+
+/* Input with Icons */
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon input {
+  padding-left: 36px;
+}
+
+.input-with-icon .icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #007acc;
+}
+
+/* Error State */
+input.error,
+select.error,
+textarea.error {
+  border-color: #d32f2f;
+}
+
+input.error:focus,
+select.error:focus,
+textarea.error:focus {
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Success State */
+input.success,
+select.success,
+textarea.success {
+  border-color: #388e3c;
+}
+
+input.success:focus,
+select.success:focus,
+textarea.success:focus {
+  box-shadow: 0 0 0 3px rgba(56, 142, 60, 0.1);
+}
+
+/* Loading State */
+button.loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+
+button.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+  border: 2px solid white;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spinner 0.6s linear infinite;
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}

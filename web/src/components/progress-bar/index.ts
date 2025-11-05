@@ -1,4 +1,5 @@
 import { div, span } from 'kt.js';
+import './style.css';
 
 export class ProgressBar {
   readonly el: HTMLDivElement;
