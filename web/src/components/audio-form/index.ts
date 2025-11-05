@@ -3,17 +3,18 @@ import { isAudio, isVideo, loadAudioBuffer, play, audioBufferToWav } from '@/med
 import { audioPlayer, videoPlayer } from '../players';
 import { languageOptions } from './language-options';
 import { TimerDialog } from '../timer-dialog';
+import { ProgressBar } from '../progress-bar';
 
 export class AudioForm {
+  readonly el: HTMLFormElement;
   private readonly input: HTMLInputElement;
   private readonly label: HTMLLabelElement;
-  private readonly form: HTMLFormElement;
 
   private convertingToAudio: boolean = false;
   private audioFile: File | null = null;
 
   constructor() {
-    this.form = form(
+    this.el = form(
       {
         id: 'audio-form',
         method: 'POST',
@@ -78,9 +79,11 @@ export class AudioForm {
         btn({ class: 'execute', type: 'submit' }, 'Submit'),
       ]
     );
+
+    this.registerEvents();
   }
 
-  registerEvents() {
+  private registerEvents() {
     this.input.addEventListener('change', async () => {
       this.input.disabled = true;
       const file = this.input.files && this.input.files[0];
@@ -111,20 +114,13 @@ export class AudioForm {
         play(file, videoPlayer.el);
         this.convertingToAudio = true;
 
-        let percentage = 0;
-
         // todo 制作进度条
-        const timerDialog = new TimerDialog();
+        const progressBar = new ProgressBar();
+        const timerDialog = new TimerDialog(progressBar);
         timerDialog.start();
-        const progress = dialog.progress(() => percentage, {
-          progressLabel: { zh: '提取音频中', en: 'Extracting audio' },
-        });
 
-        const loader = loadAudioBuffer(file).then((ab) => audioBufferToWav(ab, (p) => (percentage = p)));
-
-        const [, wav] = await Promise.all([progress, loader]).finally(() => {
-          this.input.disabled = false;
-        });
+        const loader = loadAudioBuffer(file).then((ab) => audioBufferToWav(ab, (p) => progressBar.set(p)));
+        const wav = await loader.finally(() => (this.input.disabled = false));
         this.audioFile = wav;
         this.convertingToAudio = false;
         const yes = confirm('Download audio?');
@@ -141,7 +137,7 @@ export class AudioForm {
       }
     });
 
-    this.form.addEventListener('submit', async (event) => {
+    this.el.addEventListener('submit', async (event) => {
       event.preventDefault();
 
       if (!isAudio(this.audioFile)) {
@@ -154,9 +150,9 @@ export class AudioForm {
         return;
       }
 
-      const formData = new FormData(this.form);
+      const formData = new FormData(this.el);
       formData.set('audio_file', this.audioFile as Blob);
-      const url = new URL(this.form.action);
+      const url = new URL(this.el.action);
       formData.forEach((v, k) => {
         if (typeof v === 'string') {
           url.searchParams.append(k, v);
@@ -165,7 +161,7 @@ export class AudioForm {
 
       // todo 这里还缺少等待进度条
       const resp = await fetch(url, {
-        method: this.form.method,
+        method: this.el.method,
         body: formData,
       })
         .then((response) => response.text())

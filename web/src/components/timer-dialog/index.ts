@@ -8,6 +8,9 @@ export class TimerDialog {
   private seconds: number = 0;
   private timerId: number | null = null;
 
+  private resolve: () => void;
+  readonly awaited: Promise<void>;
+
   constructor(progressBar?: ProgressBar) {
     this.progressBar = progressBar;
     this.content = div({ class: 'timer-content' });
@@ -33,6 +36,10 @@ export class TimerDialog {
     });
 
     document.body.appendChild(this.el);
+
+    // promise
+    this.resolve = () => {};
+    this.awaited = new Promise((resolve) => (this.resolve = resolve));
   }
 
   start() {
@@ -40,17 +47,12 @@ export class TimerDialog {
     this.updateContent();
     this.el.showModal();
 
-    // Add opening animation class
-    requestAnimationFrame(() => {
-      this.el.classList.add('dialog-open');
-    });
+    requestAnimationFrame(() => this.el.classList.add('dialog-open'));
 
-    // Start timer
     this.timerId = window.setInterval(() => {
       this.seconds++;
       this.updateContent();
 
-      // Check if progress is complete
       if (this.progressBar && this.progressBar.value >= 1) {
         this.stop();
       }
@@ -73,6 +75,7 @@ export class TimerDialog {
       this.el.close();
       this.el.classList.remove('dialog-close');
       this.destroy();
+      this.resolve();
     }, 300); // Match CSS animation duration
   }
 
