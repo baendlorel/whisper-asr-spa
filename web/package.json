@@ -5,13 +5,16 @@
   "type": "module",
   "scripts": {
     "lines": "find ./src -type f \\( -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.js\" -o -name \"*.mjs\" -o -name \"*.cjs\" -o -name \"*.cpp\" -o -name \"*.h\" -o -name \"*.py\"  -o -name \"*.css\" -o -name \"*.rs\" -o -name \"*.rc\" \\) | xargs wc -l",
-    "dev": "clear && export DEBUG=vite:proxy && vite",
+    "dev:server": "PYTHONPATH=.. uvicorn app.webservice:app --reload --host 0.0.0.0 --port 9000",
+    "dev:web": "export DEBUG=vite:proxy && vite",
+    "dev": "run-p dev:*",
     "build": "rm -rf ../app/html && tsc && vite build",
     "preview": "vite preview",
     "mock": "clear && node ./public/mock-server.js"
   },
   "devDependencies": {
     "@types/node": "^22.13.1",
+    "npm-run-all2": "^8.0.4",
     "sass": "^1.85.0",
     "typescript": "~5.6.2",
     "unplugin-auto-import": "^19.0.0",
@@ -20,7 +23,7 @@
   "dependencies": {
     "@emotion/css": "^11.13.5",
     "axios": "^1.7.9",
-    "kt.js": "^0.4.2",
+    "kt.js": "^0.5.0",
     "minimal-event-bus": "^1.0.0"
   }
 }
